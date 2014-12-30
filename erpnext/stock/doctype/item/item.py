@@ -279,7 +279,7 @@ class Item(WebsiteGenerator):
 					row.description = desc
 
 	def get_size_details(self):
-		if self.get("__islocal"):
+		if self.get("__islocal") and self.item_group == 'Tailoring':
 			size_details= frappe.db.sql("""select name from `tabSize`""",as_list=1)
 			width_details= frappe.db.sql("""select name from `tabWidth`""",as_list=1)
 			self.set('size_item', [])
