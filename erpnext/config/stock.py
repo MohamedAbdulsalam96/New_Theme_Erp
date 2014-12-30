@@ -28,11 +28,6 @@ def get_data():
 				},
 				{
 					"type": "doctype",
-					"name": "Installation Note",
-					"description": _("Installation record for a Serial No.")
-				},
-				{
-					"type": "doctype",
 					"name": "Item",
 					"description": _("All Products or Services."),
 				},
@@ -61,6 +56,11 @@ def get_data():
 					"type": "doctype",
 					"name": "Stock Reconciliation",
 					"description": _("Upload stock balance via csv.")
+				},
+				{
+					"type": "doctype",
+					"name": "Installation Note",
+					"description": _("Installation record for a Serial No.")
 				},
 				{
 					"type": "doctype",
@@ -142,10 +142,10 @@ def get_data():
 					"doctype": "Item",
 				},
 				{
-					"type": "report",
-					"is_query_report": True,
-					"name": "Stock Balance",
-					"doctype": "Warehouse"
+					"type": "page",
+					"name": "stock-balance",
+					"label": _("Stock Balance"),
+					"icon": "icon-table",
 				},
 				{
 					"type": "report",
@@ -170,7 +170,7 @@ def get_data():
 					"name": "stock-analytics",
 					"label": _("Stock Analytics"),
 					"icon": "icon-bar-chart"
-				}
+				},
 			]
 		},
 		{
@@ -221,6 +221,12 @@ def get_data():
 					"is_query_report": True,
 					"name": "Batch-Wise Balance History",
 					"doctype": "Batch"
+				},
+				{
+					"type": "report",
+					"is_query_report": True,
+					"name": "Warehouse-Wise Stock Balance",
+					"doctype": "Warehouse"
 				},
 				{
 					"type": "report",

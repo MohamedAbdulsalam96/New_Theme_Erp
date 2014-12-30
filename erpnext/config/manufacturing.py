@@ -6,27 +6,48 @@ def get_data():
 			"label": _("Documents"),
 			"icon": "icon-star",
 			"items": [
+				# {
+				# 	"type": "doctype",
+				# 	"name": "BOM",
+				# 	"description": _("Bill of Materials (BOM)"),
+				# 	"label": _("Bill of Material")
+				# },
+				# {
+				# 	"type": "doctype",
+				# 	"name": "Production Order",
+				# 	"description": _("Orders released for production."),
+				# },
+				# {
+				# 	"type": "doctype",
+				# 	"name": "Item",
+				# 	"description": _("All Products or Services."),
+				# },
+				# {
+				# 	"type": "doctype",
+				# 	"name": "Workstation",
+				# 	"description": _("Where manufacturing operations are carried out."),
+				# },
 				{
 					"type": "doctype",
-					"name": "BOM",
-					"description": _("Bill of Materials (BOM)"),
-					"label": _("Bill of Material")
+					"name": "Process Allotment",
+					"description": _("Cut Order"),
 				},
 				{
 					"type": "doctype",
-					"name": "Production Order",
-					"description": _("Orders released for production."),
+					"name": "Cut Order",
+					"description": _("Cut Order"),
 				},
 				{
 					"type": "doctype",
-					"name": "Item",
-					"description": _("All Products or Services."),
+					"name": "Work Order",
+					"description": _("Work Order"),
 				},
 				{
 					"type": "doctype",
-					"name": "Workstation",
-					"description": _("Where manufacturing operations are carried out."),
+					"name": "Stock Entry",
+					"description": _("Stock Entry"),
 				},
+
 
 			]
 		},
