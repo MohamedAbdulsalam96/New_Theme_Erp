@@ -24,7 +24,8 @@ def welcome_notification():
 				send_mail(customer_data.email_id, data, notification.subject)
 			if notification.sms_template and customer_data:
 				send_sms([customer_data.phone],data)
-			update_status(d.name, 'Welcome')
+			if customer_data and notification:
+				update_status(d.name, 'Welcome')
 
 def make_WelcomeMSG():
 	args = frappe.db.sql(""" select customer , customer_name, name from `tabSales Invoice` a

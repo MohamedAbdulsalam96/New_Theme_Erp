@@ -68,6 +68,9 @@ doc_events = {
 		"on_submit": ["erpnext.stock.doctype.material_request.material_request.update_completed_qty","erpnext.stock.stock_custom_methods.stock_out_entry","erpnext.stock.stock_custom_methods.in_stock_entry"],
 		"on_cancel": "erpnext.stock.doctype.material_request.material_request.update_completed_qty"
 	},
+	"Delivery Date":{
+		"on_submit": "erpnext.accounts.custom_notification_event.delivery_note",
+	},
 	"Serial No":{
 		"validate":["erpnext.stock.stock_custom_methods.serial_barcode","erpnext.stock.stock_custom_methods.serial_qrcode"],
 	},
@@ -122,13 +125,17 @@ scheduler_events = {
 		"erpnext.setup.doctype.site_master.site_master.create_feedback",
 		"erpnext.setup.doctype.site_master.site_master.assign_support",
 		"erpnext.setup.doctype.site_master.site_master.disable_user",
-		"erpnext.setup.doctype.site_master.site_master.add_validity"
+		"erpnext.setup.doctype.site_master.site_master.add_validity",
+		"erpnext.accounts.custom_notification_event.welcome_notification",
+		"erpnext.accounts.custom_notification_event.thank_you",
 	],
 	"daily": [
 		"erpnext.controllers.recurring_document.create_recurring_documents",
 		"erpnext.stock.utils.reorder_item",
 		"erpnext.setup.doctype.email_digest.email_digest.send",
-		"erpnext.support.doctype.support_ticket.support_ticket.auto_close_tickets"
+		"erpnext.support.doctype.support_ticket.support_ticket.auto_close_tickets",
+		"erpnext.accounts.custom_notification_event.outstanding_amount",
+		"erpnext.accounts.custom_notification_event.late_delivery",
 	],
 	"daily_long": [
 		"erpnext.setup.doctype.backup_manager.backup_manager.take_backups_daily"

@@ -33,8 +33,8 @@ class SupportTicket(TransactionBase):
 			from frappe.widgets.form.assign_to import clear
 			clear(self.doctype, self.name)
 
-	def on_update(self):		
-	    self.send_email();
+	def on_update(self):
+		self.send_email();
 		#frappe.errprint("in the update")
 		from frappe.utils import get_url, cstr
 		#frappe.errprint(get_url())
@@ -166,8 +166,7 @@ def auto_close_tickets():
 
 frappe.whitelist()
 def assing_future(name, assign_in_future,raised_by,assign_to):
-  	#frappe.errprint("in assign future")
-  	from frappe.utils import get_url, cstr
+	from frappe.utils import get_url, cstr
 	if get_url()=='http://tailorpad.com':
 		check_entry = frappe.db.sql("""select assign_to from `tabAssing Master` where name = %s """, raised_by)
 		#frappe.errprint(raised_by)
@@ -200,24 +199,22 @@ def auto_close_tickets():
 
 @frappe.whitelist()
 def reenable(name):
-	#frappe.errprint("calling superadmin")
-        from frappe.utils import get_url, cstr
-	#frappe.errprint(get_url())
+	from frappe.utils import get_url, cstr
+
 	if get_url()!='http://tailorpad.com':
-	  #frappe.errprint("in reenable")
-  	  from frappe.utils import get_url, cstr,add_months
-  	  from frappe import msgprint, throw, _
-  	  res = frappe.db.sql("select validity from `tabUser` where name='Administrator' and no_of_users >0")
-	  if  res:
-		res1 = frappe.db.sql("select validity_end_date from `tabUser` where '"+cstr(name)+"' and validity_end_date <CURDATE()")
-		if res1:
-			bc="update `tabUser` set validity_end_date=DATE_ADD((nowdate(), INTERVAL "+cstr(res[0][0])+" MONTH) where name = '"+cstr(name)+"'"
-			frappe.db.sql(bc)
-	  		frappe.db.sql("update `tabUser`set no_of_users=no_of_users-1  where name='Administrator'")
+		from frappe.utils import get_url, cstr,add_months
+		from frappe import msgprint, throw, _
+		res = frappe.db.sql("select validity from `tabUser` where name='Administrator' and no_of_users >0")
+		if res:
+			res1 = frappe.db.sql("select validity_end_date from `tabUser` where '"+cstr(name)+"' and validity_end_date <CURDATE()")
+			if res1:
+				bc="update `tabUser` set validity_end_date=DATE_ADD((nowdate(), INTERVAL "+cstr(res[0][0])+" MONTH) where name = '"+cstr(name)+"'"
+				frappe.db.sql(bc)
+				frappe.db.sql("update `tabUser`set no_of_users=no_of_users-1  where name='Administrator'")
+			else:
+				ab="update `tabUser` set validity_end_date=DATE_ADD(validity_end_date,INTERVAL "+cstr(res[0][0])+" MONTH) where name = '"+cstr(name)+"' "
+				#frappe.errprint(ab)
+				frappe.db.sql(ab)
+				frappe.db.sql("update `tabUser`set no_of_users=no_of_users-1  where name='Administrator'")
 		else:
-			ab="update `tabUser` set validity_end_date=DATE_ADD(validity_end_date,INTERVAL "+cstr(res[0][0])+" MONTH) where name = '"+cstr(name)+"' "
-			#frappe.errprint(ab)
-			frappe.db.sql(ab)
-	  		frappe.db.sql("update `tabUser`set no_of_users=no_of_users-1  where name='Administrator'")
-	  else:
-		    frappe.throw(_("Your subscription plan expired .Please purchase an subscription plan and enable user."))
+			frappe.throw(_("Your subscription plan expired .Please purchase an subscription plan and enable user."))
