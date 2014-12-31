@@ -126,8 +126,8 @@ def get_data():
 				{
 					"type": "doctype",
 					"name": "Notification Settings",
-					"label":"Notification Template",
-					"description": _("Notification Settings"),
+					"label":"Notification Settings",
+					"description": _("Notification Template"),
 				},
 			]
 		},
