@@ -30,7 +30,7 @@ class Item(WebsiteGenerator):
 		if self.item_group == 'Tailoring':
 			self.item_code = self.item_name
 		elif self.naming_series:
-			self.item_code = make_autoname(self.naming_series+'.#####')
+			self.item_code = make_autoname(self.series+'.#####')
 		elif not self.item_code:
 			msgprint(_("Item Code is mandatory because Item is not automatically numbered"), raise_exception=1)
 

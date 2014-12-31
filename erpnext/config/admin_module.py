@@ -24,7 +24,7 @@ def get_data():
 				{
 					"type": "doctype",
 					"name": "Pricing Rule",
-					"label": _("Offer"),
+					"label": _("Pricing Rule"),
 					"description": _("List of offer"),
 				},
 				{
@@ -126,8 +126,8 @@ def get_data():
 				{
 					"type": "doctype",
 					"name": "Notification Settings",
-					"label":"Customer Acquisition",
-					"description": _("Notification Template"),
+					"label":"Notification Template",
+					"description": _("Notification Settings"),
 				},
 			]
 		},
