@@ -75,7 +75,7 @@ def outstanding_amount():
 			for d in args:
 				customer_data = get_customer_details(d.customer)
 				symbol = frappe.db.get_value('Currency', d.currency, 'symbol')
-				data = cstr(notification.template).replace('customer_name', d.customer).replace('symbol', symbol).replace('outstanding_amount', d.outstanding_amount).replace('order_no':d.name)
+				data = cstr(notification.template).replace('customer_name', d.customer).replace('symbol', symbol).replace('outstanding_amount', d.outstanding_amount).replace('order_no', d.name)
 				if notification.email_template and customer_data:
 					send_mail(customer_data.email_id, data, notification.subject)
 				if notification.sms_template and customer_data:
@@ -91,7 +91,7 @@ def late_delivery():
 			for d in args:
 				customer = frappe.db.get_value('Sales Invoice', d.parent, 'customer')
 				customer_data = get_customer_details(customer)
-				data = cstr(notification.template).replace('customer_name', customer).replace('order_no':d.parent)
+				data = cstr(notification.template).replace('customer_name', customer).replace('order_no', d.parent)
 				if notification.email_template and customer_data:
 					send_mail(customer_data.email_id, data, notification.subject)
 				if notification.sms_template and customer_data:

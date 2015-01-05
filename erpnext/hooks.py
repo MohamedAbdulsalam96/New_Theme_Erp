@@ -69,7 +69,7 @@ doc_events = {
 		"on_cancel": "erpnext.stock.doctype.material_request.material_request.update_completed_qty"
 	},
 	"Delivery Date":{
-		"on_submit": "erpnext.accounts.custom_notification_event.delivery_note",
+		"on_submit": "erpnext.accounts.custom_notification_events.delivery_note",
 	},
 	"Serial No":{
 		"validate":["erpnext.stock.stock_custom_methods.serial_barcode","erpnext.stock.stock_custom_methods.serial_qrcode"],
@@ -126,16 +126,16 @@ scheduler_events = {
 		"erpnext.setup.doctype.site_master.site_master.assign_support",
 		"erpnext.setup.doctype.site_master.site_master.disable_user",
 		"erpnext.setup.doctype.site_master.site_master.add_validity",
-		"erpnext.accounts.custom_notification_event.welcome_notification",
-		"erpnext.accounts.custom_notification_event.thank_you",
+		"erpnext.accounts.custom_notification_events.welcome_notification",
+		"erpnext.accounts.custom_notification_events.thank_you",
 	],
 	"daily": [
 		"erpnext.controllers.recurring_document.create_recurring_documents",
 		"erpnext.stock.utils.reorder_item",
 		"erpnext.setup.doctype.email_digest.email_digest.send",
 		"erpnext.support.doctype.support_ticket.support_ticket.auto_close_tickets",
-		"erpnext.accounts.custom_notification_event.outstanding_amount",
-		"erpnext.accounts.custom_notification_event.late_delivery",
+		"erpnext.accounts.custom_notification_events.outstanding_amount",
+		"erpnext.accounts.custom_notification_events.late_delivery",
 	],
 	"daily_long": [
 		"erpnext.setup.doctype.backup_manager.backup_manager.take_backups_daily"
