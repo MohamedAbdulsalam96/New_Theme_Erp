@@ -278,15 +278,12 @@ def get_user_details(user_id):
 def update_details(value, name):
 	frappe.db.sql("""update `tabDefaultValue` set defvalue='%s' where name='%s'"""%(value, name))	
 
-def make_barcode(doc, method):
-	frappe.errprint(doc.barcode_image)
-	if not doc.barcode_img:
-		doc.barcode_img = generate_barcode(doc.name, doc.doctype)
-		if doc.barcode_img:
-			image = '<img src="/files/Barcode/%s/%s.svg">'%(doc.doctype,doc.barcode_img)
-			description = ("""<div style="width:100%">{0}</div>""").format(doc.barcode_description or 'Barcode')
-			doc.barcode_image = ("""<table><tr><td></td>{0}</tr><tr><td>{1}</td></tr></table>""").format(description, image)
-			make_barcode_log(doc.doctype, doc.name, image, doc.barcode_description)
+def make_barcode(doc,method):
+	if cint(frappe.db.get_value('Global Defaults',None,'barcode'))==1:
+		if not doc.barcode_image:
+			doc.bar= generate_barcode(doc.name, doc.doctype)        
+			doc.barcode_image = '<img src="/files/Barcode/%s/%s.svg">'%(doc.doctype,doc.name.replace("/","-"))
+			make_barcode_log(doc.doctype, doc.name,doc.barcode_image,doc.bar)
 
 def make_barcode_log(doctype_name, barcode_id, path, barcode_description):
 	blog = frappe.new_doc('Barcode Log')			
