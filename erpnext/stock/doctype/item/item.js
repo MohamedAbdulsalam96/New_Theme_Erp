@@ -33,7 +33,7 @@ cur_frm.cscript.refresh = function(doc) {
 }
 
 erpnext.item.toggle_reqd = function(frm) {
-	frm.toggle_reqd("default_warehouse", frm.doc.is_stock_item==="Yes");
+	frm.toggle_reqd("default_branch", frm.doc.is_stock_item==="Yes");
 };
 
 frappe.ui.form.on("Item", "is_stock_item", function(frm) {
@@ -192,24 +192,36 @@ cur_frm.cscript.copy_from_item_group = function(doc) {
 cur_frm.cscript.image = function(doc, cdt, cdn) {
 var d = locals[cdt][cdn]
 d.image_view = '<table style="width: 100%; table-layout: fixed;"><tr><td><img src="'+d.image+'" width="100px"></td></tr></table>'
-refresh_field("measurement_item");
+	refresh_field('image_view', d.name, 'measurement_item');
 }
 cur_frm.cscript.add_image = function(doc, cdt, cdn) {
 var d = locals[cdt][cdn]
 d.image_viewer = '<table style="width: 100%; table-layout: fixed;"><tr><td ><img src="'+d.add_image+'" width="100px"></td></tr></table>'
-refresh_field("style_item");
+	refresh_field('image_viewer', d.name, 'style_item');
 }
+
 cur_frm.cscript.measurement_template = function(doc, cdt, cdn){
+	var d = locals[cdt][cdn]
 get_server_fields('get_measurement_details',doc.measurement_template,'',doc ,cdt, cdn,1, function(){
-refresh_field('measurement_item')
+	refresh_field('measurement_item');
 })
 }
+
 cur_frm.cscript.style = function(doc, cdt, cdn){
 var	d = locals[cdt][cdn]
 get_server_fields('get_style_details',d.style,'',doc ,cdt, cdn,1, function(){
-refresh_field('style_item')
+	refresh_field('abbreviation', d.name, 'style_item');
 })
 }
+
+cur_frm.cscript.parameter = function(doc, cdt, cdn){
+var	d = locals[cdt][cdn]
+get_server_fields('get_parameter_details',d.parameter,'',doc ,cdt, cdn,1, function(){
+
+	refresh_field('abbreviation', d.name, 'measurement_item');
+})
+}
+
 // cur_frm.cscript.onload= function(doc, cdt, cdn) {
 // 	alert("hii")
 // return get_server_fields('get_details','', '', doc, cdt, cdn, 1,function(){

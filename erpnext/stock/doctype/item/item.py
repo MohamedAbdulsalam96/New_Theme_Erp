@@ -306,7 +306,12 @@ class Item(WebsiteGenerator):
 		for d in self.get('style_item'):
 			if d.style == style_name:
 				d.abbreviation = frappe.db.get_value('Style', style_name, 'abbreviation')
-				d.default_value = frappe.db.get_value('Style', style_name, 'default_value')
+		return "Done"
+
+	def get_parameter_details(self, parameter):
+		for d in self.get('measurement_item'):
+			if d.parameter == parameter:
+				d.abbreviation = frappe.db.get_value('Measurement', parameter, 'abbreviation')
 		return "Done"
 
 def validate_end_of_life(item_code, end_of_life=None, verbose=1):
