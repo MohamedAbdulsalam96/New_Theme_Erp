@@ -36,26 +36,26 @@ class SupportTicket(TransactionBase):
 	def on_update(self):
 		self.send_email();
 		#frappe.errprint("in the update")
-		from frappe.utils import get_url, cstr
-		#frappe.errprint(get_url())
-		if get_url()=='http://tailorpad.com':
-			pass
-		else:
-			pr2 = frappe.db.sql("""select name from `tabSupport Ticket`""")
-			#frappe.errprint(pr2)
-			frappe.errprint("is feed back saved")
-			if pr2:
-				# self.login()
-				#frappe.errprint("in if for creation support ticket")
-				test = {}
-				support_ticket = self.get_ticket_details()
-				self.call_del_keys(support_ticket)
-				#test['communications'] = []
-				#self.call_del_keys(support_ticket.get('communications'), test)
-				self.login()
-				#frappe.errprint("support_ticket")
-				#frappe.errprint(support_ticket)
-				self.tenent_based_ticket_creation(support_ticket)
+		# from frappe.utils import get_url, cstr
+		# #frappe.errprint(get_url())
+		# if get_url()=='http://demo.tailorpad.com':
+		# 	pass
+		# else:
+		# 	pr2 = frappe.db.sql("""select name from `tabSupport Ticket`""")
+		# 	#frappe.errprint(pr2)
+		# 	frappe.errprint("is feed back saved")
+		# 	if pr2:
+		# 		# self.login()
+		# 		#frappe.errprint("in if for creation support ticket")
+		# 		test = {}
+		# 		support_ticket = self.get_ticket_details()
+		# 		self.call_del_keys(support_ticket)
+		# 		#test['communications'] = []
+		# 		#self.call_del_keys(support_ticket.get('communications'), test)
+		# 		self.login()
+		# 		#frappe.errprint("support_ticket")
+		# 		#frappe.errprint(support_ticket)
+		# 		self.tenent_based_ticket_creation(support_ticket)
 
 
 
@@ -87,7 +87,7 @@ class SupportTicket(TransactionBase):
 
 	def login(self):
 		login_details = {'usr': 'Administrator', 'pwd': 'admin'}
-		url = 'http://stich1.tailorpad.com/api/method/login'
+		url = 'http://admin.tailorpad.com/api/method/login'
 		headers = {'content-type': 'application/x-www-form-urlencoded'}
 		frappe.errprint([url, 'data='+json.dumps(login_details)])
 		response = requests.post(url, data='data='+json.dumps(login_details), headers=headers)
@@ -118,7 +118,7 @@ class SupportTicket(TransactionBase):
 
 	def tenent_based_ticket_creation(self, support_ticket):
 		#frappe.errprint(support_ticket)
-		url = 'http://tailorpad.com/api/resource/Support Ticket'
+		url = 'http://admin.tailorpad.com/api/resource/Support Ticket'
 		#url = 'http://192.168.5.12:7676/api/method/login'
 		headers = {'content-type': 'application/x-www-form-urlencoded'}
 		#frappe.errprint('data='+json.dumps(support_ticket))
@@ -164,33 +164,6 @@ def auto_close_tickets():
 		and date_sub(curdate(),interval 15 Day) > modified""")
 
 
-frappe.whitelist()
-def assing_future(name, assign_in_future,raised_by,assign_to):
-	from frappe.utils import get_url, cstr
-	if get_url()=='http://tailorpad.com':
-		check_entry = frappe.db.sql("""select assign_to from `tabAssing Master` where name = %s """, raised_by)
-		#frappe.errprint(raised_by)
-		#frappe.errprint(check_entry)
-		if check_entry :
-			#frappe.errprint("chk")
-			if assign_in_future=='No':
-				#frappe.errprint("no")
-				frappe.db.sql("""delete from `tabAssing Master` where name = %s """, raised_by)	
-			else :
-				#frappe.errprint("Yes")
-				frappe.db.sql("""update `tabAssing Master` set assign_to=%s where name = %s """,(assign_to,raised_by))
-		else :
-			#frappe.errprint("not chk")
-			if assign_in_future=='Yes':
-				#frappe.errprint("Yes")
-				am = frappe.new_doc("Assing Master")
-				am.update({
-				"name": raised_by,
-				"assign_to": assign_to,
-				"raised_by":raised_by
-			})
-			am.insert()
-
 def auto_close_tickets():
 	frappe.db.sql("""update `tabSupport Ticket` set status = 'Closed'
 		where status = 'Replied'
@@ -200,8 +173,7 @@ def auto_close_tickets():
 @frappe.whitelist()
 def reenable(name):
 	from frappe.utils import get_url, cstr
-
-	if get_url()!='http://tailorpad.com':
+	if get_url()!='http://demo.tailorpad.com':
 		from frappe.utils import get_url, cstr,add_months
 		from frappe import msgprint, throw, _
 		res = frappe.db.sql("select validity from `tabUser` where name='Administrator' and no_of_users >0")
