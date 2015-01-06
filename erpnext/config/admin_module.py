@@ -133,43 +133,49 @@ def get_data():
 		},
 		{
 			"label": _("Main Reports"),
-			"icon": "icon-table",
+			"icon": "icon-list",
 			"items": [
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Booked Orders",
-					"doctype": "Sales Invoice"
+					"doctype": "Sales Invoice",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Sales Details",
-					"doctype": "Sales Invoice"
+					"doctype": "Sales Invoice",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Outstanding Amount",
-					"doctype": "Sales Invoice"
+					"doctype": "Sales Invoice",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Extra Raw Material Used",
-					"doctype": "Process Allotment"
+					"doctype": "Process Allotment",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Worker Details",
-					"doctype": "Employee"
+					"doctype": "Employee",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Customer History",
-					"doctype": "Customer"
+					"doctype": "Customer",
+					"icon":"icon-file-text"
 				},
 			]
 		},
@@ -181,49 +187,57 @@ def get_data():
 					"type": "report",
 					"is_query_report": True,
 					"name": "Items To Be Requested",
-					"doctype": "Item"
+					"doctype": "Item",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Requested Items To Be Ordered",
-					"doctype": "Material Request"
+					"doctype": "Material Request",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Material Requests for which Supplier Quotations are not created",
-					"doctype": "Material Request"
+					"doctype": "Material Request",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Item-wise Purchase History",
-					"doctype": "Item"
+					"doctype": "Item",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Item-wise Last Purchase Rate",
-					"doctype": "Item"
+					"doctype": "Item",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Purchase Order Trends",
-					"doctype": "Purchase Order"
+					"doctype": "Purchase Order",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Supplier Addresses and Contacts",
-					"doctype": "Supplier"
+					"doctype": "Supplier",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Supplier-Wise Sales Analytics",
-					"doctype": "Stock Ledger Entry"
+					"doctype": "Stock Ledger Entry",
+					"icon":"icon-file-text"
 				}
 			]
 		},

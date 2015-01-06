@@ -6,6 +6,7 @@ import frappe
 
 from erpnext.utilities.transaction_base import TransactionBase
 from frappe.utils import now, extract_email_id
+STANDARD_USERS = ("Guest", "Administrator")
 
 class SupportTicket(TransactionBase):
 
@@ -77,11 +78,11 @@ class SupportTicket(TransactionBase):
 
 			first_name = frappe.db.sql_list("""select first_name from `tabUser` where name='%s'"""%(self.raised_by))
 			#frappe.errprint(first_name[0])
-
-			msg="Dear  "+first_name[0]+"!<br><br>Support Ticket is created successfully for '"+self.subject+"'<br><br>Your Support Ticket Number is '"+self.name+"' <br><br>Please note for further information. <br><br>Regards, <br>Team TailorPad."
-			sender = frappe.session.user not in STANDARD_USERS and frappe.session.user or None
-			#frappe.errprint("before send")
-			frappe.sendmail(recipients=self.raised_by, sender=sender, subject=self.subject,	message=msg)
+			if first_name[0]!='Administrator' :
+				msg="Dear  "+first_name[0]+"!<br><br>Support Ticket is created successfully for '"+self.subject+"'<br><br>Your Support Ticket Number is '"+self.name+"' <br><br>Please note for further information. <br><br>Regards, <br>Team TailorPad."
+				sender = frappe.session.user not in STANDARD_USERS and frappe.session.user or None
+				#frappe.errprint("before send")
+				frappe.sendmail(recipients=self.raised_by, sender=sender, subject=self.subject,	message=msg)
 
 
 
@@ -89,7 +90,7 @@ class SupportTicket(TransactionBase):
 		login_details = {'usr': 'Administrator', 'pwd': 'admin'}
 		url = 'http://admin.tailorpad.com/api/method/login'
 		headers = {'content-type': 'application/x-www-form-urlencoded'}
-		frappe.errprint([url, 'data='+json.dumps(login_details)])
+		#frappe.errprint([url, 'data='+json.dumps(login_details)])
 		response = requests.post(url, data='data='+json.dumps(login_details), headers=headers)
 
 	def get_ticket_details(self):
@@ -97,7 +98,7 @@ class SupportTicket(TransactionBase):
 		response = requests.get("""%(url)s/api/resource/Support Ticket/SUP-00001"""%{'url':get_url()})
 		
 		# frappe.errprint(["""%(url)s/api/resource/Support Ticket/%(name)s"""%{'url':get_url(), 'name':self.name}])
-		frappe.errprint(response.text)
+		#frappe.errprint(response.text)
 		return eval(response.text).get('data')
 
 	def call_del_keys(self, support_ticket):
@@ -168,6 +169,18 @@ def auto_close_tickets():
 	frappe.db.sql("""update `tabSupport Ticket` set status = 'Closed'
 		where status = 'Replied'
 		and date_sub(curdate(),interval 15 Day) > modified""")
+
+@frappe.whitelist()
+def get_admin(name):
+	admin = frappe.db.sql("select email_id_admin from tabUser  where name='administrator'")
+	#frappe.errprint(len(admin))
+	#frappe.errprint(frappe.session.get('user'))
+	if admin and admin[0][0]:
+		#frappe.errprint(admin[0][0])
+		return admin[0][0]
+	else:
+		#frappe.errprint("else")
+	  	return frappe.session.get('user')
 
 
 @frappe.whitelist()

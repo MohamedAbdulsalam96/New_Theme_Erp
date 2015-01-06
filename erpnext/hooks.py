@@ -6,7 +6,7 @@ app_icon = "icon-th"
 app_color = "#e74c3c"
 app_version = "4.3.0"
 
-error_report_email = "support@erpnext.com"
+error_report_email = "support@tailorpad.com"
 
 app_include_js = ["assets/js/erpnext.min.js","assets/js/charts.js","assets/js/bjqs-1.3.js","assets/js/bjqs-1.3.min.js","assets/js/cropper.js",
 					"assets/lib/jquery.ui.core.1.10.3.min.js",

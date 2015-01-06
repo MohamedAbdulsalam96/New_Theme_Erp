@@ -56,6 +56,7 @@ class Item(WebsiteGenerator):
 		self.cant_change()
 		self.validate_item_type_for_reorder()
 		self.get_size_details()
+		self.check_default()  #Newly Added for checking default
 
 		if not self.get("__islocal"):
 			self.old_item_group = frappe.db.get_value(self.doctype, self.name, "item_group")
@@ -280,8 +281,8 @@ class Item(WebsiteGenerator):
 
 	def get_size_details(self):
 		if self.get("__islocal") and self.item_group == 'Tailoring':
-			size_details= frappe.db.sql("""select name from `tabSize`""",as_list=1)
-			width_details= frappe.db.sql("""select name from `tabWidth`""",as_list=1)
+			size_details= frappe.db.sql("""select name from `tabSize` order by creation desc""",as_list=1)     # Newly added 
+			width_details= frappe.db.sql("""select name from `tabWidth` order by creation desc""",as_list=1)   #Newly added
 			self.set('size_item', [])
 			for size in size_details:
 				for width in width_details:
@@ -313,6 +314,16 @@ class Item(WebsiteGenerator):
 			if d.parameter == parameter:
 				d.abbreviation = frappe.db.get_value('Measurement', parameter, 'abbreviation')
 		return "Done"
+
+	def check_default(self):   #Newly added method for checking default
+		check_list=[]
+		frappe.errprint("In check default")
+		for d in self.get('style_item'):
+			if d.style in check_list:
+				if d.default==True:
+					frappe.throw(_("Style {0} is already set to default").format(d.style))
+			elif d.default == True:
+				check_list.append(d.style)	
 
 def validate_end_of_life(item_code, end_of_life=None, verbose=1):
 	if not end_of_life:

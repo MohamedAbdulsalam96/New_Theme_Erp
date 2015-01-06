@@ -6,10 +6,16 @@ import frappe
 from frappe.model.document import Document
 
 class FeedBack(Document):
-		def validate(self):
+		def on_submit(self):
 			#frappe.errprint("in the validate")
 			from frappe.utils import get_url, cstr
-			if not self.get("__islocal"):
+			from frappe.utils.user import get_user_fullname
+			full_name = get_user_fullname(frappe.session['user'])
+			if full_name == "Guest":
+				full_name = "Administrator"
+			first_name = frappe.db.sql_list("""select first_name from `tabUser` where name='%s'"""%(self.raised_by))
+			#frappe.errprint(first_name[0])
+			if first_name[0]!='Administrator' :
 				msg="Dear "+self.raised_by+"!<br><br>Thank you for your precious feedback. <br><br>We are continuously working to improve the system ,your feedback is essential for improvement of system. <br><br>Regards,  <br>Team TailorPad."
 				#frappe.errprint("in the send")
 				#frappe.errprint(self.get('customer_information'))

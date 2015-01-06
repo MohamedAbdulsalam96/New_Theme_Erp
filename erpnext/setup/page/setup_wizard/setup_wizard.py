@@ -17,6 +17,11 @@ import install_fixtures
 def setup_account(args=None):
 	try:
 		frappe.clear_cache()
+		frappe.installer.install_app('tools')
+		frappe.installer.install_app('mreq')
+		path = os.path.abspath(os.path.join('.'))
+		os.system('cd %s && source ./env/bin/activate && cd %s && frappe --latest'%(path.replace('sites', ''), path))
+		frappe.db.sql("""update  tabSingles set value = 1 where field = 'disable_signup' and doctype = 'Website Settings'""")
 
 		if frappe.db.sql("select name from tabCompany"):
 			frappe.throw(_("Setup Already Complete!!"))

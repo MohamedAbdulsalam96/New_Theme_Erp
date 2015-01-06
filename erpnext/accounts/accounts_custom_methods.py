@@ -42,6 +42,7 @@ def create_work_order_style(data, wo_name, item_code):
 	 		"""%(item_code),as_dict=1)
 	 	if styles:
 	 		for s in styles:
+	 			image_viewer, default_value = get_styles_DefaultValues(s.style, item_code)  #Newly Added
 	 			ws = frappe.new_doc('WO Style')
 	 			ws.field_name = s.style
 	 			ws.abbreviation  = s.abbreviation
@@ -51,6 +52,12 @@ def create_work_order_style(data, wo_name, item_code):
 	 			ws.table_view = 'Right'
 	 			ws.save(ignore_permissions =True)
 	return True
+
+def get_styles_DefaultValues(style, item_code):            #Newly Added
+	default_item= frappe.db.sql(""" select image_viewer, default_value from `tabStyle Item` as a 
+		where a.default_name=1 and a.parent='%s' and a.style='%s'"""%(item_code, style),as_list=1)
+	if default_item:
+		return default_item[0][0], default_item[0][1]
 
 def create_work_order_measurement(data, wo_name, item_code):
 	style_parm=[]

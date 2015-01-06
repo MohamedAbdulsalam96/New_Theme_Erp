@@ -15,6 +15,7 @@ $.extend(cur_frm.cscript, {
 			cur_frm.footer.help_area.innerHTML = '<p><a href="#Form/Support Email Settings/Support Email Settings">'+__("Support Email Settings")+'</a><br>\
 				<span class="help">'+__("Integrate incoming support emails to Support Ticket")+'</span></p>';
 		}*/
+		//console.log("local and admin");
 		var usr=''
 		if(doc.__islocal && user=='Administrator') {
 				//console.log("local and admin");
@@ -28,7 +29,7 @@ $.extend(cur_frm.cscript, {
 					usr=r.message;
 					doc.raised_by=r.message;
 					//console.log(doc.raised_by)
-					//console.log(r.message)
+					console.log(r.message)
 					refresh_field('raised_by');
 				}
 				})
