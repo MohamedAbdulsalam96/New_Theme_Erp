@@ -47,21 +47,21 @@ class website_maker(object):
 		website_settings.brand_html = self.company
 		website_settings.copyright = self.company
 		website_settings.top_bar_items = []
-		website_settings.append("top_bar_items", {
-			"doctype": "Top Bar Item",
-			"label":"Contact",
-			"url": "contact"
-		})
-		website_settings.append("top_bar_items", {
-			"doctype": "Top Bar Item",
-			"label":"Blog",
-			"url": "blog"
-		})
-		website_settings.append("top_bar_items", {
-			"doctype": "Top Bar Item",
-			"label": _("Products"),
-			"url": "products"
-		})
+		# website_settings.append("top_bar_items", {
+		# 	"doctype": "Top Bar Item",
+		# 	"label":"Contact",
+		# 	"url": "contact"
+		# })
+		# website_settings.append("top_bar_items", {
+		# 	"doctype": "Top Bar Item",
+		# 	"label":"Blog",
+		# 	"url": "blog"
+		# })
+		# website_settings.append("top_bar_items", {
+		# 	"doctype": "Top Bar Item",
+		# 	"label": _("Products"),
+		# 	"url": "products"
+		# })
 		website_settings.save()
 
 	def make_blog(self):
