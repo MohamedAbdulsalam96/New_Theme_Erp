@@ -304,32 +304,32 @@ frappe.pages['setup-wizard'].onload = function(wrapper) {
 			},
 
 			// Items to Sell
-			{
-				icon: "icon-barcode",
-				"title": __("Your Products or Services"),
-				"help": __("List your products or services that you buy or sell. Make sure to check the Item Group, Unit of Measure and other properties when you start."),
-				"fields": [],
-				before_load: function(slide) {
-					slide.fields = [];
-					for(var i=1; i<6; i++) {
-						slide.fields = slide.fields.concat([
-							{fieldtype:"Section Break", show_section_border: true},
-							{fieldtype:"Data", fieldname:"item_" + i, label:__("Item") + " " + i,
-								placeholder:__("A Product or Service")},
-							{fieldtype: "Check", fieldname: "is_sales_item_" + i, label:__("We sell this Item")},
-							{fieldtype: "Check", fieldname: "is_purchase_item_" + i, label:__("We buy this Item")},
-							{fieldtype:"Column Break"},
-							{fieldtype:"Select", label:__("Group"), fieldname:"item_group_" + i,
-								options:[__("Products"), __("Services"),
-									__("Raw Material"), __("Consumable"), __("Sub Assemblies")]},
-							{fieldtype:"Select", fieldname:"item_uom_" + i, label:__("UOM"),
-								options:[__("Unit"), __("Nos"), __("Box"), __("Pair"), __("Kg"), __("Set"),
-									__("Hour"), __("Minute")]},
-							{fieldtype:"Attach", fieldname:"item_img_" + i, label:__("Attach Image")},
-						])
-					}
-				}
-			},
+			// {
+			// 	icon: "icon-barcode",
+			// 	"title": __("Your Products or Services"),
+			// 	"help": __("List your products or services that you buy or sell. Make sure to check the Item Group, Unit of Measure and other properties when you start."),
+			// 	"fields": [],
+			// 	before_load: function(slide) {
+			// 		slide.fields = [];
+			// 		for(var i=1; i<6; i++) {
+			// 			slide.fields = slide.fields.concat([
+			// 				{fieldtype:"Section Break", show_section_border: true},
+			// 				{fieldtype:"Data", fieldname:"item_" + i, label:__("Item") + " " + i,
+			// 					placeholder:__("A Product or Service")},
+			// 				{fieldtype: "Check", fieldname: "is_sales_item_" + i, label:__("We sell this Item")},
+			// 				{fieldtype: "Check", fieldname: "is_purchase_item_" + i, label:__("We buy this Item")},
+			// 				{fieldtype:"Column Break"},
+			// 				{fieldtype:"Select", label:__("Group"), fieldname:"item_group_" + i,
+			// 					options:[__("Products"), __("Services"),
+			// 						__("Raw Material"), __("Consumable"), __("Sub Assemblies")]},
+			// 				{fieldtype:"Select", fieldname:"item_uom_" + i, label:__("UOM"),
+			// 					options:[__("Unit"), __("Nos"), __("Box"), __("Pair"), __("Kg"), __("Set"),
+			// 						__("Hour"), __("Minute")]},
+			// 				{fieldtype:"Attach", fieldname:"item_img_" + i, label:__("Attach Image")},
+			// 			])
+			// 		}
+			// 	}
+			// },
 		]
 	}
 

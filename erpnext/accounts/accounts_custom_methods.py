@@ -53,7 +53,7 @@ def create_work_order_style(data, wo_name, item_code):
 	 			ws.save(ignore_permissions =True)
 	return True
 
-def get_styles_DefaultValues(style, item_code):            #Newly Added
+def get_styles_DefaultValues(style, item_code):            #Newly Added Method
 	default_item= frappe.db.sql(""" select image_viewer, default_value from `tabStyle Item` as a 
 		where a.default_name=1 and a.parent='%s' and a.style='%s'"""%(item_code, style),as_list=1)
 	if default_item:

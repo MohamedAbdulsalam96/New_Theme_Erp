@@ -12,6 +12,8 @@ from frappe.country_info import get_country_info
 from frappe.utils.nestedset import get_root_of
 from default_website import website_maker
 import install_fixtures
+import frappe.installer
+import os
 
 @frappe.whitelist()
 def setup_account(args=None):
@@ -65,8 +67,8 @@ def setup_account(args=None):
 		create_taxes(args)
 		frappe.local.message_log = []
 
-		create_items(args)
-		frappe.local.message_log = []
+		# create_items(args)
+		# frappe.local.message_log = []
 
 		create_customers(args)
 		frappe.local.message_log = []
