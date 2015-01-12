@@ -445,9 +445,9 @@ def generate_serial_no(doc, item_code, qty):
 		sn.sales_invoice = doc.name
 		sn.status = 'Available'
 		sn.save(ignore_permissions=True)
-		if cint(temp_qty) == qty:
+		if cint(temp_qty) == cint(qty) and sn.name:
 			serial_no = sn.name
-		else:
+		elif sn.name:
 			serial_no += '\n' + sn.name 
 		qty = cint(qty) -1
 	return serial_no
