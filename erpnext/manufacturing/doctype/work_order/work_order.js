@@ -17,6 +17,21 @@ cur_frm.cscript.item_code = function(doc, cdt, cdn){
 	})
 }
 
+cur_frm.cscript.field_name=function(doc,cdt,cdn){
+	var d=locals[cdt][cdn]
+	frappe.call({
+		method:"erpnext.accounts.accounts_custom_methods.get_styles_DefaultValues",
+		args:{style:d.field_name,item_code:doc.item_code},
+		callback:function(r){
+			d.default_value=r.message[1]
+			d.image_viewer=r.message[0]
+			refresh_field('image_viewer',d.name,'wo_style');
+			refresh_field('default_value',d.name,'wo_style');
+
+		}
+
+	})
+}
 
 
 cur_frm.cscript.value = function(doc, cdt, cdn){
