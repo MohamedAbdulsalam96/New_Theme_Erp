@@ -54,13 +54,15 @@ def get_data():
 					"type": "report",
 					"is_query_report": True,
 					"name": "Daily Time Log Summary",
-					"doctype": "Time Log"
+					"doctype": "Time Log",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Project wise Stock Tracking",
-					"doctype": "Project"
+					"doctype": "Project",
+					"icon":"icon-file-text"
 				},
 			]
 		},

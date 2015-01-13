@@ -9,7 +9,7 @@ def get_data():
 				{
 					"type": "page",
 					"name": "sales-dashboard",
-					"icon": "icon-sitemap",
+					"icon": "icon-dashboard",
 					"label": _("Sales Dashboard"),
 					"link": "sales-dashboard",
 					"description": _("Sales Dashboard"),

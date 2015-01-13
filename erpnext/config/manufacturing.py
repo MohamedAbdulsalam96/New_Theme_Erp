@@ -75,25 +75,29 @@ def get_data():
 					"type": "report",
 					"is_query_report": True,
 					"name": "Open Production Orders",
-					"doctype": "Production Order"
+					"doctype": "Production Order",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Production Orders in Progress",
-					"doctype": "Production Order"
+					"doctype": "Production Order",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Issued Items Against Production Order",
-					"doctype": "Production Order"
+					"doctype": "Production Order",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Completed Production Orders",
-					"doctype": "Production Order"
+					"doctype": "Production Order",
+					"icon":"icon-file-text"
 				},
 			]
 		},

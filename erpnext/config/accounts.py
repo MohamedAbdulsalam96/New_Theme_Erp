@@ -9,7 +9,7 @@ def get_data():
 				{
 					"type": "page",
 					"name": "account-dashboard",
-					"icon": "icon-money",
+					"icon": "icon-dashboard",
 					"label": _("Dashboard"),
 					"description": _("Dashboard"),
 					"doctype": "Mreq",
@@ -172,60 +172,69 @@ def get_data():
 					"name":"General Ledger",
 					"doctype": "GL Entry",
 					"is_query_report": True,
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Trial Balance",
 					"doctype": "GL Entry",
 					"is_query_report": True,
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Accounts Receivable",
 					"doctype": "Sales Invoice",
-					"is_query_report": True
+					"is_query_report": True,
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Accounts Payable",
 					"doctype": "Purchase Invoice",
-					"is_query_report": True
+					"is_query_report": True,
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Sales Register",
 					"doctype": "Sales Invoice",
-					"is_query_report": True
+					"is_query_report": True,
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Purchase Register",
 					"doctype": "Purchase Invoice",
-					"is_query_report": True
+					"is_query_report": True,
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Balance Sheet",
 					"doctype": "GL Entry",
-					"is_query_report": True
+					"is_query_report": True,
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Profit and Loss Statement",
 					"doctype": "GL Entry",
-					"is_query_report": True
+					"is_query_report": True,
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "page",
 					"name": "financial-analytics",
 					"label": _("Financial Analytics"),
-					"icon": "icon-bar-chart",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Gross Profit",
 					"doctype": "Sales Invoice",
-					"is_query_report": True
+					"is_query_report": True,
+					"icon":"icon-file-text"
 				},
 			]
 		},
@@ -237,91 +246,106 @@ def get_data():
 					"type": "report",
 					"name": "Bank Reconciliation Statement",
 					"is_query_report": True,
-					"doctype": "Journal Voucher"
+					"doctype": "Journal Voucher",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Ordered Items To Be Billed",
 					"is_query_report": True,
-					"doctype": "Sales Invoice"
+					"doctype": "Sales Invoice",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Delivered Items To Be Billed",
 					"is_query_report": True,
-					"doctype": "Sales Invoice"
+					"doctype": "Sales Invoice",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Purchase Order Items To Be Billed",
 					"is_query_report": True,
-					"doctype": "Purchase Invoice"
+					"doctype": "Purchase Invoice",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Received Items To Be Billed",
 					"is_query_report": True,
-					"doctype": "Purchase Invoice"
+					"doctype": "Purchase Invoice",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Bank Clearance Summary",
 					"is_query_report": True,
-					"doctype": "Journal Voucher"
+					"doctype": "Journal Voucher",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Payment Period Based On Invoice Date",
 					"is_query_report": True,
-					"doctype": "Journal Voucher"
+					"doctype": "Journal Voucher",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Sales Partners Commission",
 					"is_query_report": True,
-					"doctype": "Sales Invoice"
+					"doctype": "Sales Invoice",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Customer Account Head",
 					"is_query_report": True,
-					"doctype": "Account"
+					"doctype": "Account",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Supplier Account Head",
 					"is_query_report": True,
-					"doctype": "Account"
+					"doctype": "Account",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Item-wise Sales Register",
 					"is_query_report": True,
-					"doctype": "Sales Invoice"
+					"doctype": "Sales Invoice",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Item-wise Purchase Register",
 					"is_query_report": True,
-					"doctype": "Purchase Invoice"
+					"doctype": "Purchase Invoice",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Budget Variance Report",
 					"is_query_report": True,
-					"doctype": "Cost Center"
+					"doctype": "Cost Center",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Purchase Invoice Trends",
 					"is_query_report": True,
-					"doctype": "Purchase Invoice"
+					"doctype": "Purchase Invoice",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Sales Invoice Trends",
 					"is_query_report": True,
-					"doctype": "Sales Invoice"
+					"doctype": "Sales Invoice",
+					"icon":"icon-file-text"
 				},
 			]
 		},

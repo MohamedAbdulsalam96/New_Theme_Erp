@@ -266,6 +266,25 @@ cur_frm.cscript.get_list= function(doc, cdt, cdn){
 	return data
 }
 
+
+cur_frm.cscript.item_group =function(doc, cdt, cdn){
+	if(doc.item_group == 'Tailoring'){
+		doc.has_serial_no = 'Yes'
+		refresh_field('has_serial_no')
+	}
+	else if(doc.item_group=="Fabric"){
+		doc.stock_uom="Meter"
+		refresh_field('stock_uom')
+	}
+	else if(doc.item_group=="Merchandise"){
+		doc.stock_uom="Nos"
+		refresh_field('stock_uom')
+	}
+}
+
+
+
+
 // cur_frm.cscript.onload_post_render = function() {
 // 	frappe.require('assets/frappe/js/lib/jscolor/jscolor.js');
 // 	$.each(["fabric_color"], function(i, v) {

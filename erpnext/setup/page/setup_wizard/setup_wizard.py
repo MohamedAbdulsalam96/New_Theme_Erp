@@ -43,7 +43,28 @@ def setup_account(args=None):
 		update_user_name(args)
 		frappe.local.message_log = []
 
+		update_user_name(args)
+		frappe.local.message_log = []
+
+		create_size()
+		frappe.local.message_log = []
+
+		create_process()
+		frappe.local.message_log = []
+
+		create_service(args)
+		frappe.local.message_log = []
+
+		create_style()
+		frappe.local.message_log = []
+
 		create_fiscal_year_and_company(args)
+		frappe.local.message_log = []
+
+		create_measurment()
+		frappe.local.message_log = []
+
+		create_measurment_template()
 		frappe.local.message_log = []
 
 		set_defaults(args)
@@ -74,6 +95,9 @@ def setup_account(args=None):
 		frappe.local.message_log = []
 
 		create_suppliers(args)
+		frappe.local.message_log = []
+
+		create_branch()
 		frappe.local.message_log = []
 
 		frappe.db.set_default('desktop:home_page', 'desktop')
@@ -149,6 +173,140 @@ def create_fiscal_year_and_company(args):
 	}).insert()
 
 	args["curr_fiscal_year"] = curr_fiscal_year
+
+
+
+def create_size():
+	size_dict={"L":"Large","M":"Medium","S":"Small","XL":"Extra Large"}
+	for key in size_dict:
+		frappe.get_doc({
+		"doctype":"Size",
+		'abbreviation':key,
+		'size':size_dict[key],
+		}).insert()
+
+def create_process():
+	process_list=["Cutting","Finishing","Stitching"]
+	for process in process_list:
+		frappe.get_doc({
+		"doctype":"Process",
+		'process_name':process,
+		}).insert()
+
+def create_service(args):
+	frappe.get_doc({
+		"doctype":"Service",
+		'service':"Tailoring",
+		'currency':args.get('currency'),
+		}).insert()
+
+def create_style():
+	style_dict={"Belt":"BL",
+		"Belt Size":"BLS",
+		"Bottom":"BTM",
+		"Hip Pocket":"HPKT",
+		"Loop Size":"LS",
+		"Pocket":"PKT"}
+
+	for key in style_dict:
+		frappe.get_doc({
+    	"doctype":"Style",
+    	'style':key,
+    	'abbreviation':style_dict[key],
+		}).insert()
+
+
+def create_measurment():
+	measurment_dict={
+	"Back":"BK",
+	"Chest":"CH",
+	"Front":"FR",
+	"Full Back":"FBK",
+	"Full Sleeve":"FSL",
+	"Full Sleeve Cuff":"FSLCF",
+	"Half Back":"HBK",
+	"Half Sleeve":"HSL",
+	"Half Sleeve Radius":"HSLRD",	
+	"Hip":"HP",
+	"Jacket Length":"JTLN",
+	"Jacket Sleeve Length":"JTSL",
+	"Jacket Sleeve Radius":"JTSLRD",
+	"Neck":"NC",
+	"Seat Round":"SR",
+	"Shirt Length":"SHL",
+	"Shoulder":"SH",
+	"Stomach":"ST",
+	"Trouser Bottom Radius":"TRBRD",
+	"Trouser Hip":"TRHP",
+	"Trouser Inseam":"TRINS",
+	"Trouser Knee":"TRKN",
+	"Trouser Length":"TRL",
+	"Trouser Stomach":"TRST",
+	"Trouser Thigh":"TRTH",
+	"Trouser Waist":"TRW"
+		}
+	for measurment in measurment_dict:
+		frappe.get_doc({
+		"doctype":"Measurement",
+		"parameter":measurment,
+		"abbreviation":measurment_dict[measurment]	
+		}).insert()
+
+
+def create_measurment_template():
+	meas_template={
+	"Jacket Measurements":[["Jacket Length","JTLN"],["Chest","CH"],["Stomach","ST"],["Hip","HP"],["Shoulder","SH"],["Jacket Sleeve Length","JTSL"],["Jacket Sleeve Radius","JTSLRD"],["Half Back","HBK"],
+		["Full Back","FBK"]],
+	"Shirt Measurements":[["Shirt Length","SHL"],["Chest","CH"],["Stomach","ST"],["Hip","HP"],["Shoulder","SH"],["Full Sleeve","FSL"],["Full Sleeve Cuff","FSLCF"],["Half Sleeve","HSL"],
+		["Half Sleeve Radius","HSLRD"],["Neck","NC"],["Front","FR"],["Back","BK"]],
+	"Trouser Measurements":[["Trouser Length","TRL"],["Trouser Waist","TRW"],["Trouser Stomach","TRST"],["Trouser Hip","TRHP"],["Trouser Inseam","TRINS"],
+		["Trouser Knee","TRKN"],["Trouser Bottom Radius","TRBRD"],["Trouser Thigh","TRTH"],["Seat Round","SR"]]
+	}
+
+	# meas_template=["Jacket Measurements","Shirt Measurements","Trouser Measurements"]
+	for template in meas_template:
+		frappe.get_doc({
+		"doctype":"Measurement Template",
+		"template_name":template
+		}).insert()
+		for index in range(len(meas_template[template])):
+			frappe.get_doc({
+			"doctype":"Measurement Item",
+			"parent":template,
+			"parentfield":"measurement_table",
+			"parenttype":"Measurement Template",
+			"parameter":meas_template[template][index][0],
+			"abbreviation":meas_template[template][index][1]
+			}).insert()
+
+
+def create_width():
+	width_list=['36','44','58']
+	for w in width_list:
+		frappe.get_doc({
+		"doctype":"Width",
+		"width":w,	
+		"uom":"Inches"
+		}).insert()
+
+def create_branch():
+	branch_dict={
+	"Manufacturing":["","India","","","Main - I","INR","Manufacturing - I","Production"],
+	"Showroom":["50","India","Administrative Expenses - I","Administrator","Main - I","INR","Showroom - I","Showroom"]
+	}
+	for key in branch_dict:
+		frappe.get_doc({
+		"doctype":"Branch",
+		"branch":key,
+		"min_advance_payment":branch_dict[key][0],
+		"country":branch_dict[key][1],
+		"drawing_acc":branch_dict[key][2],
+		"branch_manager":branch_dict[key][3],
+		"cost_center":branch_dict[key][4],
+		"currency":branch_dict[key][5],
+		"warehouse":branch_dict[key][6],
+		"branch_type":branch_dict[key][7]
+		}).insert()
 
 def create_price_lists(args):
 	for pl_type, pl_name in (("Selling", _("Standard Selling")), ("Buying", _("Standard Buying"))):

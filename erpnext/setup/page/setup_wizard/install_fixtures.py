@@ -136,6 +136,7 @@ def install(country=None):
 		{'uom_name': _('Set'), 'doctype': 'UOM', 'name': _('Set'), "must_be_whole_number": 1},
 		{'uom_name': _('Hour'), 'doctype': 'UOM', 'name': _('Hour')},
 		{'uom_name': _('Minute'), 'doctype': 'UOM', 'name': _('Minute')},
+		{'uom_name': _('Inches'), 'doctype': 'UOM', 'name': _('Inches')},
 
 		# Mode of Payment
 		{'doctype': 'Mode of Payment', 'mode_of_payment': 'Check' if country=="United States" else _('Cheque')},

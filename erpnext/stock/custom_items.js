@@ -63,7 +63,7 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
     },
     init_trials : function(data){
         this.dialog = new frappe.ui.Dialog({
-            title:__(' Styles'),
+            title:__('Trial'),
             fields: [
                 {fieldtype:'Int', fieldname:'trial', label:__('Trial No'), reqd:false,
                     description: __("")},

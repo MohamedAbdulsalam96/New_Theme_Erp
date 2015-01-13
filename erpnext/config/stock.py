@@ -133,43 +133,47 @@ def get_data():
 		},
 		{
 			"label": _("Main Reports"),
-			"icon": "icon-table",
+			"icon": "icon-list",
 			"items": [
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Stock Ledger",
 					"doctype": "Item",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "page",
 					"name": "stock-balance",
 					"label": _("Stock Balance"),
-					"icon": "icon-table",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Stock Projected Qty",
 					"doctype": "Item",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Stock Ageing",
 					"doctype": "Item",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": False,
 					"name": "Item-wise Price List Rate",
 					"doctype": "Item Price",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "page",
 					"name": "stock-analytics",
 					"label": _("Stock Analytics"),
-					"icon": "icon-bar-chart"
+					"icon":"icon-file-text"
 				},
 			]
 		},
@@ -181,76 +185,89 @@ def get_data():
 					"type": "report",
 					"is_query_report": True,
 					"name": "Ordered Items To Be Delivered",
-					"doctype": "Delivery Note"
+					"doctype": "Delivery Note",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Purchase Order Items To Be Received",
-					"doctype": "Purchase Receipt"
+					"doctype": "Purchase Receipt",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Item Shortage Report",
 					"route": "Report/Bin/Item Shortage Report",
-					"doctype": "Purchase Receipt"
+					"doctype": "Purchase Receipt",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Serial No Service Contract Expiry",
-					"doctype": "Serial No"
+					"doctype": "Serial No",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Serial No Status",
-					"doctype": "Serial No"
+					"doctype": "Serial No",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Serial No Warranty Expiry",
-					"doctype": "Serial No"
+					"doctype": "Serial No",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Requested Items To Be Transferred",
-					"doctype": "Material Request"
+					"doctype": "Material Request",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Batch-Wise Balance History",
-					"doctype": "Batch"
+					"doctype": "Batch",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Warehouse-Wise Stock Balance",
-					"doctype": "Warehouse"
+					"doctype": "Warehouse",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Item Prices",
-					"doctype": "Price List"
+					"doctype": "Price List",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Itemwise Recommended Reorder Level",
-					"doctype": "Item"
+					"doctype": "Item",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Delivery Note Trends",
-					"doctype": "Delivery Note"
+					"doctype": "Delivery Note",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Purchase Receipt Trends",
-					"doctype": "Purchase Receipt"
+					"doctype": "Purchase Receipt",
+					"icon":"icon-file-text"
 				},
 			]
 		},

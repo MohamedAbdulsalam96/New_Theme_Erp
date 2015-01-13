@@ -188,30 +188,35 @@ def get_data():
 					"type": "report",
 					"is_query_report": True,
 					"name": "Employee Leave Balance",
-					"doctype": "Leave Application"
+					"doctype": "Leave Application",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Employee Birthday",
-					"doctype": "Employee"
+					"doctype": "Employee",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Employee Information",
-					"doctype": "Employee"
+					"doctype": "Employee",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Monthly Salary Register",
-					"doctype": "Salary Slip"
+					"doctype": "Salary Slip",
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"is_query_report": True,
 					"name": "Monthly Attendance Sheet",
-					"doctype": "Attendance"
+					"doctype": "Attendance",
+					"icon":"icon-file-text"
 				},
 			]
 		},

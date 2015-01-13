@@ -62,13 +62,14 @@ def get_data():
 					"type": "page",
 					"name": "support-analytics",
 					"label": _("Support Analytics"),
-					"icon": "icon-bar-chart"
+					"icon":"icon-file-text"
 				},
 				{
 					"type": "report",
 					"name": "Maintenance Schedules",
 					"is_query_report": True,
-					"doctype": "Maintenance Schedule"
+					"doctype": "Maintenance Schedule",
+					"icon":"icon-file-text"
 				},
 			]
 		},
