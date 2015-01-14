@@ -742,7 +742,7 @@ def update_QI_status(doc, method):
 def get_QI_status(self):
 	msg = 'Accepted'
 	for data in self.get('qa_specification_details'):
-		if d.status == 'Rejected':
+		if data.status == 'Rejected':
 			msg = 'Rejected'
 	return msg
 	

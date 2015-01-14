@@ -22,11 +22,11 @@ def get_data():
 				# 	"name": "Item",
 				# 	"description": _("All Products or Services."),
 				# },
-				# {
-				# 	"type": "doctype",
-				# 	"name": "Workstation",
-				# 	"description": _("Where manufacturing operations are carried out."),
-				# },
+				{
+					"type": "doctype",
+					"name": "Work Management",
+					"description": _("Where manufacturing operations are carried out."),
+				},
 				{
 					"type": "doctype",
 					"name": "Process Allotment",

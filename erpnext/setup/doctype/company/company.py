@@ -69,7 +69,7 @@ class Company(Document):
 			frappe.get_attr("erpnext.setup.doctype.company.fixtures.{0}.install".format(self.country.lower()))(self)
 
 	def create_default_warehouses(self):
-		for whname in (_("Stores"), _("Work In Progress"), _("Finished Goods")):
+		for whname in (_("Manufacturing"), _("Showroom")):
 			if not frappe.db.exists("Warehouse", whname + " - " + self.abbr):
 				stock_group = frappe.db.get_value("Account", {"account_type": "Stock",
 					"group_or_ledger": "Group", "company": self.name})

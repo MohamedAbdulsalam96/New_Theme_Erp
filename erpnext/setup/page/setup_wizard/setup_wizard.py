@@ -43,9 +43,6 @@ def setup_account(args=None):
 		update_user_name(args)
 		frappe.local.message_log = []
 
-		update_user_name(args)
-		frappe.local.message_log = []
-
 		create_size()
 		frappe.local.message_log = []
 
