@@ -475,7 +475,7 @@ def invoice_validation_method(doc, method):
 @frappe.whitelist()
 def get_work_order_details(sales_invoice_no):
 	return frappe.db.sql(""" Select name, item_code, ifnull(status, 'Pending') as release_status 
-		from `tabWork Order` where sales_invoice_no='%s'"""%(sales_invoice_no), as_dict=1)
+		from `tabWork Order` where sales_invoice_no='%s' and status<>'Release'"""%(sales_invoice_no), as_dict=1)
 
 @frappe.whitelist()
 def update_status(sales_invoice_no, args):
@@ -490,10 +490,11 @@ def update_status(sales_invoice_no, args):
 			if not frappe.db.get_value('Stock Entry Detail', {'work_order': s.get('work_order'), 'docstatus':0}, 'name'):
 				sn_list = frappe.db.get_value('Work Order', s.get('work_order'), 'serial_no_data')
 				parent = stock_entry_for_out(s, details.branch, sn_list, frappe.db.get_value('Work Order', s.get('work_order'), 'item_qty'))
-		elif s.get('status') == 'Hold' and frappe.db.get_value('Work Order Distribution', {'tailor_work_order':s.get('work_order'), 'parent': sales_invoice_no}, 'release_status') != 'Release':
-			update_work_order_status(s.get('work_order'), 'Pending')
-		# elif frappe.db.get_value('Work Order Distribution', {'tailor_work_order':s.get('work_order'), 'parent': sales_invoice_no}, 'release_status') != 'Release':
-		# 	frappe.msgprint("Work order %s is already release"%(s.get('work_order')))
+		elif s.get('status') == 'Hold' and frappe.db.get_value('Work Order', s.get('work_order'), 'status') != 'Release':
+			update_work_order_status(s.get('work_order'), 'Hold')
+		elif frappe.db.get_value('Work Order', s.get('work_order'), 'status') == 'Release' and s.get('status') in ('Release','Pending', 'Hold'):
+			frappe.msgprint("Work order %s is already release"%(s.get('work_order')))
+	return True
 
 def get_status(work_order):
 	process = frappe.db.sql("select process_name from `tabProcess Log` where pr_work_order='%s' and idx = 1"%(work_order), as_list=1)
@@ -637,14 +638,15 @@ def check_previous_is_closed_for_trials(serial_no, args, work_order):
 
 
 def make_serial_no_log(serial_no, args, work_order, qc, emp):
-	if cint(args.idx)>1:
-		check_previous_is_closed(serial_no, args, work_order)
+	if args:
+		if cint(args.idx)>1:
+			check_previous_is_closed(serial_no, args, work_order)
 
-	if args.trials:
-		if not frappe.db.get_value('Serial No Detail', {'parent':serial_no, 'process': args.process_name,'trial_no': args.trials,  'work_order': work_order}, 'name'):
-			make_sn_detail(serial_no, args, work_order, qc, emp)
-	elif not frappe.db.get_value('Serial No Detail', {'parent':serial_no, 'process': args.process_name, 'work_order': work_order}, 'name'):
-		make_sn_detail(serial_no, args, work_order, qc, emp)
+		if args.trials:
+			if not frappe.db.get_value('Serial No Detail', {'parent':serial_no, 'process': args.process_name,'trial_no': args.trials,  'work_order': work_order}, 'name'):
+				make_sn_detail(serial_no, args, work_order, qc, emp)
+		elif not frappe.db.get_value('Serial No Detail', {'parent':serial_no, 'process': args.process_name, 'work_order': work_order}, 'name'):
+			make_sn_detail(serial_no, args, work_order, qc, emp)		
 
 def make_sn_detail(serial_no, args, work_order, qc, emp):
 	snd = frappe.new_doc('Serial No Detail')

@@ -124,16 +124,40 @@ cur_frm.cscript.toogle_field = function(doc){
 }
 
 cur_frm.cscript.assigned= function(doc, cdt, cdn){
-	get_server_fields('assign_task_to_employee','','',doc, cdt, cdn,1, function(){
-		refresh_field('employee_details')	
-	})
+	if(doc.emp_status){
+		status = cur_frm.cscript.validate_mandatory_fields(doc)
+		if(status=='true')
+		{
+			get_server_fields('assign_task_to_employee','','',doc, cdt, cdn,1, function(){
+				refresh_field('employee_details')	
+			})	
+		}
+	}else{
+		alert("Select status")
+	}
 	
+}
+
+cur_frm.cscript.validate_mandatory_fields= function(doc){
+	data = {'Tailor': doc.process_tailor, 'Start Date': doc.start_date, 'End Data': doc.end_date, 'Serial No': doc.serial_no}
+	status = 'true'
+	for(key in data){
+		if(!data[key]){
+			alert("Mandatory Fields: "+key+"")
+			status = 'false';
+			break;
+		}
+	}
+	return status
 }
 
 cur_frm.cscript.deduct_late_work = function(doc){
 	if(doc.deduct_late_work == 'Yes'){
 		unhide_field(['latework', 'cost']);		
 	}else{
+		doc.latework = 0.0
+		doc.cost = 0.0
+		refresh_field(['latework','cost'])
 		hide_field(['latework', 'cost']);
 	}
 }
@@ -149,6 +173,8 @@ cur_frm.cscript.payment = function(doc, cdt, cdn){
 	if(doc.payment == 'Yes'){
 		unhide_field('wages');		
 	}else{
+		doc.wages = 0.0
+		refresh_field('wages')
 		hide_field('wages');	
 	}
 	
@@ -177,6 +203,8 @@ cur_frm.cscript.extra_charge = function(doc, cdt, cdn){
 	})
 				
 	}else{
+		doc.extra_charge_amount = 0.0
+		refresh_field('extra_charge_amount')
 		hide_field('extra_charge_amount');	
 	}
 }

@@ -15,7 +15,7 @@ class WorkManagement(Document):
 		if sales_invoices:
 			for si_no in sales_invoices:
 				branch = frappe.db.get_value('User',frappe.session.user,'branch')
-				if frappe.db.get_value('Sales Invoice',si_no.sales_invoice_no,'branch') == branch:
+				if frappe.db.get_value('Process Log',{'parent': si_no.name, 'branch': branch},'name'):
 					si = self.append('production_details', {})
 					self.create_invoice_bundle(si_no, si)
 		return "Done"

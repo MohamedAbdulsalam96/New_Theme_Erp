@@ -165,9 +165,11 @@ cur_frm.fields_dict['work_orders'].get_query = function(doc) {
 }
 
 cur_frm.cscript.work_orders = function(doc, cdt, cdn){
-	return get_server_fields('fill_measurement_details', '', '', doc, cdt, cdn, 1, function(){
-		refresh_field('measurement_item')
-	});
+	if(doc.work_orders){
+		return get_server_fields('fill_measurement_details', '', '', doc, cdt, cdn, 1, function(){
+			refresh_field('measurement_item')
+		});	
+	}
 }
 
 cur_frm.cscript.fetch_measurement_details = function(doc, cdt, cdn){
@@ -177,9 +179,11 @@ cur_frm.cscript.fetch_measurement_details = function(doc, cdt, cdn){
 }
 
 cur_frm.cscript.style_work_order = function(doc, cdt, cdn){
-	return get_server_fields('fetch_previuos_Wo_Style', '', '', doc, cdt, cdn, 1, function(){
-		refresh_field('wo_style')
-	});
+	if(doc.style_work_order){
+		return get_server_fields('fetch_previuos_Wo_Style', '', '', doc, cdt, cdn, 1, function(){
+			refresh_field('wo_style')
+		});	
+	}
 }
 
 cur_frm.fields_dict['style_work_order'].get_query = function(doc) {

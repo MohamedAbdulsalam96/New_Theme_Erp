@@ -108,6 +108,8 @@ def install(country=None):
 		# territory
 		{'doctype': 'Territory', 'territory_name': _('All Territories'), 'is_group': 'Yes', 'name': _('All Territories'), 'parent_territory': ''},
 
+		{'doctype': 'Product Catalog', 'product_catalog_name': _('External Product Catalog'), 'is_group': 'Yes', 'name': _('External Product Catalog')},
+
 		# customer group
 		{'doctype': 'Customer Group', 'customer_group_name': _('All Customer Groups'), 'is_group': 'Yes', 	'name': _('All Customer Groups'), 'parent_customer_group': ''},
 		{'doctype': 'Customer Group', 'customer_group_name': _('Individual'), 'is_group': 'No', 'parent_customer_group': _('All Customer Groups')},
@@ -121,7 +123,6 @@ def install(country=None):
 		{'doctype': 'Supplier Type', 'supplier_type': _('Raw Material')},
 		{'doctype': 'Supplier Type', 'supplier_type': _('Electrical')},
 		{'doctype': 'Supplier Type', 'supplier_type': _('Hardware')},
-		{'doctype': 'Supplier Type', 'supplier_type': _('Pharmaceutical')},
 		{'doctype': 'Supplier Type', 'supplier_type': _('Distributor')},
 
 		# Sales Person

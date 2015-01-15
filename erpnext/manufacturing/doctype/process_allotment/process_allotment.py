@@ -540,6 +540,7 @@ class ProcessAllotment(Document):
 		emp.tailor_serial_no = self.serial_no_data
 		emp.cost = self.cost
 		emp.qc_required = cint(self.qc)
+		self.save()
 		return "Done"
 
 	def cal_extra_chg(self):

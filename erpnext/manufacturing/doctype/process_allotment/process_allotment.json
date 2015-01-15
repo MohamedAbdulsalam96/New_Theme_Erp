@@ -308,13 +308,6 @@
    "read_only": 0
   }, 
   {
-   "fieldname": "work_qty", 
-   "fieldtype": "Int", 
-   "label": "Qty", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
    "fieldname": "serial_no", 
    "fieldtype": "Link", 
    "hidden": 0, 
@@ -327,6 +320,13 @@
    "fieldname": "serial_no_data", 
    "fieldtype": "Small Text", 
    "label": "Serial No Data", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "work_qty", 
+   "fieldtype": "Int", 
+   "label": "Qty", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -517,12 +517,13 @@
  ], 
  "hide_heading": 0, 
  "hide_toolbar": 0, 
+ "icon": " icon-list", 
  "in_create": 0, 
  "in_dialog": 0, 
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-12-30 11:08:49.751424", 
+ "modified": "2015-01-15 16:26:57.499762", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 
