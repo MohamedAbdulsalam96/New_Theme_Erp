@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 import frappe
 from frappe.utils.file_manager import save_file
 import os, base64, re
+import random
+import json
 
 @frappe.whitelist()
 def add_node():
@@ -34,4 +36,15 @@ def view_image():
 	frappe.errprint(["sd",name])
 	return frappe.db.sql(""" SELECT file_url FROM `tabFile Data` WHERE
 		attached_to_name='%s' AND attached_to_doctype='Product Catalog'"""%(name), debug=1)
+
+@frappe.whitelist()
+def webcam_img_upload(imgdata1,customer):
+	data =json.loads(imgdata1)
+	filename=random.randrange(1,100000,2)
+	filename=str(filename)+'.png'
+
+	fname, content = get_uploadedImage_content(imgdata1,filename)
+	if content:
+		image = save_file(fname, content,'Customer',customer)
+	return filename	
 

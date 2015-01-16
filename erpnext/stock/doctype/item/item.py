@@ -25,14 +25,10 @@ class Item(WebsiteGenerator):
 
 	def autoname(self):
 		from frappe.model.naming import make_autoname
-		# if self.supplier_code and frappe.db.get_value('Supplier', self.supplier_code, 'naming_series'):
-		# 	self.item_code = make_autoname(frappe.db.get_value('Supplier', self.supplier_code, 'naming_series')+'.######')
-		if self.item_group == 'Tailoring':
-			self.item_code = self.item_name
-		elif self.naming_series:
+		if self.series:
 			self.item_code = make_autoname(self.series+'.#####')
-		elif not self.item_code:
-			msgprint(_("Item Code is mandatory because Item is not automatically numbered"), raise_exception=1)
+		else:
+			msgprint(_("Naming series is mandatory "), raise_exception=1)
 
 		self.name = self.item_code
 
@@ -323,7 +319,20 @@ class Item(WebsiteGenerator):
 				if d.default==True:
 					frappe.throw(_("Style {0} is already set to default").format(d.style))
 			elif d.default == True:
-				check_list.append(d.style)	
+				check_list.append(d.style)
+
+	def get_rawtab_details(self,item_code):
+		frappe.errprint(item_code)
+		query="select item_sub_group,stock_uom,item_name from `tabItem` where name='%s'"%(item_code)
+		rawtab_data_list=frappe.db.sql(query, as_list=1)
+		frappe.errprint(rawtab_data_list)
+		if rawtab_data_list:
+			ret={
+			"raw_item_sub_group":rawtab_data_list[0][0],
+			"uom":rawtab_data_list[0][1],
+			"article_item_name":rawtab_data_list[0][2],
+			}
+			return ret
 
 def validate_end_of_life(item_code, end_of_life=None, verbose=1):
 	if not end_of_life:

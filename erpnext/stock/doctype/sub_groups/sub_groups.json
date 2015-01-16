@@ -1,6 +1,6 @@
 {
  "allow_copy": 0, 
- "allow_import": 0, 
+ "allow_import": 1, 
  "allow_rename": 0, 
  "autoname": "field:sub_group", 
  "creation": "2014-10-04 14:35:40.682689", 
@@ -36,7 +36,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-10-04 14:35:40.682689", 
+ "modified": "2015-01-16 14:59:00.818300", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Sub Groups", 

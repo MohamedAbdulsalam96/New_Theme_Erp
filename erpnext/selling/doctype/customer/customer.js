@@ -5,6 +5,56 @@
 
 cur_frm.cscript.onload = function(doc, dt, dn) {
 	cur_frm.cscript.load_defaults(doc, dt, dn);
+	var customer=doc.name
+   insert_file_data(customer)
+}
+
+function insert_file_data(customer){
+	return frappe.call({
+	method: 'erpnext.selling.doctype.customer.customer.getfile_data',
+	args: {name:customer},
+	callback: function(r, rt) {
+			set_field_options('select_image', r.message);
+			set_field_options('select', r.message);
+		}
+	});
+}
+
+cur_frm.cscript.select_image = function(doc, dt, dn){
+	img_name=doc.select_image
+	frappe.call({
+		method:'erpnext.selling.doctype.customer.customer.getfile_url',
+		args:{name:img_name},
+		callback:function(r){
+          doc.image1='<table style="max-width: 100%; margin-bottom:10px; float:left;background-color:#FFFF"><tr><td><img align="center" style="box-sizing: border-box; max-width: 60%; margin-bottom:10px" src="'+r.message[0][0]+'" ></td></tr></table>'
+          refresh_field('image1');
+		}
+	})
+	if(doc.select_image){
+		unhide_field('image1');
+	}
+}
+
+
+cur_frm.cscript.select = function(doc, dt, dn){
+
+	img_name=doc.select
+	frappe.call({
+		method:'erpnext.selling.doctype.customer.customer.getfile_url',
+		args:{name:img_name},
+		callback:function(r){
+            doc.image2='<table style="max-width: 100%; margin-bottom:10px; float:left;background-color:#FFFF"><tr><td><img align="center" style="box-sizing: border-box; max-width: 60%; margin-bottom:10px" src="'+r.message[0][0]+'" ></td></tr></table>'
+			refresh_field('image2')
+		}
+	})
+	if(doc.select){
+		unhide_field('image2');
+	}
+}
+cur_frm.cscript.take_image = function(doc, dt, dn){
+	console.log(doc.name)
+	frappe.route_options ={customer_name: doc.name};
+	frappe.set_route("web-camera");		
 }
 
 cur_frm.cscript.load_defaults = function(doc, dt, dn) {
@@ -40,6 +90,16 @@ cur_frm.cscript.refresh = function(doc, dt, dn) {
 			doc: doc,
 		});
 	}
+
+	var customer=doc.name
+   insert_file_data(customer)
+   if(!doc.select){
+   		hide_field('image2');
+   }
+	if(!doc.select_image){
+		hide_field('image1');	
+	}
+		
 }
 
 cur_frm.cscript.validate = function(doc, dt, dn) {

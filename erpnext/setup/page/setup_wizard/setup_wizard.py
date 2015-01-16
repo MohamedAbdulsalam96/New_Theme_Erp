@@ -55,6 +55,9 @@ def setup_account(args=None):
 		create_style()
 		frappe.local.message_log = []
 
+		create_item_series()
+		frappe.local.message_log = []
+
 		create_fiscal_year_and_company(args)
 		frappe.local.message_log = []
 
@@ -84,6 +87,18 @@ def setup_account(args=None):
 
 		create_taxes(args)
 		frappe.local.message_log = []
+
+		create_sub_groups()
+		frappe.local.message_log = []
+
+		create_brand()
+		frappe.local.message_log = []
+
+
+
+		create_width()
+		frappe.local.message_log = []
+
 
 		# create_items(args)
 		# frappe.local.message_log = []
@@ -191,9 +206,11 @@ def create_process():
 		}).insert()
 
 def create_service(args):
-	frappe.get_doc({
+	service_list=["Alteration","Stitching"]
+	for service in service_list:
+		frappe.get_doc({
 		"doctype":"Service",
-		'service':"Tailoring",
+		'service':service,
 		'currency':args.get('currency'),
 		}).insert()
 
@@ -210,6 +227,14 @@ def create_style():
     	"doctype":"Style",
     	'style':key,
     	'abbreviation':style_dict[key],
+		}).insert()
+
+def create_item_series():
+	series_dict=['TRO','SHI','JAC','FAB']
+	for series in series_dict:
+		frappe.get_doc({
+		"doctype":"Item Series",
+		"new_series":series,
 		}).insert()
 
 
@@ -275,6 +300,26 @@ def create_measurment_template():
 			"parameter":meas_template[template][index][0],
 			"abbreviation":meas_template[template][index][1]
 			}).insert()
+
+
+def create_sub_groups():
+	sub_grp=['Tie','Suitings','Trouser Button','Zipper','Fusing','Trouser','Shirt']
+	for sub in sub_grp:
+		frappe.get_doc({
+		"doctype":"Sub Groups",
+		"sub_group":sub
+
+		}).insert()
+
+def create_brand():
+	brand_grp=['lee','Zodiac']
+	for b in brand_grp:
+		frappe.get_doc({
+		"doctype":"Brand",
+		"brand":b
+
+		}).insert()
+
 
 
 def create_width():

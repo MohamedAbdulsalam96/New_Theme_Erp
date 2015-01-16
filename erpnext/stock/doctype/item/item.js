@@ -177,17 +177,7 @@ cur_frm.cscript.copy_from_item_group = function(doc) {
 	});
 }
 
-// cur_frm.cscript.image = function() {
-// 	refresh_field("image_view");
 
-// 	if(!cur_frm.doc.image) return;
-
-// 	if(!cur_frm.doc.description_html)
-// 		cur_frm.cscript.add_image(cur_frm.doc);
-// 	else {
-// 		msgprint(__("You may need to update: {0}", [frappe.meta.get_docfield(cur_frm.doc.doctype, "description_html").label]));
-// 	}
-// }
 //Rohit
 cur_frm.cscript.image = function(doc, cdt, cdn) {
 var d = locals[cdt][cdn]
@@ -222,12 +212,6 @@ get_server_fields('get_parameter_details',d.parameter,'',doc ,cdt, cdn,1, functi
 })
 }
 
-// cur_frm.cscript.onload= function(doc, cdt, cdn) {
-// 	alert("hii")
-// return get_server_fields('get_details','', '', doc, cdt, cdn, 1,function(){
-// refresh_field('size_item')
-// });
-// };
 
 cur_frm.cscript.item_group =function(doc, cdt, cdn){
 	if(doc.item_group == 'Tailoring'){
@@ -282,13 +266,12 @@ cur_frm.cscript.item_group =function(doc, cdt, cdn){
 	}
 }
 
+cur_frm.cscript.raw_item_code=function(doc,cdt,cdn){
+	var d=locals[cdt][cdn]
+	get_server_fields('get_rawtab_details',d.raw_item_code,'',doc,cdt,cdn,1,function(){
+		refresh_field('raw_item_sub_group',d.name,'raw_material_item');
+		refresh_field('uom',d.name,'raw_material_item');
+		refresh_field('article_item_name',d.name,'raw_material_item');
+	})
 
-
-
-// cur_frm.cscript.onload_post_render = function() {
-// 	frappe.require('assets/frappe/js/lib/jscolor/jscolor.js');
-// 	$.each(["fabric_color"], function(i, v) {
-// 		$(cur_frm.fields_dict[v].input).addClass('color');
-// 	})
-// 	jscolor.bind();
-// }
+}

@@ -1,0 +1,21 @@
+{
+ "content": null, 
+ "creation": "2015-01-16 21:54:02.594125", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "modified": "2015-01-16 21:54:02.594125", 
+ "modified_by": "Administrator", 
+ "module": "Support", 
+ "name": "web-camera", 
+ "owner": "Administrator", 
+ "page_name": "Web Camera", 
+ "roles": [
+  {
+   "role": "All"
+  }
+ ], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null, 
+ "title": "Web Camera"
+}
