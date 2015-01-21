@@ -109,7 +109,7 @@ def setup_account(args=None):
 		create_suppliers(args)
 		frappe.local.message_log = []
 
-		create_branch()
+		create_branch(args)
 		frappe.local.message_log = []
 
 		frappe.db.set_default('desktop:home_page', 'desktop')
@@ -330,7 +330,7 @@ def create_width():
 		"uom":"Inches"
 		}).insert()
 
-def create_branch():
+def create_branch(args):
 	branch_dict={
 	"Manufacturing":["","India","","","Main","INR","Manufacturing","Production"],
 	"Showroom":["50","India","Administrative Expenses","Administrator","Main","INR","Showroom","Showroom"]
