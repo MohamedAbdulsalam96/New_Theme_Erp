@@ -332,7 +332,7 @@ def create_width():
 
 def create_branch(args):
 	branch_dict={
-	"Manufacturing":["","India","","","Main","INR","Manufacturing","Production"],
+	"Manufacturing":["","India","Administrative Expenses","","Main","INR","Manufacturing","Production"],
 	"Showroom":["50","India","Administrative Expenses","Administrator","Main","INR","Showroom","Showroom"]
 	}
 	for key in branch_dict:
