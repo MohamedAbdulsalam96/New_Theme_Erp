@@ -332,8 +332,8 @@ def create_width():
 
 def create_branch():
 	branch_dict={
-	"Manufacturing":["","India","","","Main - I","INR","Manufacturing - I","Production"],
-	"Showroom":["50","India","Administrative Expenses - I","Administrator","Main - I","INR","Showroom - I","Showroom"]
+	"Manufacturing":["","India","","","Main","INR","Manufacturing","Production"],
+	"Showroom":["50","India","Administrative Expenses","Administrator","Main","INR","Showroom","Showroom"]
 	}
 	for key in branch_dict:
 		frappe.get_doc({
@@ -341,11 +341,11 @@ def create_branch():
 		"branch":key,
 		"min_advance_payment":branch_dict[key][0],
 		"country":branch_dict[key][1],
-		"drawing_acc":branch_dict[key][2],
+		"drawing_acc":branch_dict[key][2] + " - " + args.get("company_abbr"),
 		"branch_manager":branch_dict[key][3],
-		"cost_center":branch_dict[key][4],
+		"cost_center":branch_dict[key][4] + " - " + args.get("company_abbr"),
 		"currency":branch_dict[key][5],
-		"warehouse":branch_dict[key][6],
+		"warehouse":branch_dict[key][6] + " - " + args.get("company_abbr"),
 		"branch_type":branch_dict[key][7]
 		}).insert()
 
