@@ -300,6 +300,7 @@ def make_production_process_log(obj, process_list, args):
 			pl.process_name = s.process
 			pl.branch = s.branch
 			pl.trials = s.trial_no
+			pl.actual_fabric = cint(frappe.db.get_value('Trial Dates', {'work_order': args.tailor_work_order, 'process': s.process, 'trial_no': s.trial_no}, 'actual_fabric')) or 0
 			pl.status = status
 			pl.pr_work_order = s.work_order or s.process_work_order
 
@@ -487,7 +488,7 @@ def update_status(sales_invoice_no, args):
 			add_to_serial_no(details, s.get('work_order'))
 			cut_order_generation(s.get('work_order'), sales_invoice_no)
 			update_work_order_status(s.get('work_order'), s.get('status'))
-			if not frappe.db.get_value('Stock Entry Detail', {'work_order': s.get('work_order'), 'docstatus':0}, 'name'):
+			if not frappe.db.get_value('Stock Entry Detail', {'work_order': s.get('work_order'), 'docstatus':0}, 'name') and details:
 				sn_list = frappe.db.get_value('Work Order', s.get('work_order'), 'serial_no_data')
 				parent = stock_entry_for_out(s, details.branch, sn_list, frappe.db.get_value('Work Order', s.get('work_order'), 'item_qty'))
 		elif s.get('status') == 'Hold' and frappe.db.get_value('Work Order', s.get('work_order'), 'status') != 'Release':

@@ -14,8 +14,9 @@ class WorkManagement(Document):
 		sales_invoices = self.get_invoice(invoice_no)
 		if sales_invoices:
 			for si_no in sales_invoices:
+				work_order_release = frappe.db.get_value('Work Order', si_no.work_order, 'status')
 				branch = frappe.db.get_value('User',frappe.session.user,'branch')
-				if frappe.db.get_value('Process Log',{'parent': si_no.name, 'branch': branch},'name'):
+				if frappe.db.get_value('Process Log',{'parent': si_no.name, 'branch': branch},'name') and work_order_release=='Release':
 					si = self.append('production_details', {})
 					self.create_invoice_bundle(si_no, si)
 		return "Done"

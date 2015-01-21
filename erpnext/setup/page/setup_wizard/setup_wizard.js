@@ -41,7 +41,7 @@ frappe.pages['setup-wizard'].onload = function(wrapper) {
 		welcome_html: '<h1 class="text-muted text-center"><i class="icon-magic"></i></h1>\
 			<h2 class="text-center">'+__('ERPNext Setup')+'</h2>\
 			<p class="text-center" style="margin: 0px 100px">' +
-			__('Welcome to ERPNext. Over the next few minutes we will help you setup your ERPNext account. Try and fill in as much information as you have even if it takes a bit longer. It will save you a lot of time later. Good Luck!') +
+			__('Welcome to Tailorpad. Over the next few minutes we will help you setup your ERPNext account. Try and fill in as much information as you have even if it takes a bit longer. It will save you a lot of time later. Good Luck!') +
 			'</p>',
 		working_html: function() { return '<h3 class="text-muted text-center"><i class="icon-refresh icon-spin"></i></h3>\
 			<h2 class="text-center">'+__('Setting up...')+'</h2>\
@@ -64,7 +64,7 @@ frappe.pages['setup-wizard'].onload = function(wrapper) {
 						"italiano", "nederlands", "polski", "português brasileiro", "português", "српски", "தமிழ்",
 						"ไทย", "中国（简体）", "中國（繁體）"], reqd:1},
 				],
-				help: __("Welcome to ERPNext. Please select your language to begin the Setup Wizard."),
+				help: __("Welcome to Tailorpad. Please select your language to begin the Setup Wizard."),
 				onload: function(slide) {
 					slide.get_input("language").on("change", function() {
 						var lang = $(this).val();
