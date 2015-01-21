@@ -25,7 +25,7 @@ class website_maker(object):
 			"title": self.company,
 			"published": 1,
 			"header": "<h1>{0}</h1>".format(self.tagline or "Headline")+\
-				'<p>'+_("This is an example website auto-generated from ERPNext")+"</p>"+\
+				'<p>'+_("Welcome to TailorPad")+"</p>"+\
 				'<p><a class="btn btn-primary" href="/login">Login</a></p>',
 			"description": self.company + ":" + (self.tagline or ""),
 			"css": frappe.get_template("setup/page/setup_wizard/sample_home_page.css").render(),
@@ -43,7 +43,7 @@ class website_maker(object):
 	def make_website_settings(self):
 		# update in home page in settings
 		website_settings = frappe.get_doc("Website Settings", "Website Settings")
-		website_settings.home_page = self.webpage.name
+		website_settings.home_page = 'login'
 		website_settings.brand_html = self.company
 		website_settings.copyright = self.company
 		website_settings.top_bar_items = []
