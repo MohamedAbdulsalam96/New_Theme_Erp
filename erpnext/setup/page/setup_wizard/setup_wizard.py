@@ -232,9 +232,10 @@ def create_style():
 def create_item_series():
 	series_dict=['TRO','SHI','JAC','FAB']
 	for series in series_dict:
-		s = frappe.new_doc('Item Series')
-		s.new_series = series
-		s.save(ignore_permissions=True)
+		frappe.get_doc({
+		"doctype":"Item Series",
+		"new_series":series,
+		}).insert()
 
 def create_measurment():
 	measurment_dict={
