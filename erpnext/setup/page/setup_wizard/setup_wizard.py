@@ -232,7 +232,7 @@ def create_style():
 def create_item_series():
 	series_dict=['TRO','SHI','JAC','FAB']
 	for series in series_dict:
-		frappe.get_doc({
+		frappe.new_doc({
 		"doctype":"Item Series",
 		'new_series':series
 		}).insert()
