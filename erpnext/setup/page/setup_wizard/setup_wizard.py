@@ -234,9 +234,8 @@ def create_item_series():
 	for series in series_dict:
 		frappe.get_doc({
 		"doctype":"Item Series",
-		"new_series":series,
+		'new_series':series,
 		}).insert()
-
 
 def create_measurment():
 	measurment_dict={
