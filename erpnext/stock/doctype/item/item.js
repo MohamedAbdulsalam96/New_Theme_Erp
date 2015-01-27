@@ -181,12 +181,12 @@ cur_frm.cscript.copy_from_item_group = function(doc) {
 //Rohit
 cur_frm.cscript.image = function(doc, cdt, cdn) {
 var d = locals[cdt][cdn]
-d.image_view = '<table style="width: 100%; table-layout: fixed;"><tr><td><img src="'+d.image+'" width="100px"></td></tr></table>'
+d.image_view = '<table style="width: 100%; table-layout: fixed;"><tr><td><img src="'+d.image+'" style="100px" width="100px"></td></tr></table>'
 	refresh_field('image_view', d.name, 'measurement_item');
 }
 cur_frm.cscript.add_image = function(doc, cdt, cdn) {
 var d = locals[cdt][cdn]
-d.image_viewer = '<table style="width: 100%; table-layout: fixed;"><tr><td ><img src="'+d.add_image+'" width="100px"></td></tr></table>'
+d.image_viewer = '<table style="width: 100%; table-layout: fixed;"><tr><td ><img src="'+d.add_image+'" style="100px" width="100px"></td></tr></table>'
 	refresh_field('image_viewer', d.name, 'style_item');
 }
 

@@ -113,6 +113,15 @@ doc_events = {
 	"Quality Inspection":{
 		"on_update" : "erpnext.accounts.accounts_custom_methods.update_QI_status",
 		"on_submit" : "erpnext.accounts.accounts_custom_methods.make_stock_entry_against_qc"
+	},
+	"Customer":{
+		"on_update": [
+			"loyalty_point_engine.loyalty_point_engine.hooks_call_handler.create_acc_payable_head",
+			"loyalty_point_engine.loyalty_point_engine.hooks_call_handler.referral_management"
+		]
+	},
+	"Journal Voucher":{
+		"on_update": "loyalty_point_engine.loyalty_point_engine.hooks_call_handler.grab_jv_and_invoice_details"
 	}
 }
 

@@ -144,6 +144,7 @@ def install(country=None):
 		{'doctype': 'Mode of Payment', 'mode_of_payment': _('Cash')},
 		{'doctype': 'Mode of Payment', 'mode_of_payment': _('Credit Card')},
 		{'doctype': 'Mode of Payment', 'mode_of_payment': _('Wire Transfer')},
+		{'doctype': 'Mode of Payment', 'mode_of_payment': _('Redeem')},
 		{'doctype': 'Mode of Payment', 'mode_of_payment': _('Bank Draft')},
 
 		# Activity Type

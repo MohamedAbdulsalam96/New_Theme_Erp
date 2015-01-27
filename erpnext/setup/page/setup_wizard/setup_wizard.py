@@ -435,7 +435,7 @@ def create_feed_and_todo():
 	"""update activty feed and create todo for creation of item, customer, vendor"""
 	from erpnext.home import make_feed
 	make_feed('Comment', 'ToDo', '', frappe.session['user'],
-		'ERNext Setup Complete!', '#6B24B3')
+		'Tailorpad Setup Complete!', '#6B24B3')
 
 def create_email_digest():
 	from frappe.utils.user import get_system_managers

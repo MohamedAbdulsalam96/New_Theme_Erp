@@ -15,6 +15,13 @@ def get_data():
 					"description": _("Dashboard"),
 				},
 				{
+					"type":"page",
+					"name":"global-search",
+					"icon" : "icon-search",
+					"label": _("Global Search"),					
+					"description": _("Global Search"),
+				},
+				{
 					"type": "doctype",
 					"label":"Authentication Approval",
 					"icon" :"icon-check",	

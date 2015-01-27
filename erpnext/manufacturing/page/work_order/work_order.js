@@ -203,9 +203,9 @@ frappe.WOForm = Class.extend({
 				dic = {'field_name': $('[data-fieldname="field_name"]').val(), 'abbreviation': ''} 
 			}
 			$("<td>").html(dic['field_name']).appendTo(row);
-			$("<td>").html('<input type="Textbox" class="text_box">').appendTo(row);
+			$("<td>").html('<input type="Textbox" class="text_box" value="'+dic['text']+'">').appendTo(row);
 			$("<td>").html(dic['abbreviation']).appendTo(row);
-			$("<td>").appendTo(row);
+			$("<td style='width:auto'>").html(dic['image']).appendTo(row);
 			$('<button  class="remove">View</button>').appendTo($("<td>")).appendTo(row)
 				.click(function(){
 					me.view_style($(this).closest("tr").find('td'), me[key].find("tbody"))
