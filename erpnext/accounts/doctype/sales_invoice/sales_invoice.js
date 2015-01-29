@@ -397,6 +397,7 @@ cur_frm.cscript.on_submit = function(doc, cdt, cdn) {
 	$.each(doc["entries"], function(i, row) {
 		if(row.delivery_note) frappe.model.clear_doc("Delivery Note", row.delivery_note)
 	})
+	setTimeout(function	(){window.location.reload()}, 1000)
 }
 
 cur_frm.cscript.send_sms = function() {

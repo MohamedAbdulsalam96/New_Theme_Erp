@@ -197,10 +197,8 @@ class ProcessAllotment(Document):
 		if args.tailor_serial_no:
 			serial_no_list = cstr(args.tailor_serial_no).split('\n')
 			for serial_no in serial_no_list:
-				if args.employee_status == 'Completed' and not args.ste_no:
-					update_status_to_completed(serial_no, self.name, args.tailor_process_trials)
-				elif args.employee_status == 'Reassigned':
-					check_for_reassigned(serial_no, args, self.process)
+				if args.employee_status == 'Completed' or 'Reassigned' and not args.ste_no:
+					update_status_to_completed(serial_no, self.name, args.tailor_process_trials, self.emp_status)
 
 	def validate_trials(self, args):
 		if self.process_trials and cint(args.assigned_work_qty) > 1:
@@ -521,6 +519,8 @@ class ProcessAllotment(Document):
 	# 			frappe.db.sql("update `tabProcess Log` set status='Open' where idx=%s and parent='%s'"%(cint(s.idx)+1, s.parent))
 
 	def assign_task_to_employee(self):
+		self.validate_WorkOrder_ReleaseStatus()
+		self.validate_Status()
 		emp = self.append('employee_details',{})
 		emp.employee = self.process_tailor
 		emp.employee_name = frappe.db.get_value('Employee', self.process_tailor, 'employee_name')
@@ -542,6 +542,73 @@ class ProcessAllotment(Document):
 		emp.qc_required = cint(self.qc)
 		self.save()
 		return "Done"
+
+	def validate_Status(self):
+		sn_data = cstr(self.serial_no_data).split('\n')
+		if sn_data:
+			for s in sn_data:
+				if s:
+					self.validate_processStatus(s) # to avoid duplicate  process status
+					if self.emp_status == 'Reassigned' or 'Completed':
+						self.check_PreviousStaus(s) # To check sequence of status
+					if self.emp_status == 'Assigned':
+						self.check_PrevStatus(s) # Check prev is completed 
+						self.Next_process_assign(s) # If next process open then current has no
+					
+	def check_PrevStatus(self, serial_no):
+		if self.process_trials:
+			pdd, trial_no = self.get_PA_details('trial')
+			if frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'trial_no': trial_no, 'parent': serial_no}, 'status') != 'Completed':
+				frappe.throw(_("Previous trial is incompleted"))
+		else:
+			pdd = self.get_PA_details('nontrial')
+			if pdd:
+				if frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'parent': serial_no}, 'status') != 'Completed':
+					frappe.throw(_("Previous process is incompleted"))
+
+	def get_PA_details(self, type_of_trial):
+		msg = None
+		if type_of_trial == 'trial' and cint(self.process_trials) > 1:
+			return self.pdd, cint(self.process_trials) - 1
+		elif cint(frappe.db.get_value('Process Log', {'process_data': self.name, 'parent': self.pdd}, 'idx'))> 1:
+			data = frappe.db.sql("""select process_data from `tabProcess Log` where parent='%s' and 
+				process_data < '%s' limit 1"""%(self.pdd, self.name), as_list=1, debug=1)
+			if data:
+				msg = data[0][0]
+			return msg
+		else:
+			return msg
+
+	def Next_process_assign(self, serial_no):
+		data = frappe.db.sql("""select process_data from `tabProcess Log` where parent='%s' and 
+				process_data > '%s' limit 1"""%(self.pdd, self.name), as_list=1, debug=1)
+		if data:
+			if frappe.db.get_value('Serial No Detail', {'parent': serial_no, 'process_data': data[0][0]}, 'name'):
+				frappe.throw(_("Not allow to make changes in current process"))
+
+	def validate_processStatus(self, serial_no):
+		check_dict = self.get_dic_List(serial_no)
+		check_dict.setdefault('status', self.emp_status)
+		if frappe.db.get_value('Serial No Detail', check_dict, 'name'):
+			frappe.throw(_("Status {0} already defined").format(self.emp_status))
+
+	def check_PreviousStaus(self, serial_no):
+		val = 'Assigned'
+		if self.emp_status=='Completed':
+			val = 'Assigned' or 'Reassigned'
+		check_dict = self.get_dic_List(serial_no)
+		if frappe.db.get_value('Serial No Detail', check_dict, 'status') == val:
+			frappe.throw(_("Sequence is not correct").format(self.emp_status))
+
+	def get_dic_List(self, serial_no):
+		check_dict = {'parent': serial_no, 'process_data': self.name}
+		if self.process_trials:
+			check_dict = {'parent': serial_no, 'process_data': self.name, 'trial_no': self.process_trials}
+		return check_dict	
+
+	def validate_WorkOrder_ReleaseStatus(self):
+		if not frappe.db.get_value('Work Order', self.process_work_order, 'status') == 'Release':
+			frappe.throw(_('Work order {0} must be Release').format(self.process_work_order))
 
 	def cal_extra_chg(self):
 		process_data = frappe.db.get_value('Process Item',{'parent':self.item, 'process_name':self.process, 'trials':1}, 'branch_dict')

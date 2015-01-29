@@ -46,6 +46,8 @@ def create_work_order_style(data, wo_name, item_code):
 	 			ws = frappe.new_doc('WO Style')
 	 			ws.field_name = s.style
 	 			ws.abbreviation  = s.abbreviation
+	 			ws.image_viewer = image_viewer
+	 			ws.default_value = default_value
 	 			ws.parent = wo_name
 	 			ws.parentfield = 'wo_style'
 	 			ws.parenttype = 'Work Order'
@@ -59,6 +61,8 @@ def get_styles_DefaultValues(style, item_code):            #Newly Added Method
 		where a.default=1 and a.parent='%s' and a.style='%s'"""%(item_code, style),as_list=1)
 	if default_item:
 		return default_item[0][0], default_item[0][1]
+	else:
+		return '', ''
 
 def create_work_order_measurement(data, wo_name, item_code):
 	style_parm=[]
@@ -371,7 +375,7 @@ def make_order(doc, d, qty, item_code):
 		if not e.tailor_work_order:
 			e.tailor_work_order = create_work_order(doc, d, e.serial_no_data, item_code, qty)
 			update_serial_no_with_wo(e.serial_no_data, e.tailor_work_order)
-		if not e.trials:
+		if not e.trials and frappe.db.get_value('Process Item', {'parent':item_code, 'trials':1}, 'name'):
 			e.trials = make_schedule_for_trials(doc, d, e.tailor_work_order, item_code, e.serial_no_data)
 		e.save()
 		return "Done"
@@ -485,7 +489,7 @@ def update_status(sales_invoice_no, args):
 		if s.get('status') == 'Release' and frappe.db.get_value('Work Order', s.get('work_order'), 'status')!='Release':
 			validate_work_order(s)
 			details = open_next_branch(frappe.db.get_value('Production Dashboard Details',{'work_order': s.get('work_order')}, 'name'), 1)
-			add_to_serial_no(details, s.get('work_order'))
+			# add_to_serial_no(details, s.get('work_order'))
 			cut_order_generation(s.get('work_order'), sales_invoice_no)
 			update_work_order_status(s.get('work_order'), s.get('status'))
 			if not frappe.db.get_value('Stock Entry Detail', {'work_order': s.get('work_order'), 'docstatus':0}, 'name') and details:
@@ -506,7 +510,7 @@ def release_work_order(doc):
 	if doc.status != 'Release' and cint(frappe.db.get_value('Sales Invoice', doc.sales_invoice_no, 'release')) == 1:
 		s= {'work_order': doc.name, 'status': 'Release', 'item': doc.item_code}
 		details = open_next_branch(frappe.db.get_value('Production Dashboard Details',{'work_order': doc.name}, 'name'), 1)
-		add_to_serial_no(details, s.get('work_order'))
+		# add_to_serial_no(details, s.get('work_order'))
 		sn_list = frappe.db.get_value('Work Order', doc.name, 'serial_no_data')
 		parent = stock_entry_for_out(s, details.branch, sn_list, frappe.db.get_value('Work Order', doc.name, 'item_qty'))
 		update_work_order_status(doc.name, 'Release')
@@ -640,9 +644,8 @@ def check_previous_is_closed_for_trials(serial_no, args, work_order):
 
 def make_serial_no_log(serial_no, args, work_order, qc, emp):
 	if args:
-		if cint(args.idx)>1:
-			check_previous_is_closed(serial_no, args, work_order)
-
+		# if cint(args.idx)>1:
+		# 	check_previous_is_closed(serial_no, args, work_order)
 		if args.trials:
 			if not frappe.db.get_value('Serial No Detail', {'parent':serial_no, 'process': args.process_name,'trial_no': args.trials,  'work_order': work_order}, 'name'):
 				make_sn_detail(serial_no, args, work_order, qc, emp)
@@ -664,16 +667,14 @@ def make_sn_detail(serial_no, args, work_order, qc, emp):
 	snd.parent = serial_no
 	snd.save(ignore_permissions=True)
 
-def update_status_to_completed(serial_no, process_data, trial_no):
+def update_status_to_completed(serial_no, process_data, trial_no, emp_status):
 	cond = "1=1"
 	if trial_no:
 		cond = "trial_no = '%s'"%(trial_no)
 	name = frappe.db.sql("""select name from `tabSerial No Detail` where parent='%s'
-		and process_data='%s' and status='Assigned' and %s"""%(serial_no, process_data, cond), as_list=1)
+		and process_data='%s' and %s"""%(serial_no, process_data, cond), as_list=1)
 	if name:
-		update_serial_no_log_status(name[0][0], 'Completed')
-	else:
-		frappe.throw(_("Already completed or not assigned"))
+		update_serial_no_log_status(name[0][0], emp_status)
 
 def get_idx_for_serialNo(args, pdd, process):
 	if args.tailor_process_trials:
