@@ -549,7 +549,7 @@ class ProcessAllotment(Document):
 			for s in sn_data:
 				if s:
 					self.validate_processStatus(s) # to avoid duplicate  process status
-					if self.emp_status == 'Reassigned' or 'Completed':
+					if self.emp_status == 'Reassigned' or self.emp_status == 'Completed':
 						self.check_PreviousStaus(s) # To check sequence of status
 					if self.emp_status == 'Assigned':
 						self.check_PrevStatus(s) # Check prev is completed 
@@ -597,8 +597,8 @@ class ProcessAllotment(Document):
 		if self.emp_status=='Completed':
 			val = 'Assigned' or 'Reassigned'
 		check_dict = self.get_dic_List(serial_no)
-		if frappe.db.get_value('Serial No Detail', check_dict, 'status') == val:
-			frappe.throw(_("Sequence is not correct").format(self.emp_status))
+		if frappe.db.get_value('Serial No Detail', check_dict, 'status') != val:
+			frappe.throw(_("Sequence is not correct or previous process is not Completed").format(self.emp_status))
 
 	def get_dic_List(self, serial_no):
 		check_dict = {'parent': serial_no, 'process_data': self.name}

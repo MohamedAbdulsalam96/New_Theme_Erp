@@ -21,38 +21,37 @@ def create_production_process(doc, method):
 
 def create_work_order(doc, data, serial_no, item_code, qty):
 	wo = frappe.new_doc('Work Order')
- 	wo.item_code = item_code
- 	wo.customer = doc.customer
- 	wo.sales_invoice_no = doc.name
- 	wo.customer_name = frappe.db.get_value('Customer',wo.customer,'customer_name')
- 	wo.item_qty = qty
- 	wo.fabric__code = get_dummy_fabric(item_code)
- 	wo.serial_no_data = serial_no
- 	wo.branch = data.tailoring_warehouse
- 	wo.save(ignore_permissions=True)
- 	
- 	create_work_order_style(data, wo.name, item_code)
- 	create_work_order_measurement(data, wo.name, item_code)
- 	create_process_wise_warehouse_detail(data, wo.name, item_code)
- 	return wo.name
+	wo.item_code = item_code
+	wo.customer = doc.customer
+	wo.sales_invoice_no = doc.name
+	wo.customer_name = frappe.db.get_value('Customer',wo.customer,'customer_name')
+	wo.item_qty = qty
+	wo.fabric__code = get_dummy_fabric(item_code)
+	wo.serial_no_data = serial_no
+	wo.branch = data.tailoring_warehouse
+	create_work_order_style(data, wo, item_code)
+	create_work_order_measurement(data, wo, item_code)
+	create_process_wise_warehouse_detail(data, wo, item_code)
+	wo.save(ignore_permissions=True)
+	return wo.name
 
 def create_work_order_style(data, wo_name, item_code):
- 	if wo_name and item_code:
-	 	styles = frappe.db.sql(""" select distinct style, abbreviation from `tabStyle Item` where parent = '%s'
-	 		"""%(item_code),as_dict=1)
-	 	if styles:
-	 		for s in styles:
-	 			image_viewer, default_value = get_styles_DefaultValues(s.style, item_code)  #Newly Added
-	 			ws = frappe.new_doc('WO Style')
-	 			ws.field_name = s.style
-	 			ws.abbreviation  = s.abbreviation
-	 			ws.image_viewer = image_viewer
-	 			ws.default_value = default_value
-	 			ws.parent = wo_name
-	 			ws.parentfield = 'wo_style'
-	 			ws.parenttype = 'Work Order'
-	 			ws.table_view = 'Right'
-	 			ws.save(ignore_permissions =True)
+	if wo_name and item_code:
+		styles = frappe.db.sql(""" select distinct style, abbreviation from `tabStyle Item` where parent = '%s'
+			"""%(item_code),as_dict=1)
+		if styles:
+			for s in styles:
+				image_viewer, default_value = get_styles_DefaultValues(s.style, item_code)  #Newly Added
+				ws = wo_name.append('wo_style')
+				ws.field_name = s.style
+				ws.abbreviation  = s.abbreviation
+				ws.image_viewer = image_viewer
+				ws.default_value = default_value
+				# ws.parent = wo_name
+				# ws.parentfield = 'wo_style'
+				# ws.parenttype = 'Work Order'
+				ws.table_view = 'Right'
+				# ws.save(ignore_permissions =True)
 	return True
 
 @frappe.whitelist(allow_guest=True)
@@ -66,36 +65,37 @@ def get_styles_DefaultValues(style, item_code):            #Newly Added Method
 
 def create_work_order_measurement(data, wo_name, item_code):
 	style_parm=[]
- 	if wo_name and item_code:
-	 	measurements = frappe.db.sql(""" select * from `tabMeasurement Item` where parent = '%s'
-	 		"""%(item_code),as_dict=1)
-	 	if measurements:
-	 		for s in measurements:
-	 			if not s.parameter in style_parm:
-		 			mi = frappe.new_doc('Measurement Item')
-		 			mi.parameter = s.parameter
-		 			mi.abbreviation = s.abbreviation
-		 			mi.image_view = s.image_view
-		 			mi.parent = wo_name
-		 			mi.parentfield = 'measurement_item'
-		 			mi.parenttype = 'Work Order'
-		 			mi.save(ignore_permissions =True)
-		 			style_parm.append(s.parameter)
+	if wo_name and item_code:
+		measurements = frappe.db.sql(""" select * from `tabMeasurement Item` where parent = '%s'
+			"""%(item_code),as_dict=1)
+		if measurements:
+			for s in measurements:
+				if not s.parameter in style_parm:
+					mi = wo_name.append('measurement_item')
+					mi.parameter = s.parameter
+					mi.abbreviation = s.abbreviation
+					mi.image_view = s.image_view
+					# mi.parent = wo_name
+					# mi.parentfield = 'measurement_item'
+					# mi.parenttype = 'Work Order'
+					# mi.save(ignore_permissions =True)
+					style_parm.append(s.parameter)
 	return True
 
 def create_process_wise_warehouse_detail(data, wo_name, item_code):
 	if wo_name:
 		for proc_wh in frappe.db.sql("""select process_name, warehouse, idx, actual_fabric from `tabProcess Item`
 			where parent = '%s'"""%item_code,as_list=1):
-			mi = frappe.new_doc('Process Wise Warehouse Detail')
- 			mi.process = proc_wh[0]
- 			mi.warehouse = proc_wh[1]
- 			mi.idx = proc_wh[2]
- 			mi.actual_fabric = cint(proc_wh[3])
- 			mi.parent = wo_name
- 			mi.parentfield = 'process_wise_warehouse_detail'
- 			mi.parenttype = 'Work Order'
- 			mi.save(ignore_permissions =True)
+			mi = wo_name.append('process_wise_warehouse_detail')
+			mi.process = proc_wh[0]
+			mi.warehouse = proc_wh[1]
+			mi.idx = proc_wh[2]
+			mi.actual_fabric = cint(proc_wh[3])
+			# mi.parent = wo_name
+			# mi.parentfield = 'process_wise_warehouse_detail'
+			# mi.parenttype = 'Work Order'
+			# mi.save(ignore_permissions =True)
+	return True
 
 def create_process_allotment(data):
 	process_list=[]
@@ -359,14 +359,14 @@ def prepare_data_for_order(doc, d, qty):
 		make_order(doc, d,qty, d.tailoring_item_code)
 
 def make_order(doc, d, qty, item_code):
-		e = frappe.new_doc('Work Order Distribution')
+		e = doc.append('work_order_distribution', {})
 		e.tailoring_item = item_code
 		e.tailor_item_name = frappe.db.get_value('Item', item_code, 'item_name')
 		e.tailor_qty = qty
 		e.work_order_service = d.tailoring_price_list
-		e.parenttype = 'Sales Invoice'
-		e.parentfield = 'work_order_distribution'
-		e.parent = doc.name
+		# e.parenttype = 'Sales Invoice'
+		# e.parentfield = 'work_order_distribution'
+		# e.parent = doc.name
 		e.serial_no_data = generate_serial_no(doc, item_code, qty)
 		e.tailor_fabric= d.fabric_code
 		e.refer_doc = d.name
@@ -377,7 +377,7 @@ def make_order(doc, d, qty, item_code):
 			update_serial_no_with_wo(e.serial_no_data, e.tailor_work_order)
 		if not e.trials and frappe.db.get_value('Process Item', {'parent':item_code, 'trials':1}, 'name'):
 			e.trials = make_schedule_for_trials(doc, d, e.tailor_work_order, item_code, e.serial_no_data)
-		e.save()
+		# e.save()
 		return "Done"
 
 def make_schedule_for_trials(doc, args, work_order, item_code, serial_no_data):

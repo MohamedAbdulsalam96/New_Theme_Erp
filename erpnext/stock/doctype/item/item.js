@@ -275,3 +275,11 @@ cur_frm.cscript.raw_item_code=function(doc,cdt,cdn){
 	})
 
 }
+
+cur_frm.fields_dict['swatch_id'].get_query = function(doc) {
+	return {
+		filters: {
+			'supplier': doc.supplier_code
+		}
+	}
+}

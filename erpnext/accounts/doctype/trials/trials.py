@@ -22,9 +22,11 @@ class Trials(Document):
 		if self.finish_trial_for_process and not frappe.db.get_value('Completed Process Log', {'parent':self.name, 'completed_process': self.finish_trial_for_process}, 'completed_process'):
 			response = self.make_process_completed_log()
 			if response:
+				frappe.db.sql("""update `tabProcess Allotment` set process_trials = (select name from `tabCustomer` where 1=2),
+					emp_status='', start_date=(select name from `tabSupplier` where 1=2), qc=0 where pdd = '%s' 
+					and process='%s'"""%(self.pdd, process))
 				self.prepare_ste_for_finished_process()
-				
-			
+
 	def make_process_completed_log(self):
 		obj = self.append('completed_process_log', {})
 		obj.completed_process = self.finish_trial_for_process

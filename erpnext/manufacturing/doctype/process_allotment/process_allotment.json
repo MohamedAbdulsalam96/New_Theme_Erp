@@ -30,7 +30,7 @@
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
-   "read_only": 0, 
+   "read_only": 1, 
    "report_hide": 0, 
    "reqd": 0, 
    "search_index": 0, 
@@ -50,7 +50,7 @@
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
-   "read_only": 0, 
+   "read_only": 1, 
    "report_hide": 0, 
    "reqd": 0, 
    "search_index": 0, 
@@ -78,7 +78,8 @@
    "fieldtype": "Text", 
    "label": "Serial", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "finished_good_qty", 
@@ -101,7 +102,8 @@
    "label": "Process Status", 
    "options": "\nOpen\nReopen\nClosed", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "process", 
@@ -109,7 +111,8 @@
    "label": "Process", 
    "options": "Process", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "branch", 
@@ -118,7 +121,7 @@
    "options": "Branch", 
    "permlevel": 0, 
    "precision": "", 
-   "read_only": 0
+   "read_only": 1
   }, 
   {
    "fieldname": "barcode", 
@@ -144,7 +147,8 @@
    "label": "process_status_changes", 
    "options": "\nYes\nNo", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "skip_process", 
@@ -152,7 +156,8 @@
    "hidden": 1, 
    "label": "Skip Process", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "section_break_11", 
@@ -523,7 +528,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-01-15 16:26:57.499762", 
+ "modified": "2015-01-30 15:41:42.807578", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

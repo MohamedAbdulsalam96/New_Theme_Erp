@@ -51,7 +51,7 @@
    "print_hide": 0, 
    "read_only": 0, 
    "report_hide": 0, 
-   "reqd": 0, 
+   "reqd": 1, 
    "search_index": 0, 
    "set_only_once": 0
   }, 
@@ -71,7 +71,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-11-15 15:40:10.780258", 
+ "modified": "2015-01-30 15:56:34.903592", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Swatch", 
