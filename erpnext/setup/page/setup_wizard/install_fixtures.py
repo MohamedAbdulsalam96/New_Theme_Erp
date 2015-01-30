@@ -44,9 +44,16 @@ def install(country=None):
 			'is_group': 'No', 'parent_item_group': _('All Item Groups') },
 		# deduction type
 		{'doctype': 'Deduction Type', 'name': _('Income Tax'), 'description': _('Income Tax'), 'deduction_name': _('Income Tax')},
+		{'doctype': 'Deduction Type', 'name': _('Loan'), 'description': _('Loan'), 'deduction_name': _('Loan')},
+		{'doctype': 'Deduction Type', 'name': _('Drawings'), 'description': _('Drawings'), 'deduction_name': _('Drawings')},
+		{'doctype': 'Deduction Type', 'name': _('Late Work'), 'description': _('Late Work'), 'deduction_name': _('Late Work')},
 
 		# earning type
 		{'doctype': 'Earning Type', 'name': _('Basic'), 'description': _('Basic'), 'earning_name': _('Basic'), 'taxable': 'Yes'},
+		{'doctype': 'Earning Type', 'name': _('Overtime'), 'description': _('Overtime'), 'earning_name': _('Overtime'), 'taxable': 'Yes'},
+		{'doctype': 'Earning Type', 'name': _('Wages'), 'description': _('Wages'), 'earning_name': _('Wages'), 'taxable': 'Yes'},
+		{'doctype': 'Earning Type', 'name': _('Extra Charges'), 'description': _('Extra Charges'), 'earning_name': _('Extra Charges'), 'taxable': 'Yes'},
+
 
 		# expense claim type
 		{'doctype': 'Expense Claim Type', 'name': _('Calls'), 'expense_type': _('Calls')},
