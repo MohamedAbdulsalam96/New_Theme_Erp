@@ -41,6 +41,13 @@ def stock_out_entry(doc, method):
 		in_entry  = make_stock_entry_for_in(doc)
 	elif doc.purpose_type == 'Material In':
 		open_process(doc)
+	update_fb_reserve(doc)
+
+def update_fb_reserve(doc):
+	name = frappe.db.get_value('Fabric Reserve', {'article_serial_no': doc.name}, 'name')
+	if name:
+		frappe.db.sql(""" update `tabFabric Reserve` set stock_entry_status='Completed'
+			where name = '%s'"""%(name))
 
 def make_stock_entry_for_in(doc):
 	branch_list = {}

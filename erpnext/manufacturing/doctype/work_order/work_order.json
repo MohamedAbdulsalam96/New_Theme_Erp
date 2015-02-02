@@ -340,6 +340,20 @@
    "precision": ""
   }, 
   {
+   "fieldname": "current_process", 
+   "fieldtype": "Data", 
+   "label": "Current Process", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "total_process", 
+   "fieldtype": "Data", 
+   "label": "Total Process", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "allow_on_submit": 0, 
    "fieldname": "amended_from", 
    "fieldtype": "Link", 
@@ -368,7 +382,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-12-30 00:36:25.849362", 
+ "modified": "2015-02-02 11:36:37.905967", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Work Order", 

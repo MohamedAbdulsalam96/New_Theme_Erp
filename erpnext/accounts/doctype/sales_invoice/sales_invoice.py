@@ -18,6 +18,7 @@ from erpnext.controllers.recurring_document import *
 
 from erpnext.controllers.selling_controller import SellingController
 from tools.tools_management.custom_methods import get_merchandise_item_details, get_item_details
+from erpnext.accounts.accounts_custom_methods import update_serial_noInto
 
 form_grid_templates = {
 	"entries": "templates/form_grid/item_grid.html"
@@ -104,6 +105,7 @@ class SalesInvoice(SellingController):
 
 		self.update_c_form()
 		self.update_time_log_batch(self.name)
+		update_serial_noInto(self)
 		convert_to_recurring(self, "RECINV.#####", self.posting_date)
 
 	def before_cancel(self):

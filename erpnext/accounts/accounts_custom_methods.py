@@ -750,3 +750,37 @@ def get_QI_status(self):
 			msg = 'Rejected'
 	return msg
 	
+#Rohit
+def update_serial_noInto(self):
+	try:
+		serial_no_mapper = get_serial_no_mapper(self)
+		for d in self.get('entries'):
+			if serial_no_mapper.get(d.item_code):
+				frappe.db.sql(""" update `tabSales Invoice Item` set serial_no='%s'
+					where name = '%s'"""%(serial_no_mapper.get(d.item_code), d.name))
+				d.serial_no = serial_no_mapper.get(d.item_code)
+	except Exception:
+		frappe.msgprint(Exception)
+
+def get_serial_no_mapper(self):
+	mapper_list = {}
+	for d in self.get('work_order_distribution'):
+		if d.serial_no_data:
+			if mapper_list.get(d.tailoring_item):
+				val = mapper_list.get(d.tailoring_item) + '\n' + d.serial_no_data
+				mapper_list.setdefault(d.tailoring_item, val)
+			else:
+				mapper_list.setdefault(d.tailoring_item, d.serial_no_data)
+	return mapper_list
+
+# Rohit
+def update_WoCount(doc, method):
+	count = frappe.db.sql(""" select count(name) from `tabWork Order Distribution`
+		where parent = '%s'	"""%(doc.name), as_list=1)
+	if count:
+		data = frappe.db.sql(""" select * from `tabWork Order Distribution` where
+			parent = '%s'	"""%(doc.name), as_dict=1)
+		if data:
+			for d in data:
+				frappe.db.sql(""" update `tabWork Order` set total_process = '%s', current_process='%s'
+					where name = '%s'"""%(count[0][0], d.idx, d.tailor_work_order))
