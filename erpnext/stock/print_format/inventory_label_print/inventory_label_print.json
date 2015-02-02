@@ -1,0 +1,15 @@
+{
+ "creation": "2014-12-31 15:58:26.461126", 
+ "disabled": 0, 
+ "doc_type": "Purchase Receipt", 
+ "docstatus": 0, 
+ "doctype": "Print Format", 
+ "html": "\n\n\t\t{%- for row in doc.purchase_receipt_details -%}\n                {% set my_string = \"select max(price_list_rate),price_list  from `tabItem Price` where item_code =\" %}\n                {% set my_string = my_string + \"'\" + row.item_code + \"'\" %}\n                {% set rate_detail = frappe.db.sql(my_string, as_list=1) %}\n                <table class=\"table table-bordered\" style=\"width:60% !important; table-layout: fixed;\" border=\"none\">\n\t        <tbody>\n\t\t<tr >\n\t\t\t<td>\n                              <table>\n                               <tr>\n                                 <td>\n                                   <b>Supplier</b> :\n                                 </td>\n        \n                                 <td>\n                                   {{ doc.supplier }} \n                                 </td>\n                               </tr>\n                               <tr>\n                                 <td>\n                                   <b>Price List</b>\n                                 </td>                   \n                                 <td>\n                                   \n                                  {{ rate_detail[0][1] or '0.0' }}\n                                 </td>\n                                </tr>\n                              </table>\n                        </td>\n                        <td>  \n                              <table>\n                               <tr>\n                                 <td>\n                                    <b>Item</b> :\n                                 </td>\n        \n                                 <td>\n                                   {{ row.item_name }} \n                                 </td>\n                               </tr>\n                               <tr>\n                                 <td>\n                                   <b>Rate</b> :\n                                 </td>                   \n                                 <td>\n                                  \n                                  {{ rate_detail[0][0] or '' }}\n                                   \n                                 </td>\n                                </tr>\n                              </table>\n                            \n                       </td>\n                        \n\t\t</tr>\n                 <tr>\n                     <td colspan=\"2\" align=\"center\">{{ frappe.db.get_value(\"Item\", row.item_code, \"barcode_image\") }}</td>               \n                 </tr>\n                 </tbody>\n</table>\n\t\t{%- endfor -%}\n\t", 
+ "modified": "2015-02-02 12:22:27.422828", 
+ "modified_by": "Administrator", 
+ "module": "Stock", 
+ "name": "Inventory Label Print", 
+ "owner": "Administrator", 
+ "print_format_type": "Server", 
+ "standard": "Yes"
+}
