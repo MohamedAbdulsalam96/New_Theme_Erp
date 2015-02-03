@@ -335,6 +335,7 @@ def validate_sales_invoice(doc, method):
 	validate_work_order_assignment(doc)
 
 def add_data_in_work_order_assignment(doc, method):
+	validate_branch(doc)
 	if not doc.get('work_order_distribution'):
 		doc.set('work_order_distribution',[])
 	for d in doc.get('sales_invoice_items_one'):
@@ -784,3 +785,7 @@ def update_WoCount(doc, method):
 			for d in data:
 				frappe.db.sql(""" update `tabWork Order` set total_process = '%s', current_process='%s'
 					where name = '%s'"""%(count[0][0], d.idx, d.tailor_work_order))
+
+def validate_branch(doc):
+	if not get_user_branch():
+		frappe.throw(_("Define branch to user"))
