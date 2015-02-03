@@ -103,6 +103,7 @@ def open_process(doc):
 				frappe.errprint(name)
 				frappe.errprint("chheck")
 				if d.serial_no == name.serial_no:
+					frappe.errprint(name.serial_no)
 					process = frappe.db.sql(""" select p.process_name from `tabProcess Log` p, `tabProduction Dashboard Details` pd where pd.work_order = '%s' AND p.branch= '%s'
 						AND p.status='Pending' and p.parent = pd.name order by p.idx limit 1"""%(d.work_order,get_user_branch()), as_list=1)
 					frappe.db.sql(""" update  `tabProcess Log` p inner join 
