@@ -214,12 +214,12 @@ get_server_fields('get_parameter_details',d.parameter,'',doc ,cdt, cdn,1, functi
 
 
 cur_frm.cscript.item_group =function(doc, cdt, cdn){
+	doc.has_serial_no = 'No'
 	if(doc.item_group == 'Tailoring'){
 		doc.has_serial_no = 'Yes'
-		refresh_field('has_serial_no')
 	}
+	refresh_field('has_serial_no')
 }
-
 
 //for Slide Show
 
@@ -282,4 +282,13 @@ cur_frm.fields_dict['swatch_id'].get_query = function(doc) {
 			'supplier': doc.supplier_code
 		}
 	}
+}
+
+cur_frm.cscript.is_stock_item = function(doc){
+	if(doc.is_stock_item == 'No'){
+		doc.has_serial_no = 'No'
+	}else if(doc.item_group == 'Tailoring' && doc.is_stock_item == 'Yes'){
+		doc.has_serial_no = 'Yes'
+	}
+	refresh_field('has_serial_no')
 }
