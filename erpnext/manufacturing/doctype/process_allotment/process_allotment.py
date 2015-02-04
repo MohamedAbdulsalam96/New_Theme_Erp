@@ -560,8 +560,8 @@ class ProcessAllotment(Document):
 			pdd, trial_no = self.get_PA_details('trial')
 			if frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'trial_no': trial_no, 'parent': serial_no}, 'status') != 'Completed' and cint(self.process_trials) != 1:
 				frappe.throw(_("Previous trial is incompleted"))
-			else:
-				frappe.errprint(frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'parent': serial_no}, 'status'))
+			elif frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'parent': serial_no}, 'status') != 'Completed':
+				frappe.throw(_("Previous process is incompleted"))
 		else:
 			pdd, trial_no = self.get_PA_details('nontrial')
 			if pdd:
