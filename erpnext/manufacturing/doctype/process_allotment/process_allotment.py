@@ -561,7 +561,7 @@ class ProcessAllotment(Document):
 			if frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'trial_no': trial_no, 'parent': serial_no}, 'status') != 'Completed':
 				frappe.throw(_("Previous trial is incompleted"))
 		else:
-			pdd = self.get_PA_details('nontrial')
+			pdd, trial_no = self.get_PA_details('nontrial')
 			if pdd:
 				if frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'parent': serial_no}, 'status') != 'Completed':
 					frappe.throw(_("Previous process is incompleted"))
@@ -575,9 +575,9 @@ class ProcessAllotment(Document):
 				process_data < '%s' limit 1"""%(self.pdd, self.name), as_list=1, debug=1)
 			if data:
 				msg = data[0][0]
-			return msg
+			return msg, 0
 		else:
-			return msg
+			return msg, 0
 
 	def Next_process_assign(self, serial_no):
 		data = frappe.db.sql("""select process_data from `tabProcess Log` where parent='%s' and 

@@ -264,6 +264,7 @@ def set_pdd_name(table, cond, name):
 	frappe.db.sql(""" update `tab%s` set %s where name = '%s'"""%(table, cond, name))
 
 def create_production_dashboard( process, data, doc):
+	validate_duplicate_work_order(data.tailor_work_order)
 	pd = frappe.new_doc('Production Dashboard Details')
 	pd.sales_invoice_no = doc.name
 	pd.article_code = data.tailoring_item
@@ -789,3 +790,7 @@ def update_WoCount(doc, method):
 def validate_branch(doc):
 	if not get_user_branch():
 		frappe.throw(_("Define branch to user"))
+
+def validate_duplicate_work_order(work_order):
+	if frappe.db.get_value('Production Dashboard Details', {'work_order': work_order}, 'name'):
+		frappe.throw(_('Duplicate work order found please contact to support team'))
