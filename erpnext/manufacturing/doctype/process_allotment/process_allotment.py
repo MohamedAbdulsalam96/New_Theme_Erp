@@ -558,8 +558,10 @@ class ProcessAllotment(Document):
 	def check_PrevStatus(self, serial_no):
 		if self.process_trials:
 			pdd, trial_no = self.get_PA_details('trial')
-			if frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'trial_no': trial_no, 'parent': serial_no}, 'status') != 'Completed':
+			if frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'trial_no': trial_no, 'parent': serial_no}, 'status') != 'Completed' and cint(self.process_trials) != 1:
 				frappe.throw(_("Previous trial is incompleted"))
+			else:
+				frappe.errprint(frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'parent': serial_no}, 'status'))
 		else:
 			pdd, trial_no = self.get_PA_details('nontrial')
 			if pdd:
