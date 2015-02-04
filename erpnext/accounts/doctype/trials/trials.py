@@ -73,7 +73,7 @@ class Trials(Document):
 		data = frappe.db.get_value('Process Log', {'parent': self.pdd, 'process_name': trial_data.process, 'trials': trial_data.trial_no}, '*')
 		if data:
 			reverse_entry = data.reverse_entry if data.reverse_entry else ''
-			if trial_data.production_status == 'Closed' and cint(trial_data.skip_trial) != 1 and cint(finished_all_trials)!=1:
+			if trial_data.production_status == 'Closed' and cint(trial_data.skip_trial) != 1 and cint(self.finished_all_trials)!=1:
 				if reverse_entry == 'Pending' and trial_data.trial_branch != data.branch:
 					branch = data.branch
 					msg = cstr(trial_data.trial_no) + ' ' +cstr(trial_data.production_status)
