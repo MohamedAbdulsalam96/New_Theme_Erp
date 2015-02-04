@@ -22,9 +22,9 @@ class WeeklySalarySlip(TransactionBase):
 		frappe.errprint("in the")
 		if self.employee:
 			self.get_leave_details()
-			struct = self.check_sal_struct()
-			if struct:
-				self.pull_sal_struct(struct)
+			# struct = self.check_sal_struct()
+			# if struct:
+			# 	self.pull_sal_struct(struct)
 
 	def check_sal_struct(self):
 		struct = frappe.db.sql("""select name from `tabSalary Structure`
