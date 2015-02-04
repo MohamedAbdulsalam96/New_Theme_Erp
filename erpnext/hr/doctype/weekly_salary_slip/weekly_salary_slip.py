@@ -47,7 +47,7 @@ class WeeklySalarySlip(TransactionBase):
 
 
 
-	def pull_sal_struct(self, struct):
+	def pull_sal_struct(self):
 		# frappe.errprint("in the pull_sal_struct")
 		# from erpnext.hr.doctype.salary_structure.salary_structure import make_salary_slip2
 		# self.update(make_salary_slip2(struct, self).as_dict())
