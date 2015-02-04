@@ -572,7 +572,7 @@ class ProcessAllotment(Document):
 	def get_PA_details(self, type_of_trial):
 		msg = None
 		if type_of_trial == 'trial' and cint(self.process_trials) > 1:
-			return self.pdd, cint(self.process_trials) - 1
+			return self.name, cint(self.process_trials) - 1
 		elif cint(frappe.db.get_value('Process Log', {'process_data': self.name, 'parent': self.pdd}, 'idx'))> 1:
 			data = frappe.db.sql("""select process_data from `tabProcess Log` where parent='%s' and 
 				process_data < '%s' limit 1"""%(self.pdd, self.name), as_list=1, debug=1)
