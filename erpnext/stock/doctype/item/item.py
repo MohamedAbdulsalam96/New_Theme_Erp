@@ -74,8 +74,8 @@ class Item(WebsiteGenerator):
 		return context
 
 	def check_warehouse_is_set_for_stock_item(self):
-		if self.is_stock_item=="Yes" and not self.default_warehouse:
-			frappe.msgprint(_("Default Warehouse is mandatory for stock Item."),
+		if self.is_stock_item=="Yes" and not self.default_branch:
+			frappe.msgprint(_("Default Branch is mandatory for Stock Item."),
 				raise_exception=WarehouseNotSet)
 
 	def add_default_uom_in_conversion_factor_table(self):

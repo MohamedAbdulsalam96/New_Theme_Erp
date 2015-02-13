@@ -101,7 +101,7 @@ class WorkOrder(Document):
 
 	def on_submit(self):
 		self.update_status('Completed')
-		self.set_work_order()
+		# self.set_work_order()
 		release_work_order(self)
 
 	def on_cancel(self):

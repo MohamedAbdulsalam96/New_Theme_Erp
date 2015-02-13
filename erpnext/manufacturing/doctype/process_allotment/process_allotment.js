@@ -29,9 +29,9 @@ cur_frm.cscript.status = function(doc, cdt, cdn){
 cur_frm.cscript.refresh = function(doc, cdt, cdn){
 	sn_list=[];
 	cur_frm.cscript.toogle_field(doc)
-	get_server_fields('show_trials_details', '','',doc, cdt, cdn, 1, function(){
-		refresh_field('trials_transaction')
-	})
+	// get_server_fields('show_trials_details', '','',doc, cdt, cdn, 1, function(){
+	// 	refresh_field('trials_transaction')
+	// })
 }
 
 // cur_frm.cscript.add = function(doc ,cdt , cdn){
@@ -139,7 +139,15 @@ cur_frm.cscript.assigned= function(doc, cdt, cdn){
 }
 
 cur_frm.cscript.validate_mandatory_fields= function(doc){
-	data = {'Tailor': doc.process_tailor, 'Start Date': doc.start_date, 'End Data': doc.end_date, 'Serial No': doc.serial_no}
+	data = {'Tailor': doc.process_tailor, 'Start Date': doc.start_date, 'End Date': doc.end_date, 'Serial No': doc.serial_no,'Employee Name':doc.employee_name,'Serial No Data':doc.serial_no_data,'Qty':doc.work_qty}
+
+	if(doc.emp_status=='Completed'){
+		data['Completed Time']=doc.completed_time
+		data['Payment']=doc.payment
+		data['Deduct Late Work']=doc.deduct_late_work
+		data['Extra charge']=doc.extra_charge
+
+		}
 	status = 'true'
 	for(key in data){
 		if(!data[key]){

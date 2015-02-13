@@ -44,6 +44,7 @@ class HRDailyActivities(Document):
 			dwr.employee_name = employee_details.employee_name
 			dwr.date = self.date
 			dwr.drawing_amount = employee_details.drawings
+			dwr.overtime=employee_details.overtiming
 			dwr.submit()
 			self.tot_drawing += flt(employee_details.drawings)
 			drawings_id.append(dwr.name)

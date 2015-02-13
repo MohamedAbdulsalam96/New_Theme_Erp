@@ -8,6 +8,15 @@ cur_frm.cscript.onload = function(doc, cdt, cdn) {
 	if(doc.__islocal) cur_frm.set_value("att_date", get_today());
 }
 
+cur_frm.cscript.employee=function(doc,cdt,cdn){
+		if(doc.employee){
+		console.log("in if loop")
+		cur_frm.set_df_property("employee_name", "read_only",1);
+	}
+}
+
+
+
 cur_frm.fields_dict.employee.get_query = function(doc,cdt,cdn) {
 	return{
 		query: "erpnext.controllers.queries.employee_query"

@@ -74,9 +74,11 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
                 {fieldtype:'Button', fieldname:'create_new', label:__('Ok') }
             ]
         })
+        $('.modal-content').css('width', '800px')
+        $('[data-fieldname = "create_new"]').css('margin-left','100px')
         this.control_trials = this.dialog.fields_dict;
         this.div = $('<div id="myGrid" style="width:100%;height:200px;margin:10px;overflow-y:scroll;"><table class="table table-bordered" style="background-color: #f9f9f9;height:10px" id="mytable">\
-                    <thead><tr ><td>Process</td><td>Trial No</td><td>Quality</td><td>Actual Fabric</td>\
+                    <thead><tr ><td>Process</td><td>Trial No</td><td>Quality Check</td><td>Actual Fabric</td>\
                     <td>Amendment</td><td>Trial Cost</td><td>Remove</td></tr></thead><tbody></tbody></table></div>').appendTo($(this.control_trials.styles_name.wrapper))
 
         this.dialog.show();
@@ -113,6 +115,7 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
                 <td><input id="actual_fabric" class="quality_check" type="checkbox" name="actual_fabric" '+ch+'></td>\
                 <td><input class="quality_check" type="checkbox" name="amended" ></td><td><input class="text_box" data-fieldtype="Int" type="Textbox">\
                 </td><td>&nbsp;<button  class="remove">X</button></td></tr>')
+            $('[data-fieldname="trial"]').val('')
             me.auto_checked_actual_fabric()
             me.remove_row()
         })
@@ -161,6 +164,7 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
         })
         return msg
     },
+
     remove_row : function(){
         var me =this;
         $(this.div).find('.remove').click(function(){
@@ -204,7 +208,7 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
     },
     auto_checked_actual_fabric: function(){
         var me = this
-        $(me.div).find('.quality_check').click(function(){
+        $(me.div).find('[name="actual_fabric"]').click(function(){
             var s= $(this).parent().parent().index();
             var count = $('#mytable').children('tbody').children('tr').length;
             for(i=s+1 ; i<count;i++)

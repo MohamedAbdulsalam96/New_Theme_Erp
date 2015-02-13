@@ -22,6 +22,7 @@ def download_report_pdf(html):
 		html_path=report_path+'/'+filename+'.html'
 		pdf_path=report_path+'/'+filename+'.pdf'
 		data = open(html_path, 'w')
+		frappe.errprint(type(html))
 		data.write(html)
 		data.close()
 		os.system("wkhtmltopdf "+report_path+"/"+filename+".html "+report_path+"/"+filename+".pdf")

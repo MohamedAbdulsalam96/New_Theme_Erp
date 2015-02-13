@@ -45,6 +45,10 @@ class WeeklySalarySlip(TransactionBase):
 	# 	# "holidays":len(holidays)
 	# 	# }
 
+	def set_to_date(self,args):
+		frappe.errprint("in set to date")
+		d2=add_days(args['month_start_date'],7)
+		self.to_date=d2
 
 
 	def pull_sal_struct(self):
@@ -53,7 +57,7 @@ class WeeklySalarySlip(TransactionBase):
 		# self.update(make_salary_slip2(struct, self).as_dict())
 
 		
-		earnings_details, drawings_overtime_details = self.get_mapper_details()
+		earnings_details, drawings_overtime_details ,loan_details = self.get_mapper_details()
 
 		mapper = {'wages': ['Wages', earnings_details[0].get('wages') if len(earnings_details) > 0 else 0.0 ], 
 		'extra_amt': ['Extra Charges', earnings_details[0].get('extra_amt') if len(earnings_details) > 0 else 0.0 ], 
@@ -67,7 +71,7 @@ class WeeklySalarySlip(TransactionBase):
 			d.e_modified_amount = mapper.get(types)[1]
 
 		mapper = {'drawings': ['Drawings', drawings_overtime_details[0].get('drawings') if len(drawings_overtime_details) > 0 else 0.0], 
-				'loan': ['Loan',0.0], 
+				'loan': ['Loan',loan_details[0].get('emi')], 
 				'late_work':['Late Work', earnings_details[0].get('cost') if len(earnings_details) > 0 else 0.0 ]}
 
 		self.set('deduction_details',[])
@@ -95,7 +99,10 @@ class WeeklySalarySlip(TransactionBase):
 						and  STR_TO_DATE('%(to_date)s','%(format)s')"""%{'format': '%Y-%m-%d', 
 						'from_date': self.from_date, 'to_date': self.to_date, 'employee':self.employee},as_dict=1, debug=1)
 
-		return earnings_details, drawings_overtime_details
+		loan_details=frappe.db.sql(""" select  group_concat(name) as name,sum(emi) as emi from `tabLoan` where employee_id='%(employee)s' and payment_type='Weekly'  and pending_amount > 0 and  ( STR_TO_DATE('%(from_date)s','%(format)s') between from_date and to_date  or  STR_TO_DATE('%(to_date)s','%(format)s') between from_date and to_date )"""
+			%{'format': '%Y-%m-%d','from_date':self.from_date,'to_date':self.to_date,'employee':self.employee},as_dict=1,debug=True)
+
+		return earnings_details, drawings_overtime_details ,loan_details
 
 	def pull_emp_details(self):
 		emp = frappe.db.get_value("Employee", self.employee,
@@ -194,13 +201,13 @@ class WeeklySalarySlip(TransactionBase):
 		return lwp
 
 	def check_existing(self):
-		ret_exist = frappe.db.sql("""select name from `tabSalary Slip`
-			where month = %s and fiscal_year = %s and docstatus != 2
-			and employee = %s and name != %s""",
-			(self.month, self.fiscal_year, self.employee, self.name))
+		ret_exist = frappe.db.sql("""select name from `tabWeekly Salary Slip`
+			where employee='%(employee)s' and docstatus=1 and ( STR_TO_DATE('%(from_date)s','%(format)s') between from_date and to_date  or  STR_TO_DATE('%(to_date)s','%(format)s') between from_date and to_date )"""
+			%{'format': '%Y-%m-%d','from_date':self.from_date,'to_date':self.to_date,'employee':self.employee},as_list=1,debug=True)
+	
 		if ret_exist:
 			self.employee = ''
-			frappe.throw(_("Salary Slip of employee {0} already created for this month").format(self.employee))
+			frappe.throw(_(" Weekly Salary Slip of employee {0} already created for this month").format(self.employee))
 
 	def validate(self):
 		frappe.errprint("in the validate")
@@ -256,17 +263,45 @@ class WeeklySalarySlip(TransactionBase):
 		if(self.email_check == 1):
 			self.send_mail_funct()
 
-		earnings_details, drawings_overtime_details = self.get_mapper_details()
+		earnings_details, drawings_overtime_details,loan_details = self.get_mapper_details()
 
-		if len(earnings_details) > 0:
+		if len(earnings_details) > 0 and earnings_details[0].get('name') != None:
 			for name in earnings_details[0].get('name').split(','):
+				frappe.errprint(name)
 				frappe.db.sql("""update `tabEmployee Details` set flag = 'Yes' where name = '%s'"""%name)
 				frappe.db.sql("commit")
 
-		if len(drawings_overtime_details) > 0:
+		if len(drawings_overtime_details) > 0 and drawings_overtime_details[0].get('name') != None:
 			for name in drawings_overtime_details[0].get('name').split(','):
 				frappe.db.sql("""update `tabDaily Drawing` set flag = 'Yes' where name = '%s'"""%name)
 				frappe.db.sql("commit")
+
+		if len(loan_details) > 0 and loan_details[0].get('name') != None:
+			for name in loan_details[0].get('name').split(','):
+				frappe.db.sql("""update `tabLoan` set pending_amount = (pending_amount - emi) where name = '%s'"""%name)
+				frappe.db.sql("commit")
+
+
+	def on_cancel(self):
+
+		earnings_details, drawings_overtime_details,loan_details = self.get_mapper_details()
+		
+		if len(earnings_details) > 0 and earnings_details[0].get('name') != None:
+			for name in earnings_details[0].get('name').split(','):
+				frappe.errprint(name)
+				frappe.db.sql("""update `tabEmployee Details` set flag = 'No' where name = '%s'"""%name)
+				frappe.db.sql("commit")
+
+		if len(drawings_overtime_details) > 0 and drawings_overtime_details[0].get('name') != None:
+			for name in drawings_overtime_details[0].get('name').split(','):
+				frappe.db.sql("""update `tabDaily Drawing` set flag = 'No' where name = '%s'"""%name)
+				frappe.db.sql("commit")
+
+		if len(loan_details) > 0 and loan_details[0].get('name') != None:
+			for name in loan_details[0].get('name').split(','):
+				frappe.db.sql("""update `tabLoan` set pending_amount = (pending_amount + emi) where name = '%s'"""%name)
+				frappe.db.sql("commit")
+
 
 	def send_mail_funct(self):
 		from frappe.utils.email_lib import sendmail

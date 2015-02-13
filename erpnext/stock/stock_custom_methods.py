@@ -101,8 +101,8 @@ def open_process(doc):
 			else:		
 				name = frappe.db.get_value('Production Dashboard Details', {'work_order': d.work_order}, '*')
 				if d.serial_no == name.serial_no:
-					process = frappe.db.sql(""" select p.process_name from `tabProcess Log` p, `tabProduction Dashboard Details` pd where pd.work_order = '%s' AND p.branch= '%s'
-						AND p.status='Pending' and p.parent = pd.name order by p.idx limit 1"""%(d.work_order,get_user_branch()), as_list=1)
+					process = frappe.db.sql(""" select p.process_name from `tabProcess Log` p, `tabProduction Dashboard Details` pd where p.branch= '%s'
+						AND p.status='Pending' and p.parent = pd.name order by p.idx limit 1"""%(get_user_branch()), as_list=1)
 					frappe.db.sql(""" update  `tabProcess Log` p inner join 
 						`tabProduction Dashboard Details` d on p.parent=d.name inner join 
 						(select parent,min(idx) as idx from  `tabProcess Log` pd where  status='Pending'
@@ -283,9 +283,16 @@ def get_user_details(user_id):
 	return frappe.db.get_value('DefaultValue',{'parent': user_id, 'defkey': 'Branch'}, 'name') , frappe.db.get_value('DefaultValue',{'parent': user_id, 'defkey': 'Cost Center'}, 'name')
 
 def update_details(value, name):
-	frappe.db.sql("""update `tabDefaultValue` set defvalue='%s' where name='%s'"""%(value, name))	
+	frappe.db.sql("""update `tabDefaultValue` set defvalue='%s' where name='%s'"""%(value, name))
 
-def make_barcode(doc,method):
+def custom_validateItem_methods(doc, method):
+	set_default_values(doc)
+	make_barcode(doc)
+
+def set_default_values(doc):
+	doc.default_warehouse = frappe.db.get_value('Branch', doc.default_branch, 'warehouse')
+
+def make_barcode(doc):
 	if cint(frappe.db.get_value('Global Defaults',None,'barcode'))==1:
 		if not doc.barcode_image:
 			doc.bar= generate_barcode(doc.name, doc.doctype)        
@@ -353,4 +360,16 @@ def stock_qrcode(doc,method):
 	if cint(frappe.db.get_value('Global Defaults',None,'qrcode'))==1:
 		if not doc.qrcode:	
 			doc.bar= gererate_QRcode(doc.name, doc.doctype)
-			doc.qrcode = '<img src="/files/QRCode/%s/%s.png">'%(doc.doctype,doc.name.replace("/","-"))		
+			doc.qrcode = '<img src="/files/QRCode/%s/%s.png">'%(doc.doctype,doc.name.replace("/","-"))
+
+def validate_serial_no_status(doc, method):
+	for s in doc.get('delivery_note_details'):
+		if frappe.db.get_value('Item', s.item_code, 'item_group') == 'Tailoring' and s.serial_no:
+			sn = cstr(s.serial_no).split('\n')
+			if sn:
+				throw_exception(sn)
+
+def throw_exception(serial_no_list):
+	for serial_no in serial_no_list:
+		if serial_no and frappe.db.get_value('Serial No', serial_no, 'completed') != 'Yes':
+			frappe.throw(_("All process has not completed for serial no {0}").format(serial_no))

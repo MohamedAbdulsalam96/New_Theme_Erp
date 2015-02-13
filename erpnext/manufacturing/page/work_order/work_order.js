@@ -329,12 +329,12 @@ frappe.WOForm = Class.extend({
 		this.wo_details = {}
 		$.each(me.field_area.find('#style_details tbody tr'), function(i){
 			style_dict = {}
-			var key = ['field_name', 'default_value', 'abbreviation', 'image_viewer']
+			var key = ['field_name', 'default_value', 'abbreviation', 'image_viewer', 'test']
 			cells = $(this).find('td')
 			$.each(cells, function(i){
 				style_dict[key[i]] = $(this).text() || $(this).find('.text_box').val() || $(this).find('img').attr('src') || ''	
 			})
-			console.log(style_dict)
+			
 			me.style_details[i] = style_dict
 		})
 

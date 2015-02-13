@@ -224,6 +224,9 @@ class Trials(Document):
 		if not args.trial_date and not args.subject:
 			frappe.throw(_("Mandatory Field: Start on, subject to make an event").format())
 
+	def check_serial_no(self):
+		pass
+
 @frappe.whitelist()
 def get_serial_no_data(work_order):
 	return frappe.db.get_value('Work Order', work_order, 'serial_no_data') if work_order else ''

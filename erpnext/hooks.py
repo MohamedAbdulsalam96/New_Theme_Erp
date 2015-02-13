@@ -69,7 +69,7 @@ doc_events = {
 		"on_cancel": "erpnext.stock.doctype.material_request.material_request.update_completed_qty"
 	},
 	"Delivery Date":{
-		"on_submit": "erpnext.accounts.custom_notification_events.delivery_note",
+		"on_submit": ["erpnext.stock.stock_custom_methods.validate_serial_no_status", "erpnext.accounts.custom_notification_events.delivery_note"]
 	},
 	"Serial No":{
 		"validate":["erpnext.stock.stock_custom_methods.serial_barcode","erpnext.stock.stock_custom_methods.serial_qrcode"],
@@ -99,11 +99,11 @@ doc_events = {
 	"Sales Invoice": {
 		"on_update" : ["erpnext.accounts.accounts_custom_methods.create_serial_no"],#"tools.tools_management.custom_methods.update_work_order","tools.tools_management.custom_methods.create_se_or_mr"],
 		"validate"  : ["erpnext.accounts.accounts_custom_methods.add_data_in_work_order_assignment", "tools.tools_management.custom_methods.validate_reserve_fabric", "tools.tools_management.custom_methods.merge_tailoring_items", "erpnext.accounts.accounts_custom_methods.invoice_validation_method"],
-		"on_submit" : ["tools.tools_management.custom_methods.sales_invoice_on_submit_methods","erpnext.accounts.accounts_custom_methods.create_production_process","erpnext.accounts.accounts_custom_methods.validate_sales_invoice","tools.tools_management.custom_methods.create_se_or_mr", "mreq.mreq.page.sales_dashboard.sales_dashboard.create_swatch_item_po", "erpnext.accounts.accounts_custom_methods.update_WoCount"],
+		"on_submit" : ["erpnext.accounts.accounts_custom_methods.create_production_process","tools.tools_management.custom_methods.sales_invoice_on_submit_methods","erpnext.accounts.accounts_custom_methods.validate_sales_invoice","tools.tools_management.custom_methods.create_se_or_mr", "mreq.mreq.page.sales_dashboard.sales_dashboard.create_swatch_item_po", "erpnext.accounts.accounts_custom_methods.update_WoCount"],
 		"on_cancel" : ["tools.tools_management.custom_methods.delete_project_aginst_si", "erpnext.accounts.accounts_custom_methods.delete_production_process"]
 	},
 	"Item":{
-		"validate" : "erpnext.stock.stock_custom_methods.make_barcode",
+		"validate" : "erpnext.stock.stock_custom_methods.custom_validateItem_methods",
 		"on_update": "erpnext.stock.stock_custom_methods.item_validate_methods"
 
 	},

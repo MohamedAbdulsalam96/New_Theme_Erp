@@ -100,22 +100,36 @@ cur_frm.cscript.get_finished_list= function(doc){
 	return process_list
 }
 
+cur_frm.cscript.work_status = function(doc, cdt, cdn){
+	var d = locals[cdt][cdn]
+	if(d.work_status == 'Open' && doc.trials_serial_no_status){
+		d.subject = doc.trials_serial_no_status
+		if(d.work_status == 'Open' && parseInt(d.trial_no) > 1 && d.work_status != 'Closed'){
+			get_server_fields('check_serial_no', '', '', doc, cdt, cdn,1, function(r, rt){
+				console.log("hii")
+			})
+		}
+	}else if(!doc.trials_serial_no_status){
+		d.work_status = 'Pending'
+		refresh_field('work_status', d.name, 'trial_dates')
+		alert("Select trial serial no")
+	}
+	refresh_field('subject', d.name, 'trial_dates')
+}
+
 cur_frm.cscript.trial_dates_add = function(doc, cdt, cdn){
 	var d = locals[cdt][cdn]
-	if(doc.trial_serial_no){
-		d.subject = doc.trial_serial_no
-	}else{
-		alert("Select serial no")
-	}
 	var cl = doc.trial_dates || [ ]
 	var work_order;
-	$.each(cl, function(i){
-		if(parseInt(cl[i].idx) < parseInt(d.idx)){
-			work_order = cl[i].work_order
-		}
-	})
-	d.work_order = work_order
-	refresh_field('trial_dates')
+	if(!d.work_order){
+		$.each(cl, function(i){
+			if(parseInt(cl[i].idx) < parseInt(d.idx)){
+				work_order = cl[i].work_order
+			}
+		})
+		d.work_order = work_order
+		refresh_field('trial_dates')
+	}
 }
 
 

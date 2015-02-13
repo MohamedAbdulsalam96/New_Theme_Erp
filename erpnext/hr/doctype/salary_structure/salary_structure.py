@@ -80,6 +80,7 @@ def make_salary_slip(source_name, target_doc=None):
 	def postprocess(source, target):
 		target.run_method("pull_emp_details")
 		target.run_method("get_leave_details")
+		target.run_method("pull_deduction_overtime")
 		target.run_method("calculate_net_pay")
 
 	doc = get_mapped_doc("Salary Structure", source_name, {

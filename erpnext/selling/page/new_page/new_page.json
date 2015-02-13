@@ -3,13 +3,17 @@
  "creation": "2014-09-29 15:31:20.937544", 
  "docstatus": 0, 
  "doctype": "Page", 
- "modified": "2014-09-29 15:31:46.047642", 
+ "modified": "2015-02-12 12:40:58.190314", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "new-page", 
  "owner": "Administrator", 
  "page_name": "new-page", 
- "roles": [], 
+ "roles": [
+  {
+   "role": "All"
+  }
+ ], 
  "script": null, 
  "standard": "Yes", 
  "style": null, 

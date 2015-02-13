@@ -16,9 +16,9 @@ class Settlement(Document):
 
 	def fill_task_details(self):
 		self.set('pending_task',[])
-		for task in frappe.db.sql("""select distinct ed.task from `tabEmployee Details` ed, tabTask t 
-				where ed.employee='%s' and ed.task is not null 
-					and t.name = ed.task and t.status = 'Open'"""%(self.employee_id), as_list=1):
+		for task in frappe.db.sql("""select distinct ed.tailor_task from `tabEmployee Details` ed, tabTask t 
+				where ed.employee='%s' and ed.tailor_task is not null 
+					and t.name = ed.tailor_task and t.status = 'Open'"""%(self.employee_id), as_list=1):
 			e = self.append('pending_task', {})
 			e.task = task[0]
 

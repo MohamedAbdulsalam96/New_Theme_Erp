@@ -100,7 +100,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-12-01 15:28:25.150248", 
+ "modified": "2015-02-12 19:24:22.399662", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Serial No Log", 
@@ -111,7 +111,7 @@
    "amend": 0, 
    "apply_user_permissions": 0, 
    "cancel": 0, 
-   "create": 0, 
+   "create": 1, 
    "delete": 0, 
    "email": 0, 
    "export": 0, 
@@ -120,10 +120,29 @@
    "print": 0, 
    "read": 1, 
    "report": 0, 
-   "role": "All", 
+   "role": "Material Master Manager", 
    "set_user_permissions": 0, 
    "submit": 0, 
-   "write": 0
+   "write": 1
+  }, 
+  {
+   "create": 1, 
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "Manufacturing Manager", 
+   "write": 1
+  }, 
+  {
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "Material Manager", 
+   "write": 1
+  }, 
+  {
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "Material User", 
+   "write": 1
   }
  ], 
  "read_only": 0, 

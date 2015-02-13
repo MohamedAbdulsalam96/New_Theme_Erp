@@ -33,19 +33,15 @@ class SalarySlip(TransactionBase):
 		return struct and struct[0][0] or ''
 
 	def pull_sal_struct(self, struct):
+		self.set('earning_details',[])
+		self.set('deduction_details',[])
 		from erpnext.hr.doctype.salary_structure.salary_structure import make_salary_slip
 		self.update(make_salary_slip(struct, self).as_dict())
 
-		m = frappe.get_doc('Salary Manager').get_month_details(self.fiscal_year, self.month)
 
-		drawings_overtime_details = frappe.db.sql("""select sum(dd.drawing_amount) as drawings, sum(dd.overtime) as overtime, group_concat(name) as name from `tabDaily Drawing` dd 
-				where dd.employee_id = '%(employee)s' 
-					and ifnull(dd.flag, 'No') != 'Yes'
-					and dd.date between STR_TO_DATE('%(from_date)s','%(format)s') 
-						and  STR_TO_DATE('%(to_date)s','%(format)s')"""%{'format': '%Y-%m-%d', 
-						'from_date': m['month_start_date'], 'to_date': m['month_end_date'], 'employee':self.employee},as_dict=1)
+	def pull_deduction_overtime(self):
 
-		self.deduction = drawings_overtime_details
+		drawings_overtime_details ,loan_details = self.get_mapper_details()
 
 		mapper = {'overtime': ['Overtime', drawings_overtime_details[0].get('overtime') if len(drawings_overtime_details) > 0 else 0.0]}
 
@@ -55,12 +51,33 @@ class SalarySlip(TransactionBase):
 			d.e_amount = mapper.get(types)[1]
 			d.e_modified_amount = mapper.get(types)[1]
 
-		mapper = {'drawings': ['Drawing', drawings_overtime_details[0].get('drawings') if len(drawings_overtime_details) > 0 else 0.0]}
+		mapper = {'drawings': ['Drawings', drawings_overtime_details[0].get('drawings') if len(drawings_overtime_details) > 0 else 0.0],'Loan Details': ['Loan', loan_details[0].get('emi') if len(loan_details) > 0 else 0.0]}
+
+
 
 		for types in mapper:
 			d = self.append('deduction_details', {})
 			d.d_type = mapper.get(types)[0]
-			d.d_modified_amount = mapper.get(types)[1]
+			d.d_modified_amount = flt(mapper.get(types)[1])
+
+	def	get_mapper_details(self):
+
+		m = frappe.get_doc('Salary Manager').get_month_details(self.fiscal_year, self.month)
+
+		drawings_overtime_details = frappe.db.sql("""select sum(dd.drawing_amount) as drawings, sum(dd.overtime) as overtime, group_concat(name) as name from `tabDaily Drawing` dd 
+			where dd.employee_id = '%(employee)s' 
+				and ifnull(dd.flag, 'No') != 'Yes'
+				and dd.date between STR_TO_DATE('%(from_date)s','%(format)s') 
+					and  STR_TO_DATE('%(to_date)s','%(format)s')"""%{'format': '%Y-%m-%d', 
+					'from_date': m['month_start_date'], 'to_date': m['month_end_date'], 'employee':self.employee},as_dict=1)
+
+		self.deduction = drawings_overtime_details
+
+		loan_details=frappe.db.sql(""" select group_concat(name) as name,sum(emi) as emi from `tabLoan` where employee_id='%s' and payment_type='Monthly'  and  ('%s' between from_date and to_date  or  '%s' between from_date and to_date) """%(self.employee,m['month_start_date'],m['month_end_date']),as_dict=1,debug=True)
+
+		return drawings_overtime_details ,loan_details
+
+
 
 	def pull_emp_details(self):
 		emp = frappe.db.get_value("Employee", self.employee,
@@ -149,7 +166,7 @@ class SalarySlip(TransactionBase):
 
 	def check_existing(self):
 		ret_exist = frappe.db.sql("""select name from `tabSalary Slip`
-			where month = %s and fiscal_year = %s and docstatus != 2
+			where month = %s and fiscal_year = %s and docstatus = 1
 			and employee = %s and name != %s""",
 			(self.month, self.fiscal_year, self.employee, self.name))
 		if ret_exist:
@@ -194,7 +211,7 @@ class SalarySlip(TransactionBase):
 					/ cint(self.total_days_in_month), 2)
 			elif not self.payment_days:
 				d.d_modified_amount = 0
-			else:
+			elif not d.d_modified_amount:
 				d.d_modified_amount = d.d_amount
 
 			self.total_deduction += flt(d.d_modified_amount)
@@ -208,6 +225,34 @@ class SalarySlip(TransactionBase):
 	def on_submit(self):
 		if(self.email_check == 1):
 			self.send_mail_funct()
+
+		drawings_overtime_details,loan_details = self.get_mapper_details()
+
+		if len(drawings_overtime_details) > 0 and drawings_overtime_details[0].get('name') != None:
+			for name in drawings_overtime_details[0].get('name').split(','):
+				frappe.db.sql("""update `tabDaily Drawing` set flag = 'Yes' where name = '%s'"""%name)
+				frappe.db.sql("commit")
+
+		if len(loan_details) > 0 and loan_details[0].get('name') != None:
+			for name in loan_details[0].get('name').split(','):
+				frappe.db.sql("""update `tabLoan` set pending_amount = (pending_amount - emi) where name = '%s'"""%name)
+				frappe.db.sql("commit")
+
+
+	def on_cancel(self):
+
+		drawings_overtime_details,loan_details = self.get_mapper_details()
+
+		if len(drawings_overtime_details) > 0 and drawings_overtime_details[0].get('name') != None:
+			for name in drawings_overtime_details[0].get('name').split(','):
+				frappe.db.sql("""update `tabDaily Drawing` set flag = 'No' where name = '%s'"""%name)
+				frappe.db.sql("commit")
+
+		if len(loan_details) > 0 and loan_details[0].get('name') != None:
+			for name in loan_details[0].get('name').split(','):
+				frappe.db.sql("""update `tabLoan` set pending_amount = (pending_amount + emi) where name = '%s'"""%name)
+				frappe.db.sql("commit")
+
 
 
 	def send_mail_funct(self):

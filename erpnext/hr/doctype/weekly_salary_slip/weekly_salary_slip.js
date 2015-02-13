@@ -19,6 +19,16 @@ cur_frm.cscript.from_date= function(doc, cdt, cdn) {
 		}
      
 	}
+
+	if (doc.from_date && doc.salary_type=='Weekly'){
+		var arg = {'month_start_date':doc.from_date}
+		get_server_fields('set_to_date',JSON.stringify(arg),doc.to_date,doc, cdt, cdn, 1 , function(r){
+
+			refresh_field('to_date')
+			});
+	}
+
+	
 };
 
 cur_frm.cscript.to_date= function(doc, cdt, cdn) {

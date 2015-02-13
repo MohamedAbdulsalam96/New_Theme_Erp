@@ -3,13 +3,23 @@
  "creation": "2014-09-17 20:58:10.983229", 
  "docstatus": 0, 
  "doctype": "Page", 
- "modified": "2014-09-17 20:58:19.216389", 
+ "modified": "2015-02-12 12:41:24.441256", 
  "modified_by": "Administrator", 
  "module": "Dashboard", 
  "name": "dashboard-page", 
  "owner": "Administrator", 
  "page_name": "Dashboard-Page", 
- "roles": [], 
+ "roles": [
+  {
+   "role": "System Manager"
+  }, 
+  {
+   "role": "Manufacturing User"
+  }, 
+  {
+   "role": "Manufacturing Manager"
+  }
+ ], 
  "script": null, 
  "standard": "Yes", 
  "style": null, 
