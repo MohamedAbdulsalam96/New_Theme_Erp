@@ -364,7 +364,7 @@ class ProcessAllotment(Document):
 	def create_task(self):
 		self.validate_dates()
 		tsk = frappe.new_doc('Task')
-		tsk.subject = 'Do process %s for item %s'%(self.process, frappe.db.get_value('Item',self.item,'item_name'))
+		tsk.subject = '%s for %s'%(self.process, frappe.db.get_value('Item',self.item,'item_name'))
 		tsk.project = self.sales_invoice_no
 		tsk.exp_start_date = datetime.datetime.strptime(self.start_date, '%Y-%m-%d %H:%M:%S').date()
 		tsk.exp_end_date = datetime.datetime.strptime(self.end_date, '%Y-%m-%d %H:%M:%S').date()

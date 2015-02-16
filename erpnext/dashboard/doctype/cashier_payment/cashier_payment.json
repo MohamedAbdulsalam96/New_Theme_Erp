@@ -82,7 +82,7 @@
   {
    "fieldname": "min_payment_details", 
    "fieldtype": "Section Break", 
-   "label": "Min Payment Details", 
+   "label": "Minimum Payment Details", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -90,7 +90,7 @@
    "description": "In Percentage %", 
    "fieldname": "min_payment_percentage", 
    "fieldtype": "Int", 
-   "label": "Min Payment", 
+   "label": "Minimum Payment", 
    "permlevel": 0, 
    "precision": "", 
    "read_only": 1
@@ -113,7 +113,7 @@
    "description": "In Amount", 
    "fieldname": "min_payment_amount", 
    "fieldtype": "Currency", 
-   "label": "Min Payment", 
+   "label": "Minimum Payment", 
    "permlevel": 0, 
    "precision": "2", 
    "read_only": 1
@@ -133,6 +133,7 @@
    "precision": ""
   }, 
   {
+   "default": "Cash", 
    "fieldname": "mode_of_payment", 
    "fieldtype": "Link", 
    "label": "Mode of Payment", 
@@ -179,7 +180,7 @@
    "fieldname": "status", 
    "fieldtype": "Select", 
    "in_list_view": 1, 
-   "label": "Min Payment Status", 
+   "label": "Minimum Payment Status", 
    "options": "\nPending\nApproved\nRejected", 
    "permlevel": 0, 
    "precision": "", 
@@ -245,7 +246,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-01-23 22:43:21.267283", 
+ "modified": "2015-02-16 16:18:34.495216", 
  "modified_by": "Administrator", 
  "module": "Dashboard", 
  "name": "Cashier Payment", 

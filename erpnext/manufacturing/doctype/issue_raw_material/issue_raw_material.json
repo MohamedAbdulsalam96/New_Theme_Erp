@@ -68,7 +68,7 @@
   {
    "fieldname": "raw_sub_group", 
    "fieldtype": "Link", 
-   "label": "Raw Sub Group", 
+   "label": "Raw Group", 
    "options": "Sub Groups", 
    "permlevel": 0, 
    "precision": ""
@@ -91,7 +91,7 @@
   {
    "fieldname": "article_serial_no", 
    "fieldtype": "Link", 
-   "label": "Serial No", 
+   "label": "RM Serial No", 
    "options": "Serial No", 
    "permlevel": 0, 
    "precision": ""
@@ -122,7 +122,7 @@
    "fieldname": "status", 
    "fieldtype": "Select", 
    "label": "Status", 
-   "options": "\nCompleted\n\n", 
+   "options": "\nIssued", 
    "permlevel": 0, 
    "precision": ""
   }
@@ -134,7 +134,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-10-10 21:38:35.200677", 
+ "modified": "2015-02-16 15:17:17.318212", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Issue Raw Material", 

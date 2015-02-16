@@ -76,7 +76,7 @@
   {
    "fieldname": "serials_data", 
    "fieldtype": "Text", 
-   "label": "Serial", 
+   "label": "Invoice Serial No", 
    "permlevel": 0, 
    "precision": "", 
    "read_only": 1
@@ -162,7 +162,7 @@
   {
    "fieldname": "section_break_11", 
    "fieldtype": "Section Break", 
-   "label": "Tailor Details", 
+   "label": "Process Allotment", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -298,7 +298,7 @@
   {
    "fieldname": "process_trials", 
    "fieldtype": "Select", 
-   "label": "Process Trials", 
+   "label": "Trial Number", 
    "options": "\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\n42\n43\n44\n45\n46\n47\n48\n49\n50", 
    "permlevel": 0, 
    "precision": "", 
@@ -380,6 +380,7 @@
   {
    "fieldname": "section_break_19", 
    "fieldtype": "Section Break", 
+   "hidden": 1, 
    "label": "Trials Details", 
    "permlevel": 0, 
    "precision": ""
@@ -387,6 +388,7 @@
   {
    "fieldname": "trials_transaction", 
    "fieldtype": "Table", 
+   "hidden": 1, 
    "label": "Trials Transaction", 
    "options": "Trials Transaction", 
    "permlevel": 0, 
@@ -395,7 +397,7 @@
   {
    "fieldname": "section_break_6", 
    "fieldtype": "Section Break", 
-   "label": "Process", 
+   "label": "Raw Materials", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -528,7 +530,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-01-30 15:41:42.807578", 
+ "modified": "2015-02-16 16:22:44.349164", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

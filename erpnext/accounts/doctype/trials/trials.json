@@ -81,7 +81,7 @@
   {
    "fieldname": "finished_all_trials", 
    "fieldtype": "Check", 
-   "label": "Finished All Trials", 
+   "label": "Cancel Remaining Trials", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -174,7 +174,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-12-28 23:31:27.631260", 
+ "modified": "2015-02-16 15:00:55.950574", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Trials", 

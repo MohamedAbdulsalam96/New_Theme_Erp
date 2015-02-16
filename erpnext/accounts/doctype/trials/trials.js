@@ -45,7 +45,7 @@ cur_frm.cscript.refresh= function(doc, cdt, cdn){
 }
 
 cur_frm.cscript.set_value= function(doc, cdt, cdn, prev_args){
-	frappe.ui.toolbar.clear_cache();
+	window.location.reload();
 }
 
 cur_frm.cscript.finished_all_trials = function(doc){

@@ -147,11 +147,37 @@ cur_frm.cscript.refresh = function(doc){
 	if(doc.docstatus==1){
 		cur_frm.appframe.add_primary_action(__('Draw Canvas'), cur_frm.cscript['Draw Canvas'], "icon-truck")
 	}
+	 if(frappe.route_options) {
+	 	  if (frappe.route_options.number == 1){
+	 	  	window.location.reload();
+	 	  }
+            
+          }
 }
 
 cur_frm.cscript['Draw Canvas'] = function(){
-	frappe.route_options = { work_order: cur_frm.docname};
-	frappe.set_route("imgcanvas");
+	
+	frappe.call({
+          "method": "frappe.core.page.imgcanvas.imgcanvas.get_img",
+          args: {
+            work_order: cur_frm.docname
+          },
+          callback:function(r){
+          	if(r.message){
+          		frappe.route_options = { work_order: cur_frm.docname};
+				frappe.set_route("imgcanvas");
+
+          	}
+          	else if(!r.message){
+
+             alert("No Attached file found for Item")
+
+          	}
+          }
+
+
+      });
+	
 }
 
 cur_frm.fields_dict['work_orders'].get_query = function(doc) {
