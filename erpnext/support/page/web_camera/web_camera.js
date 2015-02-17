@@ -20,7 +20,6 @@ frappe.pages['web-camera'].onload = function(wrapper) {
 frappe.Webcam = Class.extend({
   // var stream;
   init: function(wrapper,cust_name) {
-    console.log("in the webcamhgfhgf");
     this.show_menus1(wrapper);
     this.compatibility();
     this.button(wrapper,cust_name);
@@ -65,9 +64,7 @@ compatibility:function(wrapper){
 },
 button:function(wrapper,cust_name){
   me=this;
-  console.log("in the button");
   $("#screenshot-button").click(function() {
-      console.log("in the button");
     me.snapshot(wrapper,cust_name);
   })
 
@@ -77,8 +74,6 @@ button:function(wrapper,cust_name){
 
 button2:function(wrapper,validJson,cust_name){
   me=this;
-  console.log("In button 2")
-  console.log(cust_name)
    $('#save-button').click(function(){
        if(validJson && cust_name){
 
@@ -86,8 +81,6 @@ button2:function(wrapper,validJson,cust_name){
             method:'erpnext.accounts.page.report_template.report_template.webcam_img_upload',
             args:{'imgdata1':validJson,'customer':cust_name},
             callback:function(r){
-              console.log("in call")
-              console.log(r.message)
               setTimeout(function (){window.location.reload()}, 1000)
              window.history.back();
 
@@ -101,7 +94,6 @@ button2:function(wrapper,validJson,cust_name){
 },
 
 snapshot:function(wrapper,cust_name) {
-               console.log("In snapshot")
               me=this
               var video = document.querySelector('#webcam');
               var button = document.querySelector('#screenshot-button');
@@ -111,7 +103,6 @@ snapshot:function(wrapper,cust_name) {
               canvas.width = video.videoWidth;
               canvas.height = video.videoHeight;
               ctx.drawImage(video,0,0);
-              console.log("after drawing image")
               var imgdata=canvas.toDataURL("img/png");
               validJson=JSON.stringify(imgdata)
               me.button2(wrapper,validJson,cust_name)

@@ -2,8 +2,8 @@
 cur_frm.add_fetch('employee', 'company', 'company');
 
 cur_frm.cscript.week_from_date= function(doc, cdt, cdn) {
-	console.log(doc.from_date);
-	console.log(doc.to_date);
+	// console.log(doc.from_date);
+	// console.log(doc.to_date);
 	if (doc.week_from_date && doc.week_to_date)
 	{
 		var arg = {'month_start_date':doc.week_from_date, 'month_end_date':doc.week_from_date,'month_days':flt(7)}
@@ -47,7 +47,7 @@ cur_frm.cscript.fiscal_year = function(doc,dt,dn){
 cur_frm.cscript.month = cur_frm.cscript.employee = cur_frm.cscript.fiscal_year;
 
 cur_frm.cscript.leave_without_pay = function(doc,cdt,cdn){
-	console.log("in the leave_without_pay ")
+	// console.log("in the leave_without_pay ")
 	var arg = {'month_start_date':doc.week_from_date, 'month_end_date':doc.week_from_date,}
 	if (doc.employee && doc.fiscal_year ) {
 		get_server_fields('get_leaves',doc.leave_without_pay,JSON.stringify(arg),doc, cdt, cdn, 1 , function(r){
@@ -57,7 +57,7 @@ cur_frm.cscript.leave_without_pay = function(doc,cdt,cdn){
 }
 
 var calculate_all = function(doc, dt, dn) {
-	console.log("in the calculate_all")
+	// console.log("in the calculate_all")
 	calculate_earning_total(doc, dt, dn);
 	calculate_ded_total(doc, dt, dn);
 	calculate_net_pay(doc, dt, dn);

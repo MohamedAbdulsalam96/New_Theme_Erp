@@ -106,7 +106,7 @@ cur_frm.cscript.work_status = function(doc, cdt, cdn){
 		d.subject = doc.trials_serial_no_status
 		if(d.work_status == 'Open' && parseInt(d.trial_no) > 1 && d.work_status != 'Closed'){
 			get_server_fields('check_serial_no', '', '', doc, cdt, cdn,1, function(r, rt){
-				console.log("hii")
+				var a;
 			})
 		}
 	}else if(!doc.trials_serial_no_status){

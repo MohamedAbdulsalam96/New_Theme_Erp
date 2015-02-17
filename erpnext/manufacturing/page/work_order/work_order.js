@@ -53,12 +53,12 @@ frappe.WOForm = Class.extend({
 
 	set_from_route: function() {
 		var me = this;
-		console.log([frappe.get_route()[1]])
+		// console.log([frappe.get_route()[1]])
 		if(frappe.get_route()[1]) {
 			woname = frappe.get_route()[1];
 			args = '';
 		} else if(frappe.route_options) {
-			console.log(frappe.route_options.args)
+			// console.log(frappe.route_options.args)
 			if(frappe.route_options.work_order) {
 				woname = frappe.route_options.work_order;
 				args = frappe.route_options.args;

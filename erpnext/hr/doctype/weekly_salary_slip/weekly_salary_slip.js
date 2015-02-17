@@ -2,8 +2,8 @@
 cur_frm.add_fetch('employee', 'company', 'company');
 
 cur_frm.cscript.from_date= function(doc, cdt, cdn) {
-	console.log(doc.from_date);
-	console.log(doc.to_date);
+	// console.log(doc.from_date);
+	// console.log(doc.to_date);
 	if (doc.from_date && doc.to_date)
 	{
 		if(doc.salary_type == 'Weekly' && frappe.datetime.get_diff(doc.to_date, doc.from_date) <= 8){
@@ -39,7 +39,7 @@ cur_frm.cscript.to_date= function(doc, cdt, cdn) {
 		if(doc.salary_type == 'Weekly' && frappe.datetime.get_diff(doc.to_date, doc.from_date) <= 8){
 			var arg = {'month_start_date':doc.from_date, 'month_end_date':doc.to_date}
 			get_server_fields('get_week_details',JSON.stringify(arg),doc.to_date,doc, cdt, cdn, 1 , function(r){
-				console.log(r.total_days_in_month)	
+				// console.log(r.total_days_in_month)	
 				refresh_field('total_days_in_month');
 			});
 		}

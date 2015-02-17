@@ -42,7 +42,7 @@ def create_work_order_style(data, wo_name, item_code):
 		if styles:
 			for s in styles:
 				image_viewer, default_value = get_styles_DefaultValues(s.style, item_code)  #Newly Added
-				ws = wo_name.append('wo_style')
+				ws = wo_name.append('wo_style', {})
 				ws.field_name = s.style
 				ws.abbreviation  = s.abbreviation
 				ws.image_viewer = image_viewer
@@ -71,7 +71,7 @@ def create_work_order_measurement(data, wo_name, item_code):
 		if measurements:
 			for s in measurements:
 				if not s.parameter in style_parm:
-					mi = wo_name.append('measurement_item')
+					mi = wo_name.append('measurement_item', {})
 					mi.parameter = s.parameter
 					mi.abbreviation = s.abbreviation
 					mi.image_view = s.image_view
@@ -86,7 +86,7 @@ def create_process_wise_warehouse_detail(data, wo_name, item_code):
 	if wo_name:
 		for proc_wh in frappe.db.sql("""select process_name, warehouse, idx, actual_fabric from `tabProcess Item`
 			where parent = '%s'"""%item_code,as_list=1):
-			mi = wo_name.append('process_wise_warehouse_detail')
+			mi = wo_name.append('process_wise_warehouse_detail', {})
 			mi.process = proc_wh[0]
 			mi.warehouse = proc_wh[1]
 			mi.idx = proc_wh[2]
@@ -316,7 +316,7 @@ def serial_no_log(obj, data):
 	sn = cstr(data.serial_no_data).split('\n')
 	for s in sn:
 		if s:
-			sn = obj.append('production_status_detail')
+			sn = obj.append('production_status_detail', {})
 			sn.item_code = data.tailoring_item
 			sn.serial_no = s
 			sn.branch = data.tailor_warehouse
@@ -476,7 +476,7 @@ def get_process_detail(name):
 		ifnull(trials,'No') as trials, (select ifnull(qi_status, '') from `tabProcess Allotment`
 			where name =a.process_data) as qi_status from `tabProcess Log` a
 		where parent ='%s' and branch = '%s' 
-		order by process_data, trials"""%(name, get_user_branch()),as_dict=1, debug=1)
+		order by process_data, trials"""%(name, get_user_branch()),as_dict=1)
 
 def invoice_validation_method(doc, method):
 	if not doc.branch:
@@ -643,7 +643,7 @@ def check_previous_is_closed_for_trials(serial_no, args, work_order):
 	process_detail = frappe.db.sql("""select process_name, trials from 
 		`tabProcess Log` where parent='%s' and idx < (select idx from `tabProcess Log` 
 		where parent='%s' and process_name='%s' and %s ) and skip_trial!=1 
-		order by idx desc limit 1"""%(args.parent, args.parent, args.process_name, cond), as_list=1, debug=1)
+		order by idx desc limit 1"""%(args.parent, args.parent, args.process_name, cond), as_list=1)
 
 	if process_detail:
 		if process_detail[0][1]:

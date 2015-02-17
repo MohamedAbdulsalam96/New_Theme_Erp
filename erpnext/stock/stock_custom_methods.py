@@ -184,7 +184,6 @@ def make_item_price(item_code, price_list, rate=None):
 	return ip.name
 
 def update_item_price(parent,data):
-	frappe.errprint(parent)
 	name = frappe.db.get_value('Customer Rate', {'parent':parent, 'branch': data.get('branch'), 'size': data.get('size')}, 'name')
 	item_price_dict = get_dict(parent, data)
 	if not name:

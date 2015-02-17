@@ -15,10 +15,8 @@ $.extend(cur_frm.cscript, {
 			cur_frm.footer.help_area.innerHTML = '<p><a href="#Form/Support Email Settings/Support Email Settings">'+__("Support Email Settings")+'</a><br>\
 				<span class="help">'+__("Integrate incoming support emails to Support Ticket")+'</span></p>';
 		}*/
-		//console.log("local and admin");
 		var usr=''
 		if(doc.__islocal && user=='Administrator') {
-				//console.log("local and admin");
 				frappe.call({
 				method: "erpnext.support.doctype.support_ticket.support_ticket.get_admin",
 				args: {
@@ -28,16 +26,12 @@ $.extend(cur_frm.cscript, {
 					//alert(r.message);
 					usr=r.message;
 					doc.raised_by=r.message;
-					//console.log(doc.raised_by)
-					console.log(r.message)
 					refresh_field('raised_by');
 				}
 				})
 			//doc.raised_by=usr;
-			//console.log(doc.raised_by)		
 		}
 		else if (doc.__islocal && user!='Administrator'){
-			//console.log("local and not admin");	
 			doc.raised_by=user;
 		}
 	},

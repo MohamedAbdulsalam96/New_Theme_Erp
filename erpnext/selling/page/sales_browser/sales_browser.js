@@ -26,7 +26,7 @@ pscript['onload_Sales Browser'] = function(wrapper){
 			args: {ctype: ctype},
 			callback: function(r) {
 				var root = r.message[0]["value"];
-				console.log([ctype, root])
+				// console.log([ctype, root])
 				erpnext.sales_chart = new erpnext.SalesChart(ctype, root,
 					$(wrapper)
 						.find(".layout-main-section")
