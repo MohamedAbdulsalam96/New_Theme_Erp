@@ -1,5 +1,4 @@
 cur_frm.cscript.onload = function(doc, cdt, cdn){
-	// console.log(doc.__islocal)
 	if(doc.__islocal){
 		doc.date = frappe.datetime.get_today()
 		refresh_field('date')

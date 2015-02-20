@@ -159,16 +159,12 @@ def get_dashboard_info(customer):
 
 @frappe.whitelist()
 def getfile_data(name=None):
-	frappe.errprint("In get file data")
-	frappe.errprint(name)
 	filename=frappe.db.sql(""" select file_name from `tabFile Data` where (attached_to_name="%s")"""%(name))
-	frappe.errprint(filename)
 	return filename
 
 @frappe.whitelist()
 def getfile_url(name=None):
 	fileurl=frappe.db.sql(""" select file_url from `tabFile Data` where (file_name="%s")"""%(name))
-	# frappe.errprint(fileurl)
 	return fileurl
 
 

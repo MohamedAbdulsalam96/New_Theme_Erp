@@ -119,19 +119,19 @@
    "permlevel": 0
   }, 
   {
-   "default": "Accepted", 
+   "default": "-", 
    "fieldname": "status", 
    "fieldtype": "Select", 
    "label": "Status", 
    "oldfieldname": "status", 
    "oldfieldtype": "Select", 
-   "options": "Accepted\nRejected", 
+   "options": "-\nAccepted\nRejected", 
    "permlevel": 0
   }
  ], 
  "idx": 1, 
  "istable": 1, 
- "modified": "2014-12-12 16:01:22.226621", 
+ "modified": "2015-02-18 07:50:18.308778", 
  "modified_by": "Administrator", 
  "module": "Buying", 
  "name": "Quality Inspection Reading", 

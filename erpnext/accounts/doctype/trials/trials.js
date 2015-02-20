@@ -5,7 +5,7 @@ cur_frm.cscript.work_order_changes = function(doc, cdt, cdn){
 		frappe.route_options = { work_order: d.work_order, args: d};
 		frappe.set_route("work-order");		
 	}else{
-		alert("Work order is not defined")
+		alert("Not allowed to amend")
 	}
 	
 }
@@ -58,20 +58,20 @@ cur_frm.cscript.finished_all_trials = function(doc){
 	refresh_field('trial_dates')
 }
 
-cur_frm.cscript.work_status = function(doc, cdt, cdn){
-	var d = locals[cdt][cdn]
-	var cl = doc.trial_dates || [ ]
+// cur_frm.cscript.work_status = function(doc, cdt, cdn){
+// 	var d = locals[cdt][cdn]
+// 	var cl = doc.trial_dates || [ ]
+// 	d.trial_no = d.idx
+// 	if(d.work_status == 'Open'){
 
-	if(d.work_status == 'Open'){
-
-		$.each(cl, function(i){
-			if(cl[i].production_status!='Closed' && parseInt(cl[i].idx) < parseInt(d.idx)){
-				cl[i].next_trial_no = d.trial_no
-			}
-		})
-	}
-	refresh_field('trial_dates')
-}
+// 		$.each(cl, function(i){
+// 			if(cl[i].production_status!='Closed' && parseInt(cl[i].idx) < parseInt(d.idx)){
+// 				cl[i].next_trial_no = d.trial_no
+// 			}
+// 		})
+// 	}
+// 	refresh_field('trial_dates')
+// }
 
 cur_frm.fields_dict['finish_trial_for_process'].get_query = function(doc, cdt, cdn) {
 		get_finished_list = cur_frm.cscript.get_finished_list(doc)
@@ -82,6 +82,25 @@ cur_frm.fields_dict['finish_trial_for_process'].get_query = function(doc, cdt, c
       			'get_finished_list' : get_finished_list
       		}
       	}
+}
+
+cur_frm.cscript.process = function(doc, cdt, cdn){
+	var d =locals[cdt][cdn]
+	if(d.production_status != 'Closed'){
+		get_server_fields('get_trial_no', d, '', doc, cdt, cdn,1, function(r, rt){
+			refresh_field('trial_no', d.name, 'trial_dates')	
+		})	
+	}else{
+		cur_frm.cscript.PermissionException(doc, cdt, cdn)
+	}
+			
+		// d.trial_no = d.idx
+}
+
+cur_frm.cscript.PermissionException = function(doc, cdt, cdn){
+	get_server_fields('PermissionException','','', doc, cdt, cdn, 1, function(r){
+		refresh_field('trial_dates')
+	})
 }
 
 cur_frm.cscript.get_finished_list= function(doc){
@@ -102,18 +121,24 @@ cur_frm.cscript.get_finished_list= function(doc){
 
 cur_frm.cscript.work_status = function(doc, cdt, cdn){
 	var d = locals[cdt][cdn]
-	if(d.work_status == 'Open' && doc.trials_serial_no_status){
-		d.subject = doc.trials_serial_no_status
-		if(d.work_status == 'Open' && parseInt(d.trial_no) > 1 && d.work_status != 'Closed'){
-			get_server_fields('check_serial_no', '', '', doc, cdt, cdn,1, function(r, rt){
-				var a;
-			})
-		}
-	}else if(!doc.trials_serial_no_status){
-		d.work_status = 'Pending'
-		refresh_field('work_status', d.name, 'trial_dates')
-		alert("Select trial serial no")
+
+	if(d.production_status != 'Closed'){
+		if(d.work_status == 'Open' && doc.trials_serial_no_status){
+			d.subject = doc.trials_serial_no_status
+			if(d.work_status == 'Open' && parseInt(d.trial_no) > 1 && d.work_status != 'Closed'){
+				get_server_fields('check_serial_no', '', '', doc, cdt, cdn,1, function(r, rt){
+					var a;
+				})
+			}
+		}else if(!doc.trials_serial_no_status){
+			d.work_status = 'Pending'
+			refresh_field('work_status', d.name, 'trial_dates')
+			alert("Select trial serial no")
+		}	
+	}else{
+		cur_frm.cscript.PermissionException(doc, cdt, cdn)
 	}
+	
 	refresh_field('subject', d.name, 'trial_dates')
 }
 
@@ -121,22 +146,50 @@ cur_frm.cscript.trial_dates_add = function(doc, cdt, cdn){
 	var d = locals[cdt][cdn]
 	var cl = doc.trial_dates || [ ]
 	var work_order;
-	if(!d.work_order){
-		$.each(cl, function(i){
-			if(parseInt(cl[i].idx) < parseInt(d.idx)){
-				work_order = cl[i].work_order
-			}
-		})
-		d.work_order = work_order
-		refresh_field('trial_dates')
+	if(d.production_status == 'Closed'){
+		return false
+	}else{
+		if(!d.work_order){
+			$.each(cl, function(i){
+				if(parseInt(cl[i].idx) < parseInt(d.idx)){
+					work_order = cl[i].work_order
+				}
+			})
+			d.work_order = work_order
+			refresh_field('trial_dates')
+		}	
 	}
+	
 }
 
 
 cur_frm.cscript.trial_date = function(doc, cdt, cdn){
 	var d = locals[cdt][cdn]
-	if(doc.trials_serial_no_status){
-		d.subject = doc.trials_serial_no_status
+	if(d.production_status != 'Closed'){
+		if(doc.trials_serial_no_status){
+			d.subject = doc.trials_serial_no_status
+		}
+		refresh_field('trial_dates')
+	}else{
+		cur_frm.cscript.PermissionException(doc, cdt, cdn)
 	}
-	refresh_field('trial_dates')
+}
+
+
+cur_frm.cscript.trial_branch = function(doc, cdt, cdn){
+	var d = locals[cdt][cdn]
+	if (d.production_status =='Closed'){
+		cur_frm.cscript.PermissionException(doc, cdt, cdn)
+	}
+}
+
+cur_frm.cscript.finish_trial_for_process = function(doc, cdt, cdn){
+	if(doc.trials_serial_no_status){
+		get_server_fields('check_serial_no', '', '', doc, cdt, cdn,1, function(r, rt){
+			var a;
+		})
+	}else{
+		alert("Select serial no")
+	}
+	
 }

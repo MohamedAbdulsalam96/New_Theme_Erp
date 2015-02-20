@@ -11,7 +11,6 @@ from erpnext.support.page.report_scheduler import delete_report_folder
 @frappe.whitelist(allow_guest=True)
 def download_report_pdf(html):
 	site_name = get_site_name()
-	frappe.errprint(site_name)
 	path = os.path.abspath(os.path.join('.',site_name, 'public', 'files'))
 	report_path=path+'/Report_PDF'
 	if not os.path.exists(report_path):
@@ -22,7 +21,7 @@ def download_report_pdf(html):
 		html_path=report_path+'/'+filename+'.html'
 		pdf_path=report_path+'/'+filename+'.pdf'
 		data = open(html_path, 'w')
-		frappe.errprint(type(html))
+		html=html.encode('utf-8')
 		data.write(html)
 		data.close()
 		os.system("wkhtmltopdf "+report_path+"/"+filename+".html "+report_path+"/"+filename+".pdf")

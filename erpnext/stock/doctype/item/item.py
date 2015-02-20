@@ -313,7 +313,6 @@ class Item(WebsiteGenerator):
 
 	def check_default(self):   #Newly added method for checking default
 		check_list=[]
-		frappe.errprint("In check default")
 		for d in self.get('style_item'):
 			if d.style in check_list:
 				if d.default==True:
@@ -322,10 +321,8 @@ class Item(WebsiteGenerator):
 				check_list.append(d.style)
 
 	def get_rawtab_details(self,item_code):
-		frappe.errprint(item_code)
 		query="select item_sub_group,stock_uom,item_name from `tabItem` where name='%s'"%(item_code)
 		rawtab_data_list=frappe.db.sql(query, as_list=1)
-		frappe.errprint(rawtab_data_list)
 		if rawtab_data_list:
 			ret={
 			"raw_item_sub_group":rawtab_data_list[0][0],

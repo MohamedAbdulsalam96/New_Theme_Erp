@@ -11,7 +11,7 @@ class HRDailyActivities(Document):
 	def get_employee(self):
 		self.set('ad_details', [])
 		for employye in frappe.db.sql("""select name, employee_name from tabEmployee 
-				where branch = '%s' and ifnull(status,'')='Active'"""%(self.branch), as_dict=1, debug=1):
+				where branch = '%s' and ifnull(status,'')='Active'"""%(self.branch), as_dict=1):
 			e = self.append('ad_details', {})
 			e.employee_id = employye.get('name')
 			e.employee_name = employye.get('employee_name')

@@ -19,7 +19,6 @@ class WeeklySalarySlip(TransactionBase):
 		self.name = make_autoname('Week Sal Slip/' +self.employee + '/.#####')
 
 	def get_emp_and_leave_details(self):
-		frappe.errprint("in the")
 		if self.employee:
 			self.get_leave_details()
 			# struct = self.check_sal_struct()
@@ -35,28 +34,15 @@ class WeeklySalarySlip(TransactionBase):
 		return struct and struct[0][0] or ''
 
 	def get_week_details(self,args):
-		frappe.errprint("in the py")
-		# frappe.errprint(args['from_date'])
-		# frappe.errprint(args['to_date'])
 		holidays = self.get_holidays_for_employee(args)
 		self.total_days_in_month=7-len(holidays)
-	# 	# return 
-	# 	# {
-	# 	# "holidays":len(holidays)
-	# 	# }
 
 	def set_to_date(self,args):
-		frappe.errprint("in set to date")
 		d2=add_days(args['month_start_date'],7)
 		self.to_date=d2
 
 
 	def pull_sal_struct(self):
-		# frappe.errprint("in the pull_sal_struct")
-		# from erpnext.hr.doctype.salary_structure.salary_structure import make_salary_slip2
-		# self.update(make_salary_slip2(struct, self).as_dict())
-
-		
 		earnings_details, drawings_overtime_details ,loan_details = self.get_mapper_details()
 
 		mapper = {'wages': ['Wages', earnings_details[0].get('wages') if len(earnings_details) > 0 else 0.0 ], 
@@ -97,10 +83,10 @@ class WeeklySalarySlip(TransactionBase):
 					and ifnull(dd.flag, 'No') != 'Yes'
 					and dd.date between STR_TO_DATE('%(from_date)s','%(format)s') 
 						and  STR_TO_DATE('%(to_date)s','%(format)s')"""%{'format': '%Y-%m-%d', 
-						'from_date': self.from_date, 'to_date': self.to_date, 'employee':self.employee},as_dict=1, debug=1)
+						'from_date': self.from_date, 'to_date': self.to_date, 'employee':self.employee},as_dict=1)
 
 		loan_details=frappe.db.sql(""" select  group_concat(name) as name,sum(emi) as emi from `tabLoan` where employee_id='%(employee)s' and payment_type='Weekly'  and pending_amount > 0 and  ( STR_TO_DATE('%(from_date)s','%(format)s') between from_date and to_date  or  STR_TO_DATE('%(to_date)s','%(format)s') between from_date and to_date )"""
-			%{'format': '%Y-%m-%d','from_date':self.from_date,'to_date':self.to_date,'employee':self.employee},as_dict=1,debug=True)
+			%{'format': '%Y-%m-%d','from_date':self.from_date,'to_date':self.to_date,'employee':self.employee},as_dict=1)
 
 		return earnings_details, drawings_overtime_details ,loan_details
 
@@ -126,7 +112,6 @@ class WeeklySalarySlip(TransactionBase):
 
 		if not cint(frappe.db.get_value("HR Settings", "HR Settings",
 			"include_holidays_in_total_working_days")):
-				# frappe.errprint(len(holidays))
 				m["month_days"] -= len(holidays)
 				# week_days -= len(holidays)
 				if m["month_days"] < 0:
@@ -141,7 +126,6 @@ class WeeklySalarySlip(TransactionBase):
 
 
 	def get_payment_days(self, m):
-		frappe.errprint("get_payment_days")
 		payment_days = m['month_days']
 		emp = frappe.db.sql("select date_of_joining, relieving_date from `tabEmployee` \
 			where name = %s", self.employee, as_dict=1)[0]
@@ -163,9 +147,6 @@ class WeeklySalarySlip(TransactionBase):
 		return payment_days
 
 	def get_holidays_for_employee(self, m):
-		frappe.errprint("get_holidays_for_employee")
-		# frappe.errprint(m['from_date'])
-		# frappe.errprint(m['to_date'])
 
 		holidays = frappe.db.sql("""select t1.holiday_date
 			from `tabHoliday` t1, tabEmployee t2
@@ -210,7 +191,6 @@ class WeeklySalarySlip(TransactionBase):
 			frappe.throw(_(" Weekly Salary Slip of employee {0} already created for this month").format(self.employee))
 
 	def validate(self):
-		frappe.errprint("in the validate")
 		from frappe.utils import money_in_words
 		self.check_existing()
 
@@ -267,7 +247,6 @@ class WeeklySalarySlip(TransactionBase):
 
 		if len(earnings_details) > 0 and earnings_details[0].get('name') != None:
 			for name in earnings_details[0].get('name').split(','):
-				frappe.errprint(name)
 				frappe.db.sql("""update `tabEmployee Details` set flag = 'Yes' where name = '%s'"""%name)
 				frappe.db.sql("commit")
 
@@ -288,7 +267,6 @@ class WeeklySalarySlip(TransactionBase):
 		
 		if len(earnings_details) > 0 and earnings_details[0].get('name') != None:
 			for name in earnings_details[0].get('name').split(','):
-				frappe.errprint(name)
 				frappe.db.sql("""update `tabEmployee Details` set flag = 'No' where name = '%s'"""%name)
 				frappe.db.sql("commit")
 

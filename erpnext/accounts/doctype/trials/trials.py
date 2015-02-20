@@ -126,7 +126,7 @@ class Trials(Document):
 	def get_target_branch(self, process):
 		name = frappe.db.sql("""select branch from `tabProcess Log` where 
 			idx > (select max(idx) from `tabProcess Log` where parent = '%s' and process_name = '%s' 
-			order by idx) and parent = '%s' order by idx limit 1 """%(self.pdd, process, self.pdd), as_dict=1, debug=1)
+			order by idx) and parent = '%s' order by idx limit 1 """%(self.pdd, process, self.pdd), as_dict=1)
  		if name:
  			return name[0].branch
  		else:
@@ -139,12 +139,16 @@ class Trials(Document):
 		ste = frappe.new_doc('Stock Entry')
 		ste.purpose_type = 'Material Out'
 		ste.branch = get_user_branch()
- 		ste.purpose ='Material Issue' 		
- 		self.stock_entry_of_child(ste, args, t_branch)
- 		ste.save(ignore_permissions=True)
- 		return ste.name
+		ste.posting_date = nowdate()
+		ste.posting_time = nowtime()
+		ste.from_warehouse = get_branch_warehouse(get_user_branch())
+		ste.t_branch = t_branch
+		ste.purpose ='Material Issue' 		
+		self.stock_entry_of_child(ste, args, t_branch)
+		ste.save(ignore_permissions=True)
+		return ste.name
 
- 	def stock_entry_of_child(self, obj, args, target_branch):
+	def stock_entry_of_child(self, obj, args, target_branch):
 		ste = obj.append('mtn_details', {})
 		ste.s_warehouse = get_branch_warehouse(get_user_branch())
 		ste.target_branch = target_branch
@@ -225,7 +229,21 @@ class Trials(Document):
 			frappe.throw(_("Mandatory Field: Start on, subject to make an event").format())
 
 	def check_serial_no(self):
-		pass
+		warehouse = get_branch_warehouse(get_user_branch())
+		if warehouse and frappe.db.get_value('Serial No', self.trials_serial_no_status, 'warehouse') != warehouse:
+			frappe.throw(_('You can not open because serial no {0} is not availble in warehouse {1}'). format(self.trials_serial_no_status, warehouse))
+		return True	
+
+	def get_trial_no(self, args):
+		trial_no = frappe.db.sql(""" Select max(trial_no) from `tabTrial Dates` where parent = '%s'
+			and process = '%s'	"""%(self.name, args.get('process')), as_list=1)
+		if trial_no:
+			return {'trial_no': cstr(cint(trial_no[0][0])+1)}
+		else:
+			return {'trial_no': args.get('idx')}
+
+	def PermissionException(self):
+		frappe.throw(_("Not allowed to edit once it is closed"))
 
 @frappe.whitelist()
 def get_serial_no_data(work_order):

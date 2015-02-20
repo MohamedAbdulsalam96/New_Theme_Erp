@@ -5,11 +5,12 @@ from __future__ import unicode_literals
 import frappe
 from frappe.widgets.reportview import get_match_cond
 from frappe.utils import add_days, cint, cstr, date_diff, rounded, flt, getdate, nowdate, \
-	get_first_day, get_last_day,money_in_words, now
+	get_first_day, get_last_day,money_in_words, now, nowtime
 from frappe import _
 from frappe.model.db_query import DatabaseQuery
 from frappe import msgprint, _, throw
 from frappe.model.naming import make_autoname
+from erpnext.stock.utils import get_incoming_rate
 from tools.custom_data_methods import get_user_branch, get_branch_cost_center, get_branch_warehouse, find_next_process
 from tools.tools_management.custom_methods import cut_order_generation
 
@@ -475,7 +476,7 @@ def get_process_detail(name):
 	return frappe.db.sql("""select process_data, process_name, 
 		ifnull(trials,'No') as trials, (select ifnull(qi_status, '') from `tabProcess Allotment`
 			where name =a.process_data) as qi_status from `tabProcess Log` a
-		where parent ='%s' and branch = '%s' 
+		where parent ='%s' and branch = '%s' and ifnull(completed_status, 'No')= 'No'
 		order by process_data, trials"""%(name, get_user_branch()),as_dict=1)
 
 def invoice_validation_method(doc, method):
@@ -537,6 +538,8 @@ def stock_entry_for_out(args, target_branch, sn_list, qty):
 		if parent:
 			obj = frappe.get_doc('Stock Entry', parent)
 			stock_entry_of_child(obj, args, target_branch, sn_list, qty)
+			obj.posting_date = nowdate()
+			obj.posting_time = nowtime()
 			obj.save(ignore_permissions=True)
 		else:
 			parent = make_StockEntry(args, target_branch, sn_list, qty)
@@ -549,18 +552,23 @@ def make_StockEntry(args, target_branch, sn_list, qty):
  	ste.purpose_type = 'Material Out'
  	ste.purpose ='Material Issue'
  	ste.branch = get_user_branch()
+ 	ste.posting_date = nowdate()
+ 	ste.posting_time = nowtime()
+ 	ste.from_warehouse = get_branch_warehouse(get_user_branch())
+ 	ste.t_branch = target_branch
  	stock_entry_of_child(ste, args, target_branch, sn_list, qty)
  	ste.save(ignore_permissions=True)
  	return ste.name
 
 def stock_entry_of_child(obj, args, target_branch, sn_list, qty):
 	ste = obj.append('mtn_details', {})
+	incoming_rate_args = get_args_list(args, get_branch_warehouse(get_user_branch()), qty, sn_list)
 	ste.s_warehouse = get_branch_warehouse(get_user_branch())
 	ste.target_branch = target_branch
 	ste.t_warehouse = get_branch_warehouse(target_branch)
 	ste.qty = qty
 	ste.serial_no = sn_list
-	ste.incoming_rate = 1.0
+	ste.incoming_rate = get_incoming_rate(incoming_rate_args) or 1.0
 	ste.conversion_factor = 1.0
 	ste.work_order = args.get('work_order')
 	ste.item_code = args.get('item')
@@ -571,6 +579,17 @@ def stock_entry_of_child(obj, args, target_branch, sn_list, qty):
 	ste.cost_center = get_branch_cost_center(get_user_branch()) or 'Main - '+frappe.db.get_value('Company', company, 'abbr')
 	return "Done"
 
+def get_args_list(args, warehouse, qty, sn_list):
+	return	frappe._dict({
+				"item_code": args.get('item'),
+				"warehouse": warehouse,
+				"posting_date": nowdate(),
+				"posting_time": nowtime(),
+				"qty": qty,
+				"serial_no": sn_list
+			})
+
+
 def validate_work_order(args):
 	if args.get('work_order'):
 		if cint(frappe.db.get_value('Work Order', args.get('work_order'), 'docstatus')) != 1:
@@ -578,7 +597,7 @@ def validate_work_order(args):
 		else:
 			sales_work_status = frappe.db.sql("""select a.name from `tabTrial Dates` a, `tabTrials` b
 				where a.parent = b.name and a.work_status = 'Open' and b.work_order = '%s'"""%(args.get('work_order')))
-			if not sales_work_status:
+			if not sales_work_status and frappe.db.get_value('Trials', {'work_order': args.get('work_order')}, 'name'):
 				frappe.throw(_("You must have to open the Trials for work order {0}").format(args.get('work_order')))			
 
 def get_target_branch(invoice_no, args):
@@ -717,6 +736,14 @@ def make_stock_entry_against_qc(doc, method):
 			elif doc.serial_no_data:
 				update_QI_for_SerialNo(doc, data)
 		make_ste_for_QI(doc, data)
+		update_trials_status(doc)
+
+def update_trials_status(self):
+	if self.trial_no and self.tdd and self.pdd:
+		frappe.db.sql(""" update `tabTrial Dates` set production_status='Closed'
+			where parent='%s' and trial_no='%s'"""%(self.tdd, cint(self.trial_no)))
+		frappe.db.sql(""" update `tabProcess Log` set completed_status = 'Yes'
+			where trials=%s and parent = '%s'	"""%(cint(self.trial_no), self.pdd))
 
 def update_QI_for_SerialNo(doc, data):
 	sn_list = cstr(doc.serial_no_data).split('\n')
@@ -741,11 +768,18 @@ def make_ste_for_QI(self, data):
 def get_branch(self, pdlog):
 	if pdlog:
 		branch = pdlog.branch	
-	else:
+	elif not self.trial_no:
 		branch = frappe.db.get_value('Production Dashboard Details', self.pdd, 'end_branch')
+		update_serial_no_status_completed(self.serial_no_data)
 	if self.trial_no and self.tdd:
 		branch = frappe.db.get_value('Trial Dates', {'parent': self.tdd, 'trial_no': self.trial_no}, 'trial_branch')	
 	return branch
+
+def update_serial_no_status_completed(serial_no):
+	sn = cstr(serial_no).split('\n')
+	for serial_no in sn:
+		if serial_no:
+			frappe.db.sql("update `tabSerial No` set completed = 'Yes' where name = '%s'"%(serial_no))
 
 def update_QI_status(doc, method):
 	msg = get_QI_status(doc)

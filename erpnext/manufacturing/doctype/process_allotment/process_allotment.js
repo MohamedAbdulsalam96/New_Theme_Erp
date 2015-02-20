@@ -72,17 +72,25 @@ cur_frm.cscript.process_status= function(doc, cdt, cdn){
 cur_frm.cscript.emp_status= function(doc, cdt, cdn){
 	doc.process_status = 'Open'
 	cur_frm.cscript.toogle_field(doc)
-	if(doc.emp_status == 'Assigned'){
-		get_server_fields('find_start_time','','', doc, cdt, cdn, 1, function(){
-			cur_frm.cscript.clear_field(doc);
-		})
-		
-	}else if (doc.emp_status == 'Completed'){
+ if (doc.emp_status == 'Completed'){
 		get_server_fields('find_to_time','','',doc, cdt, cdn, 1, function(){
 			refresh_field(['end_date', 'completed_time'])
 		})
 	}
 	refresh_field(['process_status', 'completed_time', 'start_date', 'work_qty'])
+}
+
+cur_frm.cscript.process_tailor=function(doc,cdt,cdn){
+
+	if(doc.emp_status == 'Assigned' ||  doc.emp_status == 'Reassigned'){
+		get_server_fields('find_start_time','','', doc, cdt, cdn, 1, function(){
+			cur_frm.cscript.clear_field(doc);
+		})
+
+
+	}
+	
+		
 }
 
 cur_frm.cscript.clear_field= function(doc){

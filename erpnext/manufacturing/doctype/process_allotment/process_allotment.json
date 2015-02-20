@@ -175,18 +175,18 @@
    "precision": ""
   }, 
   {
-   "fieldname": "process_tailor", 
-   "fieldtype": "Link", 
-   "label": "Process Tailor", 
-   "options": "Employee", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
    "fieldname": "employee_name", 
    "fieldtype": "Read Only", 
    "label": "Employee Name", 
    "options": "process_tailor.employee_name", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "process_tailor", 
+   "fieldtype": "Link", 
+   "label": "Process Tailor", 
+   "options": "Employee", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -236,6 +236,15 @@
    "fieldtype": "Select", 
    "label": "Payment", 
    "options": "\nYes\nNo", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "serial_no", 
+   "fieldtype": "Link", 
+   "hidden": 0, 
+   "label": "Serial No", 
+   "options": "Serial No", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -310,16 +319,7 @@
    "label": "QC", 
    "permlevel": 0, 
    "precision": "", 
-   "read_only": 0
-  }, 
-  {
-   "fieldname": "serial_no", 
-   "fieldtype": "Link", 
-   "hidden": 0, 
-   "label": "Serial No", 
-   "options": "Serial No", 
-   "permlevel": 0, 
-   "precision": ""
+   "read_only": 1
   }, 
   {
    "fieldname": "serial_no_data", 
@@ -530,7 +530,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-02-16 16:22:44.349164", 
+ "modified": "2015-02-18 01:27:58.325056", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

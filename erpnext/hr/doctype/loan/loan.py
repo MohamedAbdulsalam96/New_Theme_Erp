@@ -18,7 +18,6 @@ class Loan(Document):
 		r = flt(self.rate_of_interest)/100/div
 		n = cint(self.period)
 
-		frappe.errprint([p, r, n])
 		loc_emi = ((p*r)*(r+1)**n) / (((r+1)**n) - 1)
 
 		self.emi = loc_emi

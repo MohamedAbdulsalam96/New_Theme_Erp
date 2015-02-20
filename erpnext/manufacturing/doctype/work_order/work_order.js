@@ -17,6 +17,10 @@ cur_frm.cscript.item_code = function(doc, cdt, cdn){
 	})
 }
 
+cur_frm.cscript.validate = function(doc, cdt, cdn){
+	refresh_field('work_order_name')
+}
+
 cur_frm.cscript.field_name=function(doc,cdt,cdn){
 	var d=locals[cdt][cdn]
 	frappe.call({

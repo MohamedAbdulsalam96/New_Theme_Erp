@@ -52,7 +52,6 @@ cur_frm.cscript.select = function(doc, dt, dn){
 	}
 }
 cur_frm.cscript.take_image = function(doc, dt, dn){
-	// console.log(doc.name)
 	frappe.route_options ={customer_name: doc.name};
 	frappe.set_route("web-camera");		
 }

@@ -29,7 +29,7 @@ class WorkManagement(Document):
 			cond = "tailoring_service='%s'"%(self.services)
 		elif self.services and invoice_no:
 			cond = "sales_invoice_no='%s' and tailoring_service='%s'"%(invoice_no, self.services)
-		return frappe.db.sql("select * from `tabProduction Dashboard Details` where %s order by sales_invoice_no desc"%(cond),as_dict=1, debug=1)
+		return frappe.db.sql("select * from `tabProduction Dashboard Details` where %s order by sales_invoice_no desc"%(cond),as_dict=1)
 
 	def create_invoice_bundle(self, invoice_detail, si):
 		color = {'Completed':'green','Pending':'red', 'Trial':'#1F8C83'}
@@ -63,4 +63,4 @@ class WorkManagement(Document):
 	# 	cond = "1=1"
 	# 	if inv_no and item_code:
 	# 		cond = "sales_invoice= '%s' and article_code='%s'"%(inv_no, item_code)
-	# 	frappe.db.sql("delete from `tabProduction Details` where %s"%(cond),debug=1)
+	# 	frappe.db.sql("delete from `tabProduction Details` where %s"%(cond))

@@ -11,11 +11,9 @@ from frappe import msgprint, _, throw
 
 class FabricManagement(Document):
 	def get_invoice_details(self, invoice_no=None):
-		frappe.errprint("in the get_invoice fabric_details ")
 		self.set('fabric_details', [])
 		sales_invoices = frappe.db.sql("""select parent,tailoring_item_code,tailoring_item_name,tailoring_qty,fabric_code,fabric_qty,cut_fabric_status from 
 			`tabSales Invoice Items` where fabric_owner='Self' and cut_fabric_status='Pending'""",as_dict=1)
-		frappe.errprint(sales_invoices)
 		if sales_invoices:
 			for inv in sales_invoices:
 				si = self.append('fabric_details', {})
@@ -33,8 +31,6 @@ class FabricManagement(Document):
 
 	def make_mat_issue(self):
 		fin_dict=self.make_dict()
-		frappe.errprint("in the dict1")
-		frappe.errprint(fin_dict['Out'])
 		if fin_dict['Out']:
 			st =frappe.new_doc("Stock Entry")
 			st.set('mtn_details', [])
@@ -42,14 +38,11 @@ class FabricManagement(Document):
 			self.update_stock(st,fin_dict['Out'])
 			st.docstatus=0
 			st.save(ignore_permissions=True)
-			frappe.errprint("Done")
 		else:
 			frappe.msgprint(_("Please Select Any Row"))
 			
 	def update_stock(self,st,fin_dict):
-		frappe.errprint("in the update_stock ")
 		for d in fin_dict:
-			frappe.errprint(d['s_warehouse'])
 			e = st.append('mtn_details', {})
 			e.item_code=cstr(d['item_code'])
 			e.item_name=cstr(d['item_name'])
@@ -63,9 +56,7 @@ class FabricManagement(Document):
 			self.update_sales_invoice(d['invoice_no'])
 
 	def update_sales_invoice(self,invoice_no):
-		frappe.errprint(" in the update_sales_invoice ")
-		frappe.errprint(invoice_no)
-		frappe.db.sql("""Update `tabSales Invoice Items` set cut_fabric_status="Completed" where parent='%s'"""%(invoice_no),debug=1)
+		frappe.db.sql("""Update `tabSales Invoice Items` set cut_fabric_status="Completed" where parent='%s'"""%(invoice_no))
 		return "Done"
 			
 	def make_dict(self):

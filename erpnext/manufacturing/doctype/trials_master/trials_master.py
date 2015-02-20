@@ -44,7 +44,6 @@ class TrialsMaster(Document):
 	# 	return ste.name
 
 	# def make_child_entry(self, args, name):
-	# 	frappe.errprint(["wsef",args.trial_product])
 	# 	ste = frappe.new_doc('Stock Entry Detail')
 	# 	ste.t_warehouse = 'Finished Goods - I'
 	# 	ste.item_code = args.trial_product

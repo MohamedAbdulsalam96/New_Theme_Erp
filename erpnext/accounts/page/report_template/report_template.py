@@ -33,9 +33,8 @@ def get_uploadedImage_content(filedata, filename):
 @frappe.whitelist()
 def view_image():
 	name = frappe.form_dict.get('name')
-	frappe.errprint(["sd",name])
 	return frappe.db.sql(""" SELECT file_url FROM `tabFile Data` WHERE
-		attached_to_name='%s' AND attached_to_doctype='Product Catalog'"""%(name), debug=1)
+		attached_to_name='%s' AND attached_to_doctype='Product Catalog'"""%(name))
 
 @frappe.whitelist()
 def webcam_img_upload(imgdata1,customer):

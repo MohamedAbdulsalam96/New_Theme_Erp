@@ -37,13 +37,13 @@ frappe.WOForm = Class.extend({
 					['Customer Name', 'Data', '', 'customer'],
 					['Serial NO', 'Small Text', '', 'serial_no_data']
 				],
-			"Style Transactions":[
-					['Field Name', 'Link', 'Style', 'field_name']
-				],
 			"Measurement Item":[
 					['Parameter', 'Link', 'Measurement', 'parameter'],
 					['Abbreviation', 'Data', '', 'abbreviation'],
 					['Value', 'Float', '', 'value']
+				],
+				"Style Transactions":[
+					['Field Name', 'Link', 'Style', 'field_name']
 				]
 		}
 
@@ -53,12 +53,10 @@ frappe.WOForm = Class.extend({
 
 	set_from_route: function() {
 		var me = this;
-		// console.log([frappe.get_route()[1]])
 		if(frappe.get_route()[1]) {
 			woname = frappe.get_route()[1];
 			args = '';
 		} else if(frappe.route_options) {
-			// console.log(frappe.route_options.args)
 			if(frappe.route_options.work_order) {
 				woname = frappe.route_options.work_order;
 				args = frappe.route_options.args;

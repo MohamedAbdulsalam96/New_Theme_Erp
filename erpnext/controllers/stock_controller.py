@@ -232,8 +232,6 @@ class StockController(AccountsController):
 			make_gl_entries(gl_entries)
 
 	def check_expense_account(self, item):
-		frappe.errprint(item.get("expense_account"))
-
 		if not item.get("expense_account"):
 			frappe.throw(_("Expense or Difference account is mandatory for Item {0} as it impacts overall stock value").format(item.item_code))
 

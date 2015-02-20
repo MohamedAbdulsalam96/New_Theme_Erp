@@ -10,7 +10,6 @@ cur_frm.cscript.onload = function(doc, cdt, cdn) {
 
 cur_frm.cscript.employee=function(doc,cdt,cdn){
 		if(doc.employee){
-		// console.log("in if loop")
 		cur_frm.set_df_property("employee_name", "read_only",1);
 	}
 }

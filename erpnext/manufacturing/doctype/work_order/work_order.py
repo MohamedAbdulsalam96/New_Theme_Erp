@@ -16,8 +16,9 @@ class WorkOrder(Document):
 		else:
 			self.name = make_autoname(self.naming_series+'.#####')
 
-	# def validate(self):
-	# 	self.make_serial_no
+	def validate(self):
+		if not self.work_order_name:
+			self.work_order_name = self.name
 
 	def on_update(self):
 		self.update_process_in_production_dashboard()
@@ -132,7 +133,6 @@ class WorkOrder(Document):
 
 	def fill_measurement_details(self):
 		wo = frappe.get_doc('Work Order', self.work_orders)
-		frappe.errprint(wo)
 		self.set('measurement_item', [])
 		for d in wo.get('measurement_item'):
 			e = self.append('measurement_item', {})
@@ -143,7 +143,6 @@ class WorkOrder(Document):
 
 	def fill_cust_measurement_details(self):
 		wo = frappe.get_doc('Customer', self.customer)
-		frappe.errprint(wo)
 		self.set('measurement_item', [])
 		for d in wo.get('body_measurements'):
 			e = self.append('measurement_item', {})
@@ -181,7 +180,6 @@ def apply_measurement_rules(measurement_details=None, param_args=None):
 				if data.target_parameter == d.parameter and param_args.get('parameter') == data.parameter:
 					value = (data.formula).replace('S',cstr(param_args.get('value')))
 					d.value = cstr(flt(eval(value)))
-					frappe.errprint(d.value)
 					result_list.append({'parameter': data.target_parameter, 'value': d.value})
 					
 	return result_list

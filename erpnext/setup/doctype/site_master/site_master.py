@@ -110,14 +110,10 @@ def multitenanct(from_test=False):
     	from frappe.utils import nowdate,add_months,cint
     	en_dt=add_months(nowdate(),1)
 	qry="update `tabSite Master` set flag=1 ,expiry_date='"+en_dt+"' where name='"+cstr(res[0][0])+"'"
-	#frappe.errprint(qry)
 	frappe.db.sql(qry, auto_commit=auto_commit)
 	qry1="select email_id__if_administrator from `tabSite Master` where name='"+cstr(ste)+"'"
-	#frappe.errprint(qry1)
 	rr=frappe.db.sql(qry1)
-	#frappe.errprint(rr[0][0])
 	eml=rr and rr[0][0] or ''
-	#frappe.errprint(eml)
 	frappe.get_doc({
 			"doctype":"SubAdmin Info",
 			"parent": "SUB0001",
@@ -131,23 +127,15 @@ def multitenanct(from_test=False):
 
 
 def validate_validity(doc, method):
-	frappe.errprint("validate validity")
 	from frappe.utils import get_url, cstr
-	frappe.errprint(get_url())
-	frappe.errprint("validate validity")
 	if doc.get("__islocal") and get_url()!='http://smarttailor':
 		res =''
-		frappe.errprint("is local and not smarttailor")
 	 	# res = frappe.db.sql("select name from `tabUser` where name='Administrator' and no_of_users >0")
-	 	frappe.errprint(res)
 	 	if  res:
-	 			frappe.errprint("in res if")
 	 			frappe.db.sql("update `tabUser`set no_of_users=no_of_users-1  where name='Administrator'")
 				from frappe.utils import nowdate,add_months,cint
 		else:
 			res1 = frappe.db.sql("select count(name) from `tabUser`")
-			frappe.errprint("else res1 ")
-			frappe.errprint(res1)
 	 		if res1 and res1[0][0]==2:
 				from frappe.utils import nowdate,add_months,cint
 				doc.validity_start_date=nowdate()
@@ -159,37 +147,18 @@ def validate_validity(doc, method):
 
 	elif(get_url()!='http://smarttailor'):
 		frappe.errprint("updating existing user not smarttailor")
-		# if doc.add_validity:
-		# 	frappe.errprint("updating existing user not smarttailor")
-		# 	res1 = frappe.db.sql("select validity from `tabUser Validity` where user_name>0 and name=%s",doc.add_validity)
-		# 	frappe.errprint(res1)
-		# 	if res1:
-		# 		frappe.errprint("else res1 ")
-		# 		frappe.errprint("update user validity")
-		# 		from frappe.utils import nowdate,add_months,cint
-		# 		doc.add_validity=''
-		# 		frappe.errprint("user validity")
-		# 		frappe.errprint(doc.add_validity)
-		# 		frappe.errprint("user validity1")
-		# 		doc.validity_start_date=nowdate()
-		# 		doc.validity_end_date=add_months(nowdate(),cint(res1[0][0]))
-
+		
 
 def update_users(doc, method):
 	#doc.add_validity=''
 	from frappe.utils import get_url, cstr
 	if get_url()=='http://smarttailor':
-		frappe.errprint("reassigning supprot ticket to admin for disables users")
 		if not doc.enabled :
-			frappe.errprint(doc.name)
 			abc=frappe.db.sql("""select name from `tabUser` where name=%s and enabled=0""", doc.name)
-			frappe.errprint(abc)
 			if abc:
 				frappe.db.sql("""update `tabSupport Ticket` set assign_to='Administrator' where assign_to=%s""",doc.name)
-				frappe.errprint("updated")
 
 def create_support():
-	frappe.errprint("creating suppoert tickets")
 	import requests
 	import json
 	pr2 = frappe.db.sql("""select site_name from `tabSubAdmin Info` """)
@@ -197,7 +166,6 @@ def create_support():
 		db_name=cstr(site_name[0]).split('.')[0]
 		db_name=db_name[:16]
 		abx="select name from `"+cstr(db_name)+"`.`tabSupport Ticket` where flag='false'"
-		frappe.errprint(abx)
 		pr3 = frappe.db.sql(abx)
 		for sn in pr3:
 		 		login_details = {'usr': 'Administrator', 'pwd': 'admin'}
@@ -218,16 +186,13 @@ def create_support():
 				url="http://"+cstr(site_name[0])+"/api/resource/Support Ticket/"+cstr(sn[0])
 				support_ticket={}
 				support_ticket['flag']='True'
-				frappe.errprint('data='+json.dumps(support_ticket))
 				response = requests.put(url, data='data='+json.dumps(support_ticket), headers=headers)
 
 def create_feedback():
-	frappe.errprint("creating feed back")
 	import requests
 	import json
 	pr2 = frappe.db.sql("""select site_name from `tabSubAdmin Info`""")
 	for site_name in pr2:
-		#frappe.errprint(site_name)
 		db_name=cstr(site_name[0]).split('.')[0]
 		db_name=db_name[:16]
 		abx="select name from `"+cstr(db_name)+"`.`tabFeed Back` where flag='false'"
@@ -253,7 +218,6 @@ def create_feedback():
 				response = requests.put(url, data='data='+json.dumps(support_ticket), headers=headers)
 
 def add_validity():
-		frappe.errprint("in add validity function")
 		import requests
 		import json
 		from frappe.utils import nowdate, cstr,cint, flt, now, getdate, add_months
@@ -293,7 +257,6 @@ def add_validity():
 				response = requests.put(url, data='data='+json.dumps(vldt), headers=headers)		
 
 def disable_user():
-	frappe.errprint("in disable user ")
 	import requests
 	import json
 	pr2 = frappe.db.sql("""select site_name from `tabSubAdmin Info`""")
@@ -314,31 +277,22 @@ def disable_user():
 
 
 def assign_support():
-	frappe.errprint("assign suppoert tickets")
 	from frappe.utils import get_url, cstr
 	if get_url()=='http://smarttailor':
 		check_entry = frappe.db.sql("""select name,raised_by from `tabSupport Ticket` where assign_to is null and raised_by is not null and status<>'Closed'""")
-		#frappe.errprint(check_entry)
 		for name,raised_by in check_entry :
-			#frappe.errprint([name,raised_by])
 			assign_to = frappe.db.sql("""select assign_to from `tabAssing Master` where name= %s""",raised_by)
-			#frappe.errprint(assign_to[0][0])
 			if assign_to :
 				aa="update `tabSupport Ticket` set assign_to='"+cstr(assign_to[0][0])+"' where name = '"+name+"'"
-				#frappe.errprint(aa)
 				frappe.db.sql(aa)	
 			else :
 				aa="update `tabSupport Ticket` set assign_to='Administrator' where name = '"+name+"'"
-				#frappe.errprint(aa)
 				frappe.db.sql(aa)
 
 def superadmin():
-	frappe.errprint("calling superadmin")
-        from frappe.utils import get_url, cstr
-	frappe.errprint(get_url())
+	from frappe.utils import get_url, cstr
 	if get_url()=='http://smarttailor':
 		#self.superadmin()
-		frappe.errprint("in super admin")
 		import requests
 		import json
 		pr1 = frappe.db.sql("""select site_name,email_id__if_administrator,country from `tabSite Master` where client_name=%s""",self.customer)
@@ -346,58 +300,36 @@ def superadmin():
 		eml=pr1 and pr1[0][1] or ''
 		cnt=pr1 and pr1[0][2] or ''
 		val=usr=0
-		#frappe.errprint(val)
 		headers = {'content-type': 'application/x-www-form-urlencoded'}
 		sup={'usr':'administrator','pwd':'admin'}
 		url = 'http://'+st+'/api/method/login'
-		frappe.errprint(url)
 		response = requests.get(url, data=sup, headers=headers)
-		frappe.errprint(response.text)
 		if st.find('.')!= -1:
 			db=st.split('.')[0][:16]
 		else:
 			db=st[:16]
-		frappe.errprint(db)
 		item_code = frappe.db.sql("""select item_code from `tabSales Order Item` where parent = %s """, self.name)
 		for ic in item_code:
 			qr="select no_of_users,validity from `tabItem` where name = '"+cstr(ic[0])+"'"
 			pro = frappe.db.sql(qr)
-			frappe.errprint(pro)
 			if (pro [0][0]== 0) and (pro[0][1]>0):
-				frappe.errprint("0 and >0")
 				vldt={}
 				vldt['validity']=pro[0][1]
 				vldt['country']=cnt
 				vldt['email_id_admin']=eml
 				url = 'http://'+st+'/api/resource/User/Administrator'
-				frappe.errprint(url)
-				frappe.errprint('data='+json.dumps(vldt))
 				response = requests.put(url, data='data='+json.dumps(vldt), headers=headers)
-				frappe.errprint("responce")
-				frappe.errprint(response.text)
 			elif (pro [0][0]>0 ) and (pro[0][1]==0):
-				frappe.errprint(">0 and 0")
 				vldtt={}
 				vldtt['no_of_users']=pro[0][0]
 				vldtt['country']=cnt
 				vldtt['email_id_admin']=eml
 				url = 'http://'+st+'/api/resource/User/Administrator'
-				frappe.errprint(url)
-				frappe.errprint('data='+json.dumps(vldtt))
 				response = requests.put(url, data='data='+json.dumps(vldtt), headers=headers)
-				frappe.errprint("responce")
-				frappe.errprint(response.text)				
 			elif (pro [0][0]> 0) and (pro[0][1]>0):
-				frappe.errprint(" >0 and >0")
 				user_val={}
 				user_val['validity']=pro [0][1]
 				user_val['user_name']=pro [0][0]
 				user_val['flag']='false'
 				url = 'http://'+st+'/api/resource/User Validity'
-				frappe.errprint(url)
-				frappe.errprint('data='+json.dumps(user_val))
 				response = requests.post(url, data='data='+json.dumps(user_val), headers=headers)
-				frappe.errprint("responce")
-				frappe.errprint(response.text)		
-			else:
-				frappe.errprint("0 and 0")

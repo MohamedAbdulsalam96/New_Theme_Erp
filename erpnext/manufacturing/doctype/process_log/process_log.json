@@ -197,6 +197,15 @@
    "options": "\nPending\nDone", 
    "permlevel": 0, 
    "precision": ""
+  }, 
+  {
+   "default": "No", 
+   "fieldname": "completed_status", 
+   "fieldtype": "Select", 
+   "label": "Completed Status", 
+   "options": "\nYes\nNo", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -206,7 +215,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-11-26 11:02:37.960989", 
+ "modified": "2015-02-19 08:35:15.047478", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Log", 

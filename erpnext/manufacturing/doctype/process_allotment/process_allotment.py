@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe import _
-from frappe.utils import cstr, flt, getdate, comma_and, nowdate, cint, now, nowtime
+from frappe.utils import cstr, flt, getdate, comma_and, nowdate, cint, now, nowtime , get_datetime
 from erpnext.accounts.accounts_custom_methods import delte_doctype_data, prepare_serial_no_list, check_for_reassigned, update_status_to_completed, stock_entry_for_out, add_to_serial_no, get_idx_for_serialNo, open_next_branch
 from tools.custom_data_methods import get_user_branch, get_branch_cost_center, get_branch_warehouse, update_serial_no, find_next_process
 import datetime
@@ -148,9 +148,10 @@ class ProcessAllotment(Document):
 	def get_branch(self, pdlog, args):
 		if pdlog:
 			branch = pdlog.branch
-		else:
+		elif not args.tailor_process_trials:
 			branch = frappe.db.get_value('Production Dashboard Details', self.pdd, 'end_branch')
-			self.Change_Completed_Status(args, branch)  #newly added
+			if branch:
+				self.Change_Completed_Status(args, branch)  #newly added
 
 		if args.tailor_process_trials and self.trial_dates: 
 			branch = frappe.db.get_value('Trial Dates', {'parent': self.trial_dates, 'trial_no': args.tailor_process_trials}, 'trial_branch')
@@ -207,9 +208,12 @@ class ProcessAllotment(Document):
 			details = frappe.db.sql("""select name, production_status from `tabTrial Dates` where
 				parent='%s' and trial_no='%s'"""%(self.trial_dates, args.tailor_process_trials), as_list=1)
 			if details:
-				if details[0][1] != 'Closed':
+				if details[0][1] != 'Closed' and cint(self.qc) != 1:
 					frappe.db.sql(""" update `tabTrial Dates` set production_status='Closed'
 						where name='%s'	"""%(details[0][0]))
+					if self.pdd:
+						frappe.db.sql(""" update `tabProcess Log` set completed_status = 'Yes'
+							where trials=%s and parent = '%s'	"""%(cint(self.process_trials), self.pdd))
 
 	# def make_auto_ste(self):
 	# 	if self.process_status == 'Closed':
@@ -286,20 +290,28 @@ class ProcessAllotment(Document):
 	# 			update_serial_no(parent, sn, msg)
 
 	def find_start_time(self):
-		self.start_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+		self.start_date = now()
 		return "Done"
 
 	def find_to_time(self, date_type=None):
 		import math
 		if not date_type:
-			self.end_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+			self.end_date = self.date_formatting(now())
 		if self.start_date and self.end_date:
+			self.start_date = self.date_formatting(self.start_date)
+			self.end_date = self.date_formatting(self.end_date)
 			after = datetime.datetime.strptime(self.end_date, '%Y-%m-%d %H:%M:%S') 
 			before = datetime.datetime.strptime(self.start_date, '%Y-%m-%d %H:%M:%S')
 			self.completed_time = cstr(math.floor(((after - before).total_seconds()) / 60))
 		else:
 			frappe.msgprint("Start Date is not mentioned")
 		return "Done"
+
+	def date_formatting(self,date):
+		date = get_datetime(date)
+		date = datetime.datetime.strftime(date, '%Y-%m-%d %H:%M:%S')
+		return date
+			
 
 	# def make_stock_entry(self, t_branch, args):
 	# 	ste = frappe.new_doc('Stock Entry')
@@ -559,7 +571,6 @@ class ProcessAllotment(Document):
 		if self.process_trials:
 			pdd, trial_no = self.get_PA_details('trial')
 			if frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'trial_no': trial_no, 'parent': serial_no}, 'status') != 'Completed' and cint(self.process_trials) != 1:
-				# frappe.errprint([frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'trial_no': trial_no, 'parent': serial_no}, 'status'), pdd, trial_no, serial_no])
 				frappe.throw(_("Previous trial is incompleted"))
 			elif frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'parent': serial_no}, 'status') != 'Completed':
 				frappe.throw(_("Previous process is incompleted"))
@@ -625,6 +636,7 @@ class ProcessAllotment(Document):
 	def calculate_estimates_time(self):
 		if self.work_qty and self.start_date:
 			self.estimated_time = cint(self.work_qty) * cint(frappe.db.get_value('EmployeeSkill',{'parent':self.process_tailor, 'process':self.process, 'item_code': self.item},'time'))
+			self.start_date = self.date_formatting(self.start_date)
 			self.end_date = datetime.datetime.strptime(self.start_date, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(minutes = cint(self.estimated_time))
 		return "Done"
 
@@ -664,8 +676,6 @@ class ProcessAllotment(Document):
 		item_list = []
 		for item in raw_material:
 			if cint(item.selected) == 1 and item.status!='Completed':
-				# frappe.errprint(item.status)
-				# frappe.errprint(item.statuswede)
 				sed = obj.append('mtn_details')
 				sed.s_warehouse = get_branch_warehouse(get_user_branch())
 				company = frappe.db.get_value('Global Defaults', None, 'default_company')

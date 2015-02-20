@@ -10,7 +10,7 @@ from frappe import _
 from tools.custom_data_methods import generate_barcode
 from tools.custom_data_methods import gererate_QRcode
 from frappe.model.db_query import DatabaseQuery
-from tools.custom_data_methods import get_user_branch, get_branch_cost_center, update_serial_no
+from tools.custom_data_methods import get_user_branch, get_branch_cost_center, update_serial_no, get_branch_warehouse
 import random
 import qrcode
 from PIL import Image
@@ -65,6 +65,9 @@ def make_stock_entry(doc, target_branch):
 	se.purpose_type = 'Material In'
 	se.purpose = 'Material Receipt'
 	se.stock_in = doc.stock_in
+	se.from_warehouse = doc.from_warehouse
+	se.f_branch = doc.from_warehouse
+	se.to_warehouse = get_branch_warehouse(doc.t_branch)
 	se.branch = target_branch
 	se.save(ignore_permissions=True)
 	return se.name

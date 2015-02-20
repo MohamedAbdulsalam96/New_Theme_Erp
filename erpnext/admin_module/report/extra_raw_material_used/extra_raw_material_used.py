@@ -11,7 +11,6 @@ def execute(filters=None):
 	if filters:
 		sales_invoice, product, from_date =  filters.get('sales_invoice') or '', filters.get('product') or '', filters.get('from_date') or ''
 		to_date, branch = filters.get('to_date') or '', filters.get('branch') or ''
-	frappe.errprint(sales_invoice)
 	data = frappe.db.sql(""" select * from 
 								(
 								SELECT
@@ -36,7 +35,7 @@ def execute(filters=None):
 								sales_invoice=coalesce(nullif('%s', ''),foo.sales_invoice)
 								 and foo.product=coalesce(nullif('%s', ''),foo.product)
 								 and date(creation) between coalesce(nullif('%s', ''),'1970-11-13 15:46:52') and coalesce(nullif('%s', ''),'2050-11-13 15:46:52') 
-								and coalesce(foo.branch) = coalesce(nullif('%s', ''),foo.branch)"""%(sales_invoice, product, from_date, to_date, branch), as_list=1, debug=1)
+								and coalesce(foo.branch) = coalesce(nullif('%s', ''),foo.branch)"""%(sales_invoice, product, from_date, to_date, branch), as_list=1)
 
 	columns = ["Sales Invoice:Link/Sales Invoice:150", "Item Name::110", "Order Date:Date:100","Bom Qty:Int:70","Issued Qty:Int:70","Issued Buy::100", "Branch::60"]
 	return columns, data

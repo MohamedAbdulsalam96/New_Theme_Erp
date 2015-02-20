@@ -39,6 +39,11 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "Quality Inspection",
+					"description": _("Quality Inspection"),
+				},
+				{
+					"type": "doctype",
 					"name": "Work Order",
 					"description": _("Work Order"),
 				},

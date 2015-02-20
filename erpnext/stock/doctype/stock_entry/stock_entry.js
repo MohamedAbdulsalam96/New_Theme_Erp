@@ -68,6 +68,17 @@ erpnext.stock.StockEntry = erpnext.stock.StockController.extend({
 		this.show_stock_ledger();
 		this.show_general_ledger();
 
+		if(doc.purpose_type == 'Material Out'){
+			unhide_field(['t_branch', 'from_warehouse'])
+			hide_field(['to_warehouse', 'f_branch'])
+		}else if (doc.purpose_type == 'Material In'){
+			unhide_field(['f_branch', 'to_warehouse'])
+			hide_field(['from_warehouse', 't_branch'])
+		}else{
+			unhide_field(['to_warehouse', 'from_warehouse'])
+			hide_field(['t_branch', 'f_branch'])
+		}
+
 		if(this.frm.doc.docstatus === 1 &&
 				frappe.boot.user.can_create.indexOf("Journal Voucher")!==-1) {
 			if(this.frm.doc.purpose === "Sales Return") {
@@ -225,9 +236,11 @@ erpnext.stock.StockEntry = erpnext.stock.StockController.extend({
 		var row = frappe.get_doc(cdt, cdn);
 		this.frm.script_manager.copy_from_first_row("mtn_details", row,
 			["expense_account", "cost_center"]);
-
+		console.log([this.frm.doc.from_warehouse,this.frm.doc.to_warehouse])
 		if(!row.s_warehouse) row.s_warehouse = this.frm.doc.from_warehouse;
 		if(!row.t_warehouse) row.t_warehouse = this.frm.doc.to_warehouse;
+		if(!row.target_branch) row.target_branch = this.frm.doc.t_branch;
+		if(!row.source_warehouse) row.source_warehouse = this.frm.doc.f_branch;
 	},
 
 	source_mandatory: ["Material Issue", "Material Transfer", "Purchase Return"],
@@ -341,6 +354,17 @@ cur_frm.cscript.toggle_related_fields = function(doc) {
 	cur_frm.fields_dict["mtn_details"].grid.set_column_disp("t_warehouse", !disable_to_warehouse);
 	cur_frm.fields_dict["mtn_details"].grid.set_column_disp("target_branch", !disable_all_warehouse);
 	cur_frm.fields_dict["mtn_details"].grid.set_column_disp("source_warehouse", !disable_out_warehouse);
+
+	if(doc.purpose_type == 'Material Out'){
+		unhide_field(['t_branch', 'from_warehouse'])
+		hide_field(['to_warehouse', 'f_branch'])
+	}else if (doc.purpose_type == 'Material In'){
+		unhide_field(['f_branch', 'to_warehouse'])
+		hide_field(['from_warehouse', 't_branch'])
+	}else{
+		unhide_field(['to_warehouse', 'from_warehouse'])
+		hide_field(['t_branch', 'f_branch'])
+	}
 
 	if(doc.purpose == 'Purchase Return') {
 		doc.customer = doc.customer_name = doc.customer_address =
