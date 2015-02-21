@@ -67,6 +67,7 @@
   {
    "fieldname": "process_work_order", 
    "fieldtype": "Link", 
+   "hidden": 1, 
    "label": "Work Order", 
    "options": "Work Order", 
    "permlevel": 0, 
@@ -230,7 +231,7 @@
    "precision": ""
   }, 
   {
-   "default": "No", 
+   "default": "Yes", 
    "depends_on": "", 
    "fieldname": "payment", 
    "fieldtype": "Select", 
@@ -317,6 +318,15 @@
    "fieldname": "qc", 
    "fieldtype": "Check", 
    "label": "QC", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "fieldname": "work_order", 
+   "fieldtype": "Link", 
+   "label": "Work Order", 
+   "options": "Work Order", 
    "permlevel": 0, 
    "precision": "", 
    "read_only": 1
@@ -530,7 +540,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-02-18 01:27:58.325056", 
+ "modified": "2015-02-21 01:38:31.708823", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

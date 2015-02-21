@@ -113,6 +113,15 @@ cur_frm.cscript.toogle_field = function(doc){
 		doc.process_status = 'Closed'
 		// hide_field([ 'start_date', 'end_date']);
 		unhide_field([ 'completed_time', 'payment', 'extra_charge', 'deduct_late_work']);
+		payment_dict = {'wages': doc.payment, 'latework': doc.deduct_late_work, 'cost': doc.deduct_late_work, 'extra_charge': doc.extra_charge_amount}
+		for (key in payment_dict){
+			if (payment_dict[key] == 'Yes'){
+				unhide_field(key)
+			}else{
+				hide_field(key)
+			}
+			refresh_field(key)
+		}
 	}else if(doc.emp_status=='Assigned'){
 		unhide_field(['start_date', 'end_date', 'estimated_time'])
 		hide_field([ 'completed_time', 'payment', 'extra_charge', 'deduct_late_work']);
@@ -129,6 +138,7 @@ cur_frm.cscript.toogle_field = function(doc){
 		}
 		refresh_field(['process_tailor', 'employee_name', 'start_date', 'end_date', 'estimated_time', 'serial_no', 'serial_no_data', 'work_qty'])
 	}
+	
 }
 
 cur_frm.cscript.assigned= function(doc, cdt, cdn){

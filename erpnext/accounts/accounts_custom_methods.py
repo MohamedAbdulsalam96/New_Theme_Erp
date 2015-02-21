@@ -111,6 +111,7 @@ def create_process_allotment(data):
 		 	pa.process = s.process_name
 		 	pa.process_work_order = data.tailor_work_order
 		 	pa.qc = cint(s.quality_check)
+		 	pa.work_order = data.tailor_work_order
 		 	pa.status = 'Pending'
 		 	pa.item = data.tailoring_item
 		 	pa.branch = frappe.db.get_value('Process Wise Warehouse Detail',{'parent':data.tailor_work_order,'process':pa.process}, 'warehouse')
