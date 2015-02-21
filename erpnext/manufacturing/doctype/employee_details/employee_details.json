@@ -71,6 +71,14 @@
    "read_only": 1
   }, 
   {
+   "fieldname": "employee_work_order", 
+   "fieldtype": "Link", 
+   "label": "Employee Work Order", 
+   "options": "Work Order", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "tailor_payment", 
    "fieldtype": "Select", 
    "label": "Payment", 
@@ -211,7 +219,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-02-16 15:14:05.850809", 
+ "modified": "2015-02-21 02:31:06.546879", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Employee Details", 

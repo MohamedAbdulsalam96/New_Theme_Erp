@@ -541,6 +541,7 @@ class ProcessAllotment(Document):
 		emp.tailor_payment = self.payment
 		emp.tailor_wages = self.wages
 		emp.tailor_process_trials = self.process_trials
+		emp.employee_work_order = self.work_order
 		emp.tailor_extra_wages = self.extra_charge
 		emp.tailor_extra_amt = self.extra_charge_amount
 		emp.tailor_from_time = self.start_date
