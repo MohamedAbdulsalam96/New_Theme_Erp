@@ -4,7 +4,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
-from frappe.utils import cint, cstr, flt
+from frappe.utils import cint, cstr, flt, nowdate, nowtime
 from frappe import _
 from erpnext.accounts.accounts_custom_methods import stock_entry_for_out
 import datetime

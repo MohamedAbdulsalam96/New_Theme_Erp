@@ -81,7 +81,7 @@ cur_frm.cscript.process_allocation = function(doc, cdt, cdn){
 			fields: [
 				{fieldtype:'HTML', fieldname:'styles_name', label:__('Styles'), reqd:false,
 					description: __("")},
-					{fieldtype:'Button', fieldname:'ok', label:__('Ok') }
+					{fieldtype:'Button', fieldname:'ok', label:__('Close') }
 			]
 		})
 		var fd = dialog.fields_dict;
