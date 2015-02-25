@@ -35,7 +35,8 @@ frappe.WOForm = Class.extend({
 					['Sales Invoice No','Link','Sales Invoice','sales_invoice_no'],
 					['Item code', 'Link', 'Item', 'item_code'],
 					['Customer Name', 'Data', '', 'customer'],
-					['Serial NO', 'Small Text', '', 'serial_no_data']
+					['Serial NO', 'Small Text', '', 'serial_no_data'],
+					['Note', 'Small Text', '', 'note']
 				],
 			"Measurement Item":[
 					['Parameter', 'Link', 'Measurement', 'parameter'],
@@ -189,7 +190,9 @@ frappe.WOForm = Class.extend({
 
 		if(key == 'Work Order') {
 			$.each(dic, function(key, val){
-				$('[data-fieldname="'+key+'"]').attr("disabled","disabled")
+				if(key!='note'){
+					$('[data-fieldname="'+key+'"]').attr("disabled","disabled")
+				}
 				$('[data-fieldname="'+key+'"]').val(val)
 			})
 		};
@@ -350,7 +353,7 @@ frappe.WOForm = Class.extend({
 		
 		frappe.call({
 			method:"mreq.mreq.page.sales_dashboard.sales_dashboard.create_work_order",
-			args:{'wo_details': me.wo_details, 'style_details':me.style_details, 'fields':me.field_list, 'woname': me.woname,'args': me.args, 'type_of_wo':'amend'},
+			args:{'wo_details': me.wo_details, 'style_details':me.style_details, 'fields':me.field_list, 'woname': me.woname, 'note':$("[data-fieldname='note']").val(),'args': me.args, 'type_of_wo':'amend'},
 			callback: function(r){
 				if(r.message){
 					frappe.route_options.woname = r.message[0]

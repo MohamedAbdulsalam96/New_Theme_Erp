@@ -44,6 +44,15 @@
    "precision": ""
   }, 
   {
+   "fieldname": "customer_name", 
+   "fieldtype": "Data", 
+   "in_list_view": 1, 
+   "label": "Customer Name", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
    "allow_on_submit": 0, 
    "fieldname": "article_code", 
    "fieldtype": "Link", 
@@ -65,10 +74,12 @@
   }, 
   {
    "fieldname": "article_qty", 
-   "fieldtype": "Int", 
+   "fieldtype": "Data", 
+   "in_list_view": 1, 
    "label": "Article Qty", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "process_allocation", 
@@ -141,6 +152,7 @@
   {
    "fieldname": "serial_no", 
    "fieldtype": "Small Text", 
+   "in_list_view": 0, 
    "label": "Serial No", 
    "permlevel": 0, 
    "precision": "", 
@@ -283,7 +295,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-12-29 13:07:32.648250", 
+ "modified": "2015-02-23 08:36:12.224167", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Production Details", 

@@ -35,6 +35,7 @@ class WorkManagement(Document):
 		color = {'Completed':'green','Pending':'red', 'Trial':'#1F8C83'}
 		value = '<h style="color:red">Pending</h>'
 		si.sales_invoice = invoice_detail.sales_invoice_no
+		si.customer_name = frappe.db.get_value('Sales Invoice', si.sales_invoice, 'customer_name')
 		si.article_code = invoice_detail.article_code
 		si.article_qty = invoice_detail.article_qty
 		si.work_order = invoice_detail.work_order

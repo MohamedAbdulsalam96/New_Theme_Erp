@@ -20,10 +20,11 @@ def create_production_process(doc, method):
 		if process_allotment:
 			create_dashboard(process_allotment,d,doc)
 
-def create_work_order(doc, data, serial_no, item_code, qty):
+def create_work_order(doc, data, serial_no, item_code, qty, parent_item_code):
 	wo = frappe.new_doc('Work Order')
 	wo.item_code = item_code
 	wo.customer = doc.customer
+	wo.parent_item_code = parent_item_code
 	wo.sales_invoice_no = doc.name
 	wo.customer_name = frappe.db.get_value('Customer',wo.customer,'customer_name')
 	wo.item_qty = qty
@@ -361,11 +362,11 @@ def prepare_data_for_order(doc, d, qty):
 		sales_bom_items = frappe.db.sql("""Select * FROM `tabSales BOM Item` WHERE 
 			parent ='%s' and parenttype = 'Sales Bom'"""%(d.tailoring_item_code), as_dict=1)
 		for item in sales_bom_items:
-			make_order(doc, d, qty, item.item_code)
+			make_order(doc, d, qty, item.item_code, item.parent)
 	else:
 		make_order(doc, d,qty, d.tailoring_item_code)
 
-def make_order(doc, d, qty, item_code):
+def make_order(doc, d, qty, item_code, parent=None):
 		e = doc.append('work_order_distribution', {})
 		e.tailoring_item = item_code
 		e.tailor_item_name = frappe.db.get_value('Item', item_code, 'item_name')
@@ -380,7 +381,7 @@ def make_order(doc, d, qty, item_code):
 		e.tailor_fabric_qty = frappe.db.get_value('Size Item', {'parent':d.tailoring_item_code, 'size':d.tailoring_size, 'width':d.width }, 'fabric_qty')
 		e.tailor_warehouse = d.tailoring_branch
 		if not e.tailor_work_order:
-			e.tailor_work_order = create_work_order(doc, d, e.serial_no_data, item_code, qty)
+			e.tailor_work_order = create_work_order(doc, d, e.serial_no_data, item_code, qty, parent)
 			update_serial_no_with_wo(e.serial_no_data, e.tailor_work_order)
 		if not e.trials and frappe.db.get_value('Process Item', {'parent':item_code, 'trials':1}, 'name'):
 			e.trials = make_schedule_for_trials(doc, d, e.tailor_work_order, item_code, e.serial_no_data)
@@ -450,6 +451,7 @@ def generate_serial_no(doc, item_code, qty):
 	serial_no =''
 	temp_qty = qty
 	while cint(qty) > 0:
+		frappe.errprint(item_code)
 		sn = frappe.new_doc('Serial No')
 		sn.name = make_autoname(series) 
 		sn.serial_no = sn.name

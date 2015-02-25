@@ -34,7 +34,7 @@ def get_data():
 				},
 				{
 					"type": "doctype",
-					"name": "Cut Order",
+					"name": "Cut Order Dashboard",
 					"description": _("Cut Order"),
 				},
 				{

@@ -17,8 +17,22 @@ class WorkOrder(Document):
 			self.name = make_autoname(self.naming_series+'.#####')
 
 	def validate(self):
+		self.validate_style_measur_details()
 		if not self.work_order_name:
 			self.work_order_name = self.name
+
+	def validate_style_measur_details(self):
+		table_dict={'wo_style':'Style Options','measurement_item':'Measurement Details'}
+		style_list=[]
+		for key in table_dict:
+			for d in self.get(key):
+				style_list.append(d.field_name if key=='wo_style' else d.parameter)
+			if style_list:
+				for style in style_list:
+					count=style_list.count(style)
+					if count > 1:
+						frappe.throw("Duplicate entry of %s in %s Table"%(style,table_dict[key]))
+
 
 	def on_update(self):
 		self.update_process_in_production_dashboard()

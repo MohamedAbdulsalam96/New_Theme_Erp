@@ -69,6 +69,14 @@
    "precision": ""
   }, 
   {
+   "fieldname": "parent_item_code", 
+   "fieldtype": "Link", 
+   "label": "Parent Item Code", 
+   "options": "Item", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "allow_on_submit": 0, 
    "fieldname": "item_code", 
    "fieldtype": "Link", 
@@ -391,7 +399,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-02-20 05:04:22.356948", 
+ "modified": "2015-02-23 09:50:56.084240", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Work Order", 
