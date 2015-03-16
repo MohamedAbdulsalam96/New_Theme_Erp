@@ -132,7 +132,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-01-14 20:39:07.132073", 
+ "modified": "2015-03-07 05:33:18.613977", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "HR Daily Activities", 
@@ -164,6 +164,39 @@
    "permlevel": 0, 
    "read": 1, 
    "role": "HR Manager", 
+   "submit": 1, 
+   "write": 1
+  }, 
+  {
+   "amend": 1, 
+   "cancel": 1, 
+   "create": 1, 
+   "delete": 1, 
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "HR User", 
+   "submit": 1, 
+   "write": 1
+  }, 
+  {
+   "amend": 1, 
+   "cancel": 1, 
+   "create": 1, 
+   "delete": 1, 
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "Manufacturing User", 
+   "submit": 1, 
+   "write": 1
+  }, 
+  {
+   "amend": 1, 
+   "cancel": 1, 
+   "create": 1, 
+   "delete": 1, 
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "Cashier", 
    "submit": 1, 
    "write": 1
   }

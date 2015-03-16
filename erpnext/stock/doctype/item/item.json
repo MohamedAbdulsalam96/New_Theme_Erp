@@ -824,7 +824,7 @@
  "icon": "icon-tag", 
  "idx": 1, 
  "max_attachments": 10, 
- "modified": "2014-11-01 23:31:58.517341", 
+ "modified": "2015-03-07 05:53:27.247487", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Item", 
@@ -899,6 +899,12 @@
    "permlevel": 0, 
    "read": 1, 
    "role": "Manufacturing User"
+  }, 
+  {
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "Cashier", 
+   "write": 1
   }
  ], 
  "search_fields": "item_name,description,item_group,customer_code"

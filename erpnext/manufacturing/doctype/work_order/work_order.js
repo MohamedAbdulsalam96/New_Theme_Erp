@@ -148,6 +148,7 @@ cur_frm.fields_dict['trial_serial_no'].get_query = function(doc, cdt, cdn) {
 }
 
 cur_frm.cscript.refresh = function(doc){
+	refresh_field(['wo_style', 'measurement_item'])
 	if(doc.docstatus==1){
 		cur_frm.appframe.add_primary_action(__('Draw Canvas'), cur_frm.cscript['Draw Canvas'], "icon-truck")
 	}
@@ -156,7 +157,7 @@ cur_frm.cscript.refresh = function(doc){
 	 	  	window.location.reload();
 	 	  }
             
-          }
+    }
 }
 
 cur_frm.cscript['Draw Canvas'] = function(){

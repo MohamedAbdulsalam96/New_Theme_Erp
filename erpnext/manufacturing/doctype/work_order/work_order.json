@@ -399,7 +399,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-02-23 09:50:56.084240", 
+ "modified": "2015-03-07 03:01:15.829314", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Work Order", 
@@ -407,11 +407,11 @@
  "owner": "Administrator", 
  "permissions": [
   {
-   "amend": 0, 
+   "amend": 1, 
    "apply_user_permissions": 0, 
-   "cancel": 0, 
+   "cancel": 1, 
    "create": 1, 
-   "delete": 0, 
+   "delete": 1, 
    "email": 1, 
    "export": 0, 
    "import": 0, 
@@ -421,7 +421,7 @@
    "report": 0, 
    "role": "Manufacturing User", 
    "set_user_permissions": 0, 
-   "submit": 0, 
+   "submit": 1, 
    "write": 1
   }, 
   {
@@ -439,6 +439,19 @@
    "report": 0, 
    "role": "Manufacturing Manager", 
    "set_user_permissions": 0, 
+   "submit": 1, 
+   "write": 1
+  }, 
+  {
+   "amend": 1, 
+   "cancel": 1, 
+   "create": 1, 
+   "delete": 1, 
+   "email": 1, 
+   "permlevel": 0, 
+   "print": 1, 
+   "read": 1, 
+   "role": "Sales User", 
    "submit": 1, 
    "write": 1
   }

@@ -20,7 +20,7 @@
  ], 
  "icon": "icon-code-fork", 
  "idx": 1, 
- "modified": "2014-10-10 19:07:57.708332", 
+ "modified": "2015-03-07 05:54:37.814759", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "Branch", 
@@ -67,6 +67,20 @@
    "report": 1, 
    "role": "HR Manager", 
    "submit": 0, 
+   "write": 1
+  }, 
+  {
+   "create": 1, 
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "Cashier", 
+   "write": 1
+  }, 
+  {
+   "create": 1, 
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "Accounts User", 
    "write": 1
   }
  ]

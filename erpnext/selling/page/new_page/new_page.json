@@ -3,7 +3,7 @@
  "creation": "2014-09-29 15:31:20.937544", 
  "docstatus": 0, 
  "doctype": "Page", 
- "modified": "2015-02-12 12:40:58.190314", 
+ "modified": "2015-03-07 07:37:59.110665", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "new-page", 
@@ -11,7 +11,13 @@
  "page_name": "new-page", 
  "roles": [
   {
-   "role": "All"
+   "role": "Sales User"
+  }, 
+  {
+   "role": "Material User"
+  }, 
+  {
+   "role": "Cashier"
   }
  ], 
  "script": null, 

@@ -767,7 +767,7 @@
  "icon": "icon-truck", 
  "idx": 1, 
  "is_submittable": 1, 
- "modified": "2015-02-02 12:23:02.570407", 
+ "modified": "2015-03-07 05:07:59.844257", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Purchase Receipt", 
@@ -839,6 +839,17 @@
    "permlevel": 1, 
    "read": 1, 
    "role": "Material Manager", 
+   "write": 1
+  }, 
+  {
+   "amend": 1, 
+   "cancel": 1, 
+   "create": 1, 
+   "delete": 1, 
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "Cashier", 
+   "submit": 1, 
    "write": 1
   }
  ], 

@@ -391,36 +391,47 @@ def make_order(doc, d, qty, item_code, parent=None):
 def make_schedule_for_trials(doc, args, work_order, item_code, serial_no_data):
 	s =frappe.new_doc('Trials')
 	s.item_code = item_code
+	s.trials_serial_no = s.trials_serial_no_status = get_first_serial_no(serial_no_data)
 	s.sales_invoice = doc.name
 	s.serial_no_data = serial_no_data
 	s.customer = doc.customer
 	s.customer_name = doc.customer_name
 	s.item_name = frappe.db.get_value('Item', item_code, 'item_name')
 	s.work_order = work_order
-	s.save(ignore_permissions=True)
-	schedules_date(s.name, item_code, work_order)
+	schedules_date(s, item_code, work_order, doc.trial_date, s.customer_name)
+	s.save(ignore_permissions=True)	
 	return s.name
 
-def schedules_date(parent, item, work_order):
+def get_first_serial_no(serial_no_data):
+	serial_no = ''
+	sn = cstr(serial_no_data).split('\n')
+	if sn:
+		serial_no = sn[0]
+	return serial_no
+
+def schedules_date(parent, item, work_order, trial_date, customer_name):
 	trials = frappe.db.sql("select branch_dict from `tabProcess Item` where parent='%s' order by idx"%(item), as_dict=1)
 	if trials:
 		for t in trials:
 			if t.branch_dict:
 				branch_dict = eval(t.branch_dict)
 				for s in range(0, len(branch_dict)):
-					d = frappe.new_doc('Trial Dates')
+					d = parent.append('trial_dates',{})
 					d.process = branch_dict.get(cstr(s)).get('process')
 					d.trial_no = branch_dict.get(cstr(s)).get('trial')
+					d.trial_date = trial_date if cint(d.trial_no) == 1 else ''
+					d.work_status = 'Open' if cint(d.trial_no) == 1 else 'Pending'
+					d.subject = 'Customer %s: First Trial for Item %s'%(customer_name, frappe.db.get_value('Item', item, 'item_name')) if cint(d.trial_no) == 1 else ''
 					d.actual_fabric = 1 if branch_dict.get(cstr(s)).get('actual_fabric') == 'checked' else 0
 					d.quality_check = 1 if branch_dict.get(cstr(s)).get('quality_check') == 'checked' else 0
 					d.amend = 1 if branch_dict.get(cstr(s)).get('amended') == 'checked' else 0
 					d.trial_branch = get_user_branch()
 					d.idx = cstr(s + 1)
-					d.parent = parent
+					# d.parent = parent
 					d.work_order = work_order
-					d.parenttype = 'Trials'
-					d.parentfield = 'trial_dates'
-					d.save(ignore_permissions=True)
+					# d.parenttype = 'Trials'
+					# d.parentfield = 'trial_dates'
+					# d.save(ignore_permissions=True)
 	return "Done"
 
 def validate_work_order_assignment(doc):
@@ -451,7 +462,6 @@ def generate_serial_no(doc, item_code, qty):
 	serial_no =''
 	temp_qty = qty
 	while cint(qty) > 0:
-		frappe.errprint(item_code)
 		sn = frappe.new_doc('Serial No')
 		sn.name = make_autoname(series) 
 		sn.serial_no = sn.name

@@ -36,7 +36,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-10-04 14:36:48.635009", 
+ "modified": "2015-03-07 05:58:39.615171", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Item Category", 
@@ -59,6 +59,20 @@
    "role": "Administrator", 
    "set_user_permissions": 0, 
    "submit": 0, 
+   "write": 1
+  }, 
+  {
+   "create": 1, 
+   "delete": 1, 
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "System Manager", 
+   "write": 1
+  }, 
+  {
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "Material User", 
    "write": 1
   }
  ], 

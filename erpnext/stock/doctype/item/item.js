@@ -159,7 +159,8 @@ cur_frm.cscript.weight_to_validate = function(doc, cdt, cdn){
 
 cur_frm.cscript.validate = function(doc, cdt, cdn){
 	cur_frm.cscript.weight_to_validate(doc, cdt, cdn);
-	setTimeout(function(){refresh_field('barcode_image');},1000)
+	setTimeout(function()
+		{refresh_field('barcode_image');refresh_field('qrcode');},1000)
 }
 
 cur_frm.fields_dict.item_customer_details.grid.get_field("customer_name").get_query = function(doc, cdt, cdn) {

@@ -1,0 +1,15 @@
+{
+ "creation": "2015-03-07 02:29:41.603197", 
+ "disabled": 0, 
+ "doc_type": "Work Order", 
+ "docstatus": 0, 
+ "doctype": "Print Format", 
+ "html": "{{ letter_head }}\n\n\n{% set images = frappe.db.sql(\"\"\" select file_url from `tabFile Data` where attached_to_name='{0}' and ifnull(type_of_file, 'No')='Yes'\"\"\".format(doc.name))%}\n{% if images -%}\n<div class=\"print-heading\">\n\t\t<h4 class=\"text-muted\">{{doc.name}}</h4>\n</div>\n\n<table class=\"table table-bordered\">\n\t<tbody>\n\t\t<tr>\n\t\t\t<th>Images</th>\n\t\t</tr>\n\t\t{%- for image in images -%}\n                <tr>\n                    <td>\n                      <div class=\"row\" style=\"margin-left:3px\" > <img src={{ image[0] }}> </div>\n                    </td>\n                </tr>\n                {%- endfor -%}\n\t</tbody>\n</table>\n{%- endif %}", 
+ "modified": "2015-03-07 02:35:06.062606", 
+ "modified_by": "Administrator", 
+ "module": "Manufacturing", 
+ "name": "Canvas Inputs", 
+ "owner": "Administrator", 
+ "print_format_type": "Server", 
+ "standard": "Yes"
+}

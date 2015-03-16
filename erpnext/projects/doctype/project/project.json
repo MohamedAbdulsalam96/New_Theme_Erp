@@ -1,5 +1,4 @@
 {
- "allow_attach": 1, 
  "allow_import": 1, 
  "allow_rename": 1, 
  "autoname": "field:project_name", 
@@ -273,7 +272,7 @@
  "icon": "icon-puzzle-piece", 
  "idx": 1, 
  "max_attachments": 4, 
- "modified": "2014-08-26 14:59:27.052172", 
+ "modified": "2015-03-07 06:32:31.313579", 
  "modified_by": "Administrator", 
  "module": "Projects", 
  "name": "Project", 
@@ -294,15 +293,18 @@
    "write": 1
   }, 
   {
-   "amend": 0, 
-   "cancel": 0, 
-   "create": 0, 
-   "delete": 0, 
-   "permlevel": 1, 
+   "create": 1, 
+   "permlevel": 0, 
    "read": 1, 
-   "report": 1, 
-   "role": "All", 
-   "submit": 0
+   "role": "Sales User", 
+   "write": 1
+  }, 
+  {
+   "create": 1, 
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "Cashier", 
+   "write": 1
   }
  ], 
  "search_fields": "customer, status, priority, is_active"

@@ -73,7 +73,7 @@
  ], 
  "icon": "icon-usd", 
  "is_submittable": 1, 
- "modified": "2014-09-01 12:05:46.834513", 
+ "modified": "2015-03-07 06:14:48.656540", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Landed Cost Voucher", 
@@ -90,6 +90,18 @@
    "read": 1, 
    "report": 1, 
    "role": "Material Manager", 
+   "submit": 1, 
+   "write": 1
+  }, 
+  {
+   "cancel": 1, 
+   "create": 1, 
+   "delete": 1, 
+   "export": 1, 
+   "permlevel": 0, 
+   "read": 1, 
+   "report": 1, 
+   "role": "Accounts User", 
    "submit": 1, 
    "write": 1
   }

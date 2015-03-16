@@ -122,7 +122,7 @@
  "is_submittable": 0, 
  "issingle": 1, 
  "istable": 0, 
- "modified": "2015-01-14 20:45:04.831126", 
+ "modified": "2015-03-07 05:31:24.967577", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Work Management", 
@@ -163,6 +163,12 @@
    "role": "Manufacturing User", 
    "set_user_permissions": 0, 
    "submit": 0, 
+   "write": 1
+  }, 
+  {
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "Sales User", 
    "write": 1
   }
  ], 

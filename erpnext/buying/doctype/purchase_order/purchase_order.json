@@ -649,7 +649,7 @@
  "icon": "icon-file-text", 
  "idx": 1, 
  "is_submittable": 1, 
- "modified": "2014-09-09 05:35:32.583024", 
+ "modified": "2015-03-07 06:10:33.068669", 
  "modified_by": "Administrator", 
  "module": "Buying", 
  "name": "Purchase Order", 
@@ -714,6 +714,21 @@
    "permlevel": 1, 
    "read": 1, 
    "role": "Purchase Manager", 
+   "write": 1
+  }, 
+  {
+   "amend": 1, 
+   "apply_user_permissions": 1, 
+   "cancel": 1, 
+   "create": 1, 
+   "delete": 1, 
+   "email": 1, 
+   "permlevel": 0, 
+   "print": 1, 
+   "read": 1, 
+   "report": 1, 
+   "role": "Cashier", 
+   "submit": 1, 
    "write": 1
   }
  ], 

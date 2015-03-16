@@ -86,7 +86,7 @@
  "is_submittable": 0, 
  "issingle": 1, 
  "istable": 0, 
- "modified": "2014-11-07 00:27:45.786836", 
+ "modified": "2015-03-07 05:45:44.069699", 
  "modified_by": "Administrator", 
  "module": "Admin Module", 
  "name": "Admin Signature", 
@@ -109,6 +109,12 @@
    "role": "Administrator", 
    "set_user_permissions": 0, 
    "submit": 0, 
+   "write": 1
+  }, 
+  {
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "System Manager", 
    "write": 1
   }
  ], 

@@ -132,7 +132,7 @@
  ], 
  "icon": "icon-envelope", 
  "idx": 1, 
- "modified": "2014-08-04 07:22:06.445634", 
+ "modified": "2015-03-07 07:25:04.326481", 
  "modified_by": "Administrator", 
  "module": "Support", 
  "name": "Newsletter", 
@@ -162,6 +162,14 @@
    "report": 0, 
    "role": "Support Manager", 
    "submit": 0, 
+   "write": 1
+  }, 
+  {
+   "create": 1, 
+   "delete": 1, 
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "Cashier", 
    "write": 1
   }
  ], 
