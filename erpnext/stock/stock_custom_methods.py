@@ -375,3 +375,19 @@ def throw_exception(serial_no_list):
 	for serial_no in serial_no_list:
 		if serial_no and frappe.db.get_value('Serial No', serial_no, 'completed') != 'Yes':
 			frappe.throw(_("All process has not completed for serial no {0}").format(serial_no))
+
+
+def validate_quality_inspection_for_child_table(doc,method):
+	if doc.inspection_required == 'Yes' and not doc.get('item_specification_details'):
+		frappe.throw(_(" Please Fill parameters in 'Item Quality Inspection Parameter' table "))
+
+def validate_quality_inspection(doc,method):
+	if doc.inspection_required  == 'No':
+		for row in doc.get('process_item'):
+			if row.quality_check == 1:
+				frappe.throw(_(" Please Fill 'Inspection Required' field in Inspection Criteria Section to YES "))
+			if row.branch_dict:
+				row_dict = row.branch_dict.encode('utf-8')
+				for key,value in eval(row_dict).items():
+					if value['quality_check'] == 'checked':
+						frappe.throw(_(" Please Fill 'Inspection Required' field in Inspection Criteria Section to YES "))

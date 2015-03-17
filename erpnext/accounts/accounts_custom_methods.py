@@ -16,7 +16,7 @@ from tools.tools_management.custom_methods import cut_order_generation
 
 def create_production_process(doc, method):
 	for d in doc.get('work_order_distribution'):
-		process_allotment = create_process_allotment(d)
+		process_allotment = create_process_allotment(doc, d)
 		if process_allotment:
 			create_dashboard(process_allotment,d,doc)
 
@@ -28,6 +28,9 @@ def create_work_order(doc, data, serial_no, item_code, qty, parent_item_code):
 	wo.sales_invoice_no = doc.name
 	wo.customer_name = frappe.db.get_value('Customer',wo.customer,'customer_name')
 	wo.item_qty = qty
+	if doc.trial_date and frappe.db.get_value('Process Item', {'parent': item_code, 'trials':1}, 'name'):
+		wo.trial_no = 1
+		wo.trial_date = doc.trial_date
 	wo.fabric__code = get_dummy_fabric(item_code) or data.fabric_code
 	wo.serial_no_data = serial_no
 	wo.branch = data.tailoring_warehouse
@@ -99,10 +102,10 @@ def create_process_wise_warehouse_detail(data, wo_name, item_code):
 			# mi.save(ignore_permissions =True)
 	return True
 
-def create_process_allotment(data):
+def create_process_allotment(doc, data):
 	process_list=[]
 	i = 1
-	process = frappe.db.sql(""" select distinct process_name,idx, quality_check from `tabProcess Item` where parent = '%s' order by idx asc
+	process = frappe.db.sql(""" select distinct process_name,idx, quality_check,trials from `tabProcess Item` where parent = '%s' order by idx asc
 		"""%(data.tailoring_item),as_dict = 1)
 	if process:
 		for s in process:
@@ -115,6 +118,9 @@ def create_process_allotment(data):
 		 	pa.work_order = data.tailor_work_order
 		 	pa.status = 'Pending'
 		 	pa.item = data.tailoring_item
+		 	if doc.trial_date and cint(s.trials) == 1:
+		 		pa.process_trials = 1
+		 		pa.emp_status = 'Assigned'
 		 	pa.branch = frappe.db.get_value('Process Wise Warehouse Detail',{'parent':data.tailor_work_order,'process':pa.process}, 'warehouse')
 		 	pa.serials_data = data.serial_no_data
 		 	pa.finished_good_qty = data.tailor_qty
