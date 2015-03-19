@@ -125,6 +125,15 @@
    "read_only": 1
   }, 
   {
+   "fieldname": "customer_name", 
+   "fieldtype": "Data", 
+   "hidden": 0, 
+   "label": "Customer Name", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
    "fieldname": "barcode", 
    "fieldtype": "Data", 
    "label": "Barcode", 
@@ -540,7 +549,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-03-07 04:04:57.476560", 
+ "modified": "2015-03-18 06:07:54.375274", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

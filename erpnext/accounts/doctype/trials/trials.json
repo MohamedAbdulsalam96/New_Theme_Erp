@@ -42,12 +42,13 @@
   {
    "fieldname": "serial_no_data", 
    "fieldtype": "Small Text", 
-   "hidden": 1, 
+   "hidden": 0, 
    "label": "Serial No Data", 
    "no_copy": 1, 
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 1, 
+   "read_only": 1, 
    "report_hide": 1
   }, 
   {
@@ -174,7 +175,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-03-07 04:27:26.056080", 
+ "modified": "2015-03-18 05:51:56.077922", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Trials", 

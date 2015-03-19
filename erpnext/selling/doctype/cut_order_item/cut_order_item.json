@@ -114,9 +114,25 @@
   {
    "fieldname": "article_serial_no", 
    "fieldtype": "Data", 
-   "hidden": 1, 
+   "hidden": 0, 
    "in_list_view": 1, 
    "label": "Article Serial No", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "fieldname": "serial_no_data", 
+   "fieldtype": "Small Text", 
+   "label": "Serial No Data", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "fieldname": "work_order_nos", 
+   "fieldtype": "Small Text", 
+   "label": "Work Order Nos", 
    "permlevel": 0, 
    "precision": "", 
    "read_only": 1
@@ -129,7 +145,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-02-16 19:49:17.476730", 
+ "modified": "2015-03-18 09:28:46.835740", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Cut Order Item", 

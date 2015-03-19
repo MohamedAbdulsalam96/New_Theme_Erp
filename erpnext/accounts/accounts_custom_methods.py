@@ -116,6 +116,8 @@ def create_process_allotment(doc, data):
 		 	pa.process_work_order = data.tailor_work_order
 		 	pa.qc = cint(s.quality_check)
 		 	pa.work_order = data.tailor_work_order
+		 	# Suyash 'Customer name field added in process allotment'
+		 	pa.customer_name = doc.customer
 		 	pa.status = 'Pending'
 		 	pa.item = data.tailoring_item
 		 	if doc.trial_date and cint(s.trials) == 1:
@@ -590,6 +592,9 @@ def stock_entry_of_child(obj, args, target_branch, sn_list, qty):
 	ste.incoming_rate = get_incoming_rate(incoming_rate_args) or 1.0
 	ste.conversion_factor = 1.0
 	ste.work_order = args.get('work_order')
+	# Suyash 'sales_invoice_no and customer_name are added in custom field in stock_entry child table'
+	ste.sales_invoice_no = frappe.db.get_value('Work Order',args.get('work_order'),'sales_invoice_no') if args.get('work_order') else ''
+	ste.customer_name = frappe.db.get_value('Work Order',args.get('work_order'),'customer_name') if args.get('work_order') else ''
 	ste.item_code = args.get('item')
 	ste.item_name = frappe.db.get_value('Item', ste.item_code, 'item_name')
 	ste.stock_uom = frappe.db.get_value('Item', ste.item_code, 'stock_uom')

@@ -81,7 +81,7 @@ class Trials(Document):
 			else:
 				self.validate_QI_completed(trial_data, args_obj)
 				self.OpenNextTrial(trial_data)
-				if trial_data.work_status == 'Open' and cint(trial_data.skip_trial)!=1:
+				if trial_data.work_status == 'Open' and cint(trial_data.skip_trial)!=1 and trial_data.production_status!='Closed':
 					self.open_trial(trial_data.quality_check, trial_data.process, trial_data)
 
 	def validate_QI_completed(self, args, args_obj):
@@ -159,6 +159,9 @@ class Trials(Document):
 		ste.conversion_factor = 1.0
 		ste.has_trials = 'Yes'
 		ste.work_order = args.get('work_order')
+		# Suyash 'sales_invoice_no and customer_name are added in custom field in stock_entry child table'
+		ste.sales_invoice_no = frappe.db.get_value('Work Order',args.get('work_order'),'sales_invoice_no') if args.get('work_order') else ''
+		ste.customer_name = frappe.db.get_value('Work Order',args.get('work_order'),'customer_name') if args.get('work_order') else ''
 		ste.item_code = args.get('item')
 		ste.item_name = frappe.db.get_value('Item', ste.item_code, 'item_name')
 		ste.stock_uom = frappe.db.get_value('Item', ste.item_code, 'stock_uom')

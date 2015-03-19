@@ -117,6 +117,8 @@ class ProcessAllotment(Document):
 			qi.item_code = self.item
 			qi.inspected_by = frappe.session.user
 			qi.sample_size = data.assigned_work_qty
+			qi.customer_name = self.customer_name
+			qi.sales_invoice_no =self.sales_invoice_no
 			qi.serial_no_data = sn_list
 			qi.process = self.process
 			qi.work_order = self.process_work_order
@@ -569,17 +571,18 @@ class ProcessAllotment(Document):
 						self.Next_process_assign(s) # If next process open then current has no
 					
 	def check_PrevStatus(self, serial_no):
-		if self.process_trials:
-			pdd, trial_no = self.get_PA_details('trial')
-			if frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'trial_no': trial_no, 'parent': serial_no}, 'status') != 'Completed' and cint(self.process_trials) != 1:
-				frappe.throw(_("Previous trial is incompleted"))
-			elif frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'parent': serial_no}, 'status') != 'Completed':
-				frappe.throw(_("Previous process is incompleted"))
-		else:
-			pdd, trial_no = self.get_PA_details('nontrial')
-			if pdd:
-				if frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'parent': serial_no}, 'status') != 'Completed':
+		if frappe.db.get_value('Serial No Detail', {'parent': serial_no}, 'name'):
+			if self.process_trials:
+				pdd, trial_no = self.get_PA_details('trial')
+				if frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'trial_no': trial_no, 'parent': serial_no}, 'status') != 'Completed' and cint(self.process_trials) != 1:
+					frappe.throw(_("Previous trial is incompleted"))
+				elif frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'parent': serial_no}, 'status') != 'Completed':
 					frappe.throw(_("Previous process is incompleted"))
+			else:
+				pdd, trial_no = self.get_PA_details('nontrial')
+				if pdd:
+					if frappe.db.get_value('Serial No Detail', {'process_data': pdd, 'parent': serial_no}, 'status') != 'Completed':
+						frappe.throw(_("Previous process is incompleted"))
 
 	def get_PA_details(self, type_of_trial):
 		msg = None

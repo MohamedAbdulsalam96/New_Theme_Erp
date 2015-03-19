@@ -82,6 +82,16 @@
    "read_only": 1
   }, 
   {
+   "fieldname": "work_order", 
+   "fieldtype": "Link", 
+   "hidden": 0, 
+   "label": "Work Order", 
+   "options": "Work Order", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
    "fieldname": "process_allocation", 
    "fieldtype": "Button", 
    "label": "Process Allocation", 
@@ -187,15 +197,6 @@
    "precision": ""
   }, 
   {
-   "fieldname": "work_order", 
-   "fieldtype": "Link", 
-   "hidden": 1, 
-   "label": "Work Order", 
-   "options": "Work Order", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
    "fieldname": "column_break_15", 
    "fieldtype": "Column Break", 
    "permlevel": 0, 
@@ -295,7 +296,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-02-23 08:36:12.224167", 
+ "modified": "2015-03-18 07:05:02.800431", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Production Details", 

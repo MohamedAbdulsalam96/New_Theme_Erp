@@ -82,6 +82,10 @@ def make_stock_entry_for_child(s, name):
 	sed.qty = s.qty
 	sed.conversion_factor = s.conversion_factor
 	sed.work_order = s.work_order
+	# Suyash 'sales_invoice_no and customer_name are added in custom field in stock_entry child table'
+	sed.sales_invoice_no = frappe.db.get_value('Work Order',s.work_order,'sales_invoice_no') if s.work_order else ''
+	sed.customer_name = frappe.db.get_value('Work Order',s.work_order,'customer_name') if s.work_order else ''
+
 	sed.uom = s.uom
 	sed.incoming_rate = s.incoming_rate
 	sed.serial_no = s.serial_no
