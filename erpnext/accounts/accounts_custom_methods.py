@@ -862,3 +862,22 @@ def validate_branch(doc):
 def validate_duplicate_work_order(work_order):
 	if frappe.db.get_value('Production Dashboard Details', {'work_order': work_order}, 'name'):
 		frappe.throw(_('Duplicate work order found please contact to support team'))
+
+def validations(doc, method):
+	validate_trial_date(doc)
+
+def validate_trial_date(self):
+	if not self.trial_date:
+		status = get_Trials_Info(self) # check has a trial
+		if status == False:
+			frappe.throw(_("Trial date is mandatory"))
+
+def get_Trials_Info(self):
+	if self.get('sales_invoice_items_one'):
+		for d in self.get('sales_invoice_items_one'):
+			data = frappe.db.sql(""" select name from `tabProcess Item` where parent = '%s' and trials = 1"""%(d.tailoring_item_code))
+			if data:
+				return False
+	return True
+
+

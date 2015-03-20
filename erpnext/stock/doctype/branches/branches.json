@@ -44,7 +44,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-12-02 18:39:24.678973", 
+ "modified": "2015-03-20 09:12:49.619915", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Branches", 
@@ -64,10 +64,25 @@
    "print": 0, 
    "read": 1, 
    "report": 0, 
-   "role": "All", 
+   "role": "Administrator", 
    "set_user_permissions": 0, 
    "submit": 0, 
    "write": 0
+  }, 
+  {
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "System Manager"
+  }, 
+  {
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "Cashier"
+  }, 
+  {
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "Material User"
   }
  ], 
  "read_only": 0, 
