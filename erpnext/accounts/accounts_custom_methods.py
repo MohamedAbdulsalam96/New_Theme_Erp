@@ -123,6 +123,7 @@ def create_process_allotment(doc, data):
 		 	if doc.trial_date and cint(s.trials) == 1:
 		 		pa.process_trials = 1
 		 		pa.emp_status = 'Assigned'
+		 		pa.qc = cint(frappe.db.get_value('Trial Dates', {'parent': data.trials, 'trial_no':1, 'process': pa.process}, 'quality_check')) or 0
 		 	pa.branch = frappe.db.get_value('Process Wise Warehouse Detail',{'parent':data.tailor_work_order,'process':pa.process}, 'warehouse')
 		 	pa.serials_data = data.serial_no_data
 		 	pa.finished_good_qty = data.tailor_qty

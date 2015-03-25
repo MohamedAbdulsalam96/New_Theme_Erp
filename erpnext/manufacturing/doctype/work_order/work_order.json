@@ -240,6 +240,13 @@
    "precision": ""
   }, 
   {
+   "fieldname": "measured_by", 
+   "fieldtype": "Data", 
+   "label": "Measured By", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "measurement_details", 
    "fieldtype": "Section Break", 
    "label": "Measurement Details", 
@@ -399,7 +406,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-03-07 03:01:15.829314", 
+ "modified": "2015-03-23 10:20:09.354286", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Work Order", 

@@ -1,0 +1,15 @@
+{
+ "creation": "2015-03-24 10:34:02.273919", 
+ "disabled": 0, 
+ "doc_type": "Barcode Label Print", 
+ "docstatus": 0, 
+ "doctype": "Print Format", 
+ "html": "{{ letter_head }}\n\n\n<h4>{{ doc.select_print_heading or \"Serial No Barcode Label\" }}</h4>\n<table class=\"table table-bordered\" style=\"width:30%;\" >\n\t<tbody>\n\t\t{%- for row in doc.serial_no_details -%}\n\t        \n                        {% if row.select == 1 -%}\n                          \n                              <tr style=\"width:100%;\">\n                                  <td>{{ row.sales_invoice or '' }}</td>\n                                  <td>{{ row.item_code or '' }}</td>\n                                   \n                                </tr>\n                              \n                                 <tr style=\"width:100%;\">\n                                  <td>{{ row.customer_name or '' }}</td>\n                                  <td>{{ row.trial_no or '' }}</td>\n                                   \n                                </tr>\n                              \n                               <tr style=\"width:100%;\">\n                                  <td>{{ row.work_order or '' }}</td>\n                                  <td>{{ row.trial_date or '' }}</td>\n                                   \n                                </tr>\n                              <tr style=\"width:100%;\">\n                                  <td colspan=2 >{{ row.barcode }}</td>\n                                   \n                                </tr>\n                      {%- endif %}\n                         \n                      {%- endfor %}\n\n\t</tbody>\n</table>", 
+ "modified": "2015-03-25 05:49:02.460136", 
+ "modified_by": "Administrator", 
+ "module": "Stock", 
+ "name": "Serial No Barcode", 
+ "owner": "Administrator", 
+ "print_format_type": "Server", 
+ "standard": "Yes"
+}

@@ -122,7 +122,7 @@ cur_frm.cscript.toogle_field = function(doc){
 			}
 			refresh_field(key)
 		}
-	}else if(doc.emp_status=='Assigned'){
+	}else if(doc.emp_status=='Assigned' || doc.emp_status=='Reassigned'){
 		unhide_field(['start_date', 'end_date', 'estimated_time'])
 		hide_field([ 'completed_time', 'payment', 'extra_charge', 'deduct_late_work']);
 		doc.process_tailor = ''

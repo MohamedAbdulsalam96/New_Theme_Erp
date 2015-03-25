@@ -92,18 +92,24 @@ class ProcessAllotment(Document):
 		return tl.name
 
 	def start_process_for_serialNo(self, data):
+		frappe.errprint("start processs for serial no")
+		frappe.errprint(data)
 		if data.employee_status == 'Assigned':
 			idx = get_idx_for_serialNo(data, self.pdd, self.process)
 			details = open_next_branch(self.pdd, idx)
 			add_to_serial_no(details, self.process_work_order, data.tailor_serial_no, data.qc_required, data.employee_name)
 		else:
+			frappe.errprint("in else ljkjjlkjljkljl")
 			self.update_sn_status(data)
 			if data.employee_status == 'Completed' and not data.ste_no:
+				frappe.errprint("in 213")
 				details = find_next_process(self.pdd, self.process, data.tailor_process_trials)
 				if cint(data.qc_required)==1:
+					frappe.errprint("in if loop ")
 					if data.tailor_process_trials and cint(frappe.db.get_value('Trial Dates',{'parent':self.trial_dates, 'trial_no':data.tailor_process_trials}, 'quality_check')) != 1:
 						data.ste_no = self.make_ste(details, data)
 					else:
+						frappe.errprint("in else loop")
 						data.ste_no = self.make_qc(details, data)
 				else:
 					data.ste_no = self.make_ste(details, data)
@@ -111,6 +117,7 @@ class ProcessAllotment(Document):
 	def make_qc(self, details, data):
 		sn_list = self.get_not_added_sn(data.tailor_serial_no, 'serial_no_data', 'Quality Inspection')
 		if sn_list:
+			frappe.errprint("in make qc")
 			qi = frappe.new_doc('Quality Inspection')
 			qi.inspection_type = 'In Process'
 			qi.report_date = nowdate()
@@ -611,11 +618,14 @@ class ProcessAllotment(Document):
 			frappe.throw(_("Status {0} already defined").format(self.emp_status))
 
 	def check_PreviousStaus(self, serial_no):
-		val = 'Assigned'
+		val = ['Assigned']
 		if self.emp_status=='Completed':
-			val = 'Assigned' or 'Reassigned'
+			val.append('Reassigned')
+		if self.emp_status == 'Reassigned':
+			val.append('Completed')
+			val.append('Reassigned')	 
 		check_dict = self.get_dic_List(serial_no)
-		if frappe.db.get_value('Serial No Detail', check_dict, 'status') != val:
+		if frappe.db.get_value('Serial No Detail', check_dict, 'status') not in val:
 			frappe.throw(_("Sequence is not correct or previous process is not Completed").format(self.emp_status))
 
 	def get_dic_List(self, serial_no):

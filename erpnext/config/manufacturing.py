@@ -6,17 +6,17 @@ def get_data():
 			"label": _("Documents"),
 			"icon": "icon-star",
 			"items": [
-				# {
-				# 	"type": "doctype",
-				# 	"name": "BOM",
-				# 	"description": _("Bill of Materials (BOM)"),
-				# 	"label": _("Bill of Material")
-				# },
-				# {
-				# 	"type": "doctype",
-				# 	"name": "Production Order",
-				# 	"description": _("Orders released for production."),
-				# },
+				{
+					"type": "doctype",
+					"name": "BOM",
+					"description": _("Bill of Materials (BOM)"),
+					"label": _("Bill of Material")
+				},
+				{
+					"type": "doctype",
+					"name": "Production Order",
+					"description": _("Orders released for production."),
+				},
 				# {
 				# 	"type": "doctype",
 				# 	"name": "Item",

@@ -132,7 +132,7 @@ def install(country=None):
 		{'doctype': 'Supplier Type', 'supplier_type': _('Hardware')},
 		{'doctype': 'Supplier Type', 'supplier_type': _('Distributor')},
 
-		{'doctype': 'Role', 'role_name': _('Cashier')},
+		# {'doctype': 'Role', 'role_name': _('Cashier')},
 
 		# Sales Person
 		{'doctype': 'Sales Person', 'sales_person_name': _('Sales Team'), 'is_group': "Yes", "parent_sales_person": ""},

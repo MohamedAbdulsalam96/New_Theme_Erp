@@ -11,6 +11,9 @@
 				"Purchase Return": "icon-warning-sign",
 				"Subcontract": "icon-truck"
 			}[doc.purpose]; %}
+			<span class="form-link"
+				title="{%= doc.stock_in %}"><b style="font-size:12px">{%= doc.stock_in %}</b>
+			</span>
 			<span class="label label-info filterable"
 				data-filter="purpose,=,{%= doc.purpose %}"
 				title="{%= doc.purpose %}">
