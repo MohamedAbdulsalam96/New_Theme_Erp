@@ -23,7 +23,8 @@ def setup_account(args=None):
 		frappe.installer.install_app('mreq')
 		frappe.installer.install_app('loyalty_point_engine')
 		path = os.path.abspath(os.path.join('.'))
-		os.system('cd %s && source ./env/bin/activate && cd %s && frappe --latest'%(path.replace('sites', ''), path))
+		site_name = frappe.local.site_path.split('/')[1]
+		os.system('cd %s && source ./env/bin/activate && cd %s && frappe --use %s && frappe --latest'%(path.replace('sites', ''), path, site_name))
 		frappe.db.sql("""update  tabSingles set value = 1 where field = 'disable_signup' and doctype = 'Website Settings'""")
 
 		if frappe.db.sql("select name from tabCompany"):
