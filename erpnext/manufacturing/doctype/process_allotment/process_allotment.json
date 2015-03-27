@@ -549,7 +549,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-03-18 06:07:54.375274", 
+ "modified": "2015-03-26 09:39:20.823136", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 
@@ -597,6 +597,7 @@
    "write": 1
   }, 
   {
+   "apply_user_permissions": 1, 
    "create": 1, 
    "delete": 1, 
    "permlevel": 0, 

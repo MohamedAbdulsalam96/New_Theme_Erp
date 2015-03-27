@@ -1193,7 +1193,7 @@
  "icon": "icon-file-text", 
  "idx": 1, 
  "is_submittable": 1, 
- "modified": "2015-03-07 06:04:02.677122", 
+ "modified": "2015-03-26 09:48:38.142938", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Sales Invoice", 
@@ -1201,6 +1201,7 @@
  "permissions": [
   {
    "amend": 1, 
+   "apply_user_permissions": 1, 
    "cancel": 1, 
    "create": 1, 
    "delete": 1, 
@@ -1240,6 +1241,7 @@
    "role": "Customer"
   }, 
   {
+   "apply_user_permissions": 1, 
    "permlevel": 1, 
    "read": 1, 
    "role": "Accounts Manager", 

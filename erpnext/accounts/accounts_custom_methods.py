@@ -405,6 +405,7 @@ def make_schedule_for_trials(doc, args, work_order, item_code, serial_no_data):
 	s.serial_no_data = serial_no_data
 	s.customer = doc.customer
 	s.customer_name = doc.customer_name
+	s.branch = get_user_branch()
 	s.item_name = frappe.db.get_value('Item', item_code, 'item_name')
 	s.work_order = work_order
 	schedules_date(s, item_code, work_order, doc.trial_date, s.customer_name)

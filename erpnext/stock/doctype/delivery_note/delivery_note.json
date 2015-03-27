@@ -1013,7 +1013,7 @@
  "idx": 1, 
  "in_create": 0, 
  "is_submittable": 1, 
- "modified": "2015-03-07 06:13:05.429776", 
+ "modified": "2015-03-26 09:52:44.364302", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Delivery Note", 
@@ -1036,6 +1036,7 @@
   }, 
   {
    "amend": 1, 
+   "apply_user_permissions": 1, 
    "cancel": 1, 
    "create": 1, 
    "delete": 1, 
@@ -1089,6 +1090,7 @@
    "role": "Customer"
   }, 
   {
+   "apply_user_permissions": 1, 
    "permlevel": 1, 
    "read": 1, 
    "role": "Material Manager", 

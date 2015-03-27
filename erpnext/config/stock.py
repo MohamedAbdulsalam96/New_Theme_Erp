@@ -46,6 +46,12 @@ def get_data():
 					"name": "Batch",
 					"description": _("Batch (lot) of an Item."),
 				},
+				{
+					"type": "doctype",
+					"name": "Barcode Label Print",
+					"label": "Tailoring Product Barcode Label Print",
+					"description": _("Batch (lot) of an Item."),
+				},
 			]
 		},
 		{

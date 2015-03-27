@@ -1020,7 +1020,7 @@
  "idx": 1, 
  "is_submittable": 1, 
  "issingle": 0, 
- "modified": "2015-03-07 06:08:43.560272", 
+ "modified": "2015-03-26 09:46:51.556787", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Sales Order", 
@@ -1043,6 +1043,7 @@
   }, 
   {
    "amend": 1, 
+   "apply_user_permissions": 1, 
    "cancel": 1, 
    "create": 1, 
    "delete": 1, 
@@ -1101,6 +1102,7 @@
    "role": "Material User"
   }, 
   {
+   "apply_user_permissions": 1, 
    "permlevel": 1, 
    "read": 1, 
    "role": "Sales Manager", 

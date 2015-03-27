@@ -132,6 +132,15 @@
    "read_only": 1
   }, 
   {
+   "fieldname": "branch", 
+   "fieldtype": "Link", 
+   "label": "Branch", 
+   "options": "Branch", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
    "fieldname": "section_break_5", 
    "fieldtype": "Section Break", 
    "permlevel": 0, 
@@ -175,7 +184,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-03-18 05:51:56.077922", 
+ "modified": "2015-03-27 05:58:37.527016", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Trials", 

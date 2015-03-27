@@ -767,7 +767,7 @@
  "icon": "icon-truck", 
  "idx": 1, 
  "is_submittable": 1, 
- "modified": "2015-03-07 05:07:59.844257", 
+ "modified": "2015-03-26 09:54:39.971973", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Purchase Receipt", 
@@ -775,6 +775,7 @@
  "permissions": [
   {
    "amend": 1, 
+   "apply_user_permissions": 1, 
    "cancel": 1, 
    "create": 1, 
    "delete": 1, 
@@ -836,6 +837,7 @@
    "role": "Supplier"
   }, 
   {
+   "apply_user_permissions": 1, 
    "permlevel": 1, 
    "read": 1, 
    "role": "Material Manager", 
@@ -843,6 +845,7 @@
   }, 
   {
    "amend": 1, 
+   "apply_user_permissions": 1, 
    "cancel": 1, 
    "create": 1, 
    "delete": 1, 

@@ -649,7 +649,7 @@
  "icon": "icon-file-text", 
  "idx": 1, 
  "is_submittable": 1, 
- "modified": "2015-03-07 06:10:33.068669", 
+ "modified": "2015-03-26 09:50:35.769026", 
  "modified_by": "Administrator", 
  "module": "Buying", 
  "name": "Purchase Order", 
@@ -672,6 +672,7 @@
   }, 
   {
    "amend": 1, 
+   "apply_user_permissions": 1, 
    "cancel": 1, 
    "create": 1, 
    "delete": 1, 
@@ -711,6 +712,7 @@
    "role": "Supplier"
   }, 
   {
+   "apply_user_permissions": 1, 
    "permlevel": 1, 
    "read": 1, 
    "role": "Purchase Manager", 
