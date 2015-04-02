@@ -392,6 +392,7 @@ class ProcessAllotment(Document):
 		tsk.status = 'Open'
 		tsk.process_name = self.process
 		tsk.item_code = self.item
+		tsk.process_allotment_number = self.name
 		tsk.sales_order_number = self.sales_invoice_no
 		tsk.save(ignore_permissions=True)
 		return tsk.name

@@ -62,6 +62,7 @@
   {
    "fieldname": "customer", 
    "fieldtype": "Data", 
+   "in_list_view": 1, 
    "label": "Customer Name", 
    "options": "", 
    "permlevel": 0, 
@@ -246,7 +247,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-02-16 16:18:34.495216", 
+ "modified": "2015-03-30 02:32:32.199591", 
  "modified_by": "Administrator", 
  "module": "Dashboard", 
  "name": "Cashier Payment", 

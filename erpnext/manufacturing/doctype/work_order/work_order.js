@@ -150,7 +150,7 @@ cur_frm.fields_dict['trial_serial_no'].get_query = function(doc, cdt, cdn) {
 cur_frm.cscript.refresh = function(doc){
 	refresh_field(['wo_style', 'measurement_item'])
 	if(doc.docstatus==1){
-		cur_frm.appframe.add_primary_action(__('Draw Canvas'), cur_frm.cscript['Draw Canvas'], "icon-truck")
+		cur_frm.appframe.add_primary_action(__('Draw Canvas'), cur_frm.cscript['Draw Canvas'], "icon-edit")
 	}
 	 if(frappe.route_options) {
 	 	  if (frappe.route_options.number == 1){

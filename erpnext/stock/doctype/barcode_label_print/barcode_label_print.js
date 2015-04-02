@@ -23,7 +23,9 @@ cur_frm.cscript.search = function(doc,cdt,cdn){
 
 	})
 	var x='search'
+	console.log("before get")
 	get_server_fields('get_serial_nos',x,'',doc,cdt,cdn,1,function(){
+		console.log("in get")
 		refresh_field('offset')
 		refresh_field('serial_no_details')
 		

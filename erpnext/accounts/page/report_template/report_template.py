@@ -45,5 +45,5 @@ def webcam_img_upload(imgdata1,customer):
 	fname, content = get_uploadedImage_content(imgdata1,filename)
 	if content:
 		image = save_file(fname, content,'Customer',customer)
-	return filename	
+	return fname	
 

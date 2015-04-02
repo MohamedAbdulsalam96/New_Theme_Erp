@@ -34,6 +34,7 @@ def create_work_order(doc, data, serial_no, item_code, qty, parent_item_code):
 	wo.fabric__code = get_dummy_fabric(item_code) or data.fabric_code
 	wo.serial_no_data = serial_no
 	wo.branch = data.tailoring_warehouse
+	wo.delivery_date = data.tailoring_delivery_date or ''
 	create_work_order_style(data, wo, item_code)
 	create_work_order_measurement(data, wo, item_code)
 	create_process_wise_warehouse_detail(data, wo, item_code)
@@ -89,11 +90,17 @@ def create_work_order_measurement(data, wo_name, item_code):
 
 def create_process_wise_warehouse_detail(data, wo_name, item_code):
 	if wo_name:
-		for proc_wh in frappe.db.sql("""select process_name, warehouse, idx, actual_fabric from `tabProcess Item`
+		for proc_wh in frappe.db.sql("""select process_name, warehouse, idx, actual_fabric,branch_list from `tabProcess Item`
 			where parent = '%s'"""%item_code,as_list=1):
+			warehouse_list = []
+			if proc_wh[4]:
+				warehouse_list = proc_wh[4].split('\n')	
 			mi = wo_name.append('process_wise_warehouse_detail', {})
 			mi.process = proc_wh[0]
-			mi.warehouse = proc_wh[1]
+			if get_user_branch() in warehouse_list:
+				mi.warehouse = get_user_branch()
+			else:
+				mi.warehouse = proc_wh[1]
 			mi.idx = proc_wh[2]
 			mi.actual_fabric = cint(proc_wh[3])
 			# mi.parent = wo_name
@@ -392,7 +399,7 @@ def make_order(doc, d, qty, item_code, parent=None):
 		if not e.tailor_work_order:
 			e.tailor_work_order = create_work_order(doc, d, e.serial_no_data, item_code, qty, parent)
 			update_serial_no_with_wo(e.serial_no_data, e.tailor_work_order)
-		if not e.trials and frappe.db.get_value('Process Item', {'parent':item_code, 'trials':1}, 'name'):
+		if not e.trials and frappe.db.get_value('Process Item', {'parent':item_code, 'trials':1}, 'name') and doc.trial_date:
 			e.trials = make_schedule_for_trials(doc, d, e.tailor_work_order, item_code, e.serial_no_data)
 		# e.save()
 		return "Done"

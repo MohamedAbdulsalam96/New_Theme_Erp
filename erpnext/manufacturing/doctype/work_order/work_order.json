@@ -148,6 +148,13 @@
    "precision": ""
   }, 
   {
+   "fieldname": "delivery_date", 
+   "fieldtype": "Data", 
+   "label": "Delivery Date", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "other_work_orders", 
    "fieldtype": "Small Text", 
    "hidden": 1, 
@@ -406,7 +413,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-03-23 10:20:09.354286", 
+ "modified": "2015-04-01 09:41:50.114060", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Work Order", 
