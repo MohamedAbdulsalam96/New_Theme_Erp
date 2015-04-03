@@ -133,12 +133,12 @@ snapshot:function(wrapper,cust_name) {
 
             var fd = dialog.fields_dict;
 
-              this.table = $(fd.styles_name.wrapper).html("<div style='width:600px;height:300px' id='myid'>\
-                 <div style='width:50%;height:100%;display:inline-block'><canvas id='capimage'  style='width:75%;height:70%;padding-left:40px'></canvas></div>\
-                <div id='showDataURL' style='display:inline-block;'></div>\
-                </div>\
+              this.table = $(fd.styles_name.wrapper).html("<table style='width:600px;height:300px;table-layout:fixed' id='myid'>\
+                 <tr><td style='width:50%;height:100%;'><canvas id='capimage'  style='width:75%;height:70%;padding-left:40px'></canvas></td>\
+                <td id='showDataURL' style='display:inline-block;'></td></tr>\
+                </table>\
                    <div class='clearfix' >\
-              <div class='eg-button' style='width:100%;display:inline-block'>\
+              <div class='eg-button' style='width:100%;display:inline-block;margin-top:10px'>\
       <button class='btn btn-primary' id='getDataURL' type='button'>Crope Image</button>\
          <button id='rotateLeft' type='button' class='btn btn-info'>Rotate Left</button>\
         <button id='rotateRight' type='button' class='btn btn-info'>Rotate Right</button>\
@@ -166,6 +166,10 @@ snapshot:function(wrapper,cust_name) {
               ctx.drawImage(video,0,0);
               me.button2(wrapper,cust_name)
               me.get_cropper();
+              setTimeout(function(){
+                 $('.cropper-container').css("top","0px")
+
+              },1000)
               me.show_functions(wrapper);
             
 },
@@ -175,12 +179,17 @@ snapshot:function(wrapper,cust_name) {
                      aspectRatio: 16 / 9,
                       crop: function(data) {
                            // Output the result data for cropping image.
+                      $('.cropper-container').css("top","1px")
+
                      }
                });
 
 
  }, 
   show_functions: function(wrapper) {
+
+
+    
     var me = this;
     $(function() {
       var $image =$('#capimage'),
@@ -268,12 +277,13 @@ snapshot:function(wrapper,cust_name) {
       });
 
       $("button#rotateLeft.btn.btn-info").click(function() {
-
+        $('.cropper-container').css("top","0px")
         $image.cropper("rotate", -90);
         $('div.cropper-container').css({'width':'450px','height':'250px'})
       });
 
       $("button#rotateRight.btn.btn-info").click(function() {
+        $('.cropper-container').css("top","0px")
         $image.cropper("rotate", 90);
       });
 
@@ -299,7 +309,7 @@ snapshot:function(wrapper,cust_name) {
         var dataURL = $image.cropper("getDataURL");
         //window.open(dataURL);
         $("#dataURL").text(dataURL);
-        $("div#showDataURL").html('<img id="target_image" src="' + dataURL + '" style="width:250px;height:200px;padding-top:50px">');
+        $("#showDataURL").html('<img id="target_image" src="' + dataURL + '" style="width:250px;height:200px;margin-top:50px;padding-left:10px">');
       });
 
       $("#getDataURL2").click(function() {

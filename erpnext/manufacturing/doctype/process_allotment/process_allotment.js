@@ -28,7 +28,7 @@ cur_frm.cscript.status = function(doc, cdt, cdn){
 // var sn_list=[]
 cur_frm.cscript.refresh = function(doc, cdt, cdn){
 	sn_list=[];
-	cur_frm.cscript.toogle_field(doc)
+	//cur_frm.cscript.toogle_field(doc)
 	// get_server_fields('show_trials_details', '','',doc, cdt, cdn, 1, function(){
 	// 	refresh_field('trials_transaction')
 	// })
