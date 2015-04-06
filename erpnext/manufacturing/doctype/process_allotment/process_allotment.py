@@ -685,12 +685,19 @@ class ProcessAllotment(Document):
 		item_list = self.make_ChildSTE_Issue(se, raw_material)
 		if item_list:
 			se.submit()
+			self.update_child_STE(se.name)
 		return "Done"
+
+	def update_child_STE(self, name):
+		data = self.get('issue_raw_material')
+		for d in data:
+			if not d.issue_stock_entry:
+				d.issue_stock_entry = name
 
 	def make_ChildSTE_Issue(self, obj, raw_material):
 		item_list = []
 		for item in raw_material:
-			if cint(item.selected) == 1 and item.status!='Completed':
+			if cint(item.selected) == 1 and item.status!='Issued':
 				sed = obj.append('mtn_details')
 				sed.s_warehouse = get_branch_warehouse(get_user_branch())
 				company = frappe.db.get_value('Global Defaults', None, 'default_company')
@@ -706,7 +713,7 @@ class ProcessAllotment(Document):
 				sed.qty = flt(item.qty)
 				sed.transfer_qty = flt(item.qty) * 1
 				sed.serial_no = item.serial_no
-				item.status = 'Completed'
+				item.status = 'Issued'
 				item_list.append(item.name)
 		return item_list
 
