@@ -106,7 +106,8 @@ doc_events = {
 		"on_cancel" : ["tools.tools_management.custom_methods.delete_project_aginst_si", "erpnext.accounts.accounts_custom_methods.delete_production_process"]
 	},
 	"Item":{
-		"validate" : ["erpnext.stock.stock_custom_methods.custom_validateItem_methods","erpnext.stock.stock_custom_methods.work_qrcode","erpnext.stock.stock_custom_methods.validate_quality_inspection_for_child_table","erpnext.stock.stock_custom_methods.validate_quality_inspection","erpnext.stock.stock_custom_methods.validate_for_gift_voucher"],
+		"validate" : ["erpnext.stock.stock_custom_methods.custom_validateItem_methods","erpnext.stock.stock_custom_methods.work_qrcode","erpnext.stock.stock_custom_methods.validate_quality_inspection_for_child_table","erpnext.stock.stock_custom_methods.validate_quality_inspection"],
+		# "validate" : ["erpnext.stock.stock_custom_methods.custom_validateItem_methods","erpnext.stock.stock_custom_methods.work_qrcode","erpnext.stock.stock_custom_methods.validate_quality_inspection_for_child_table","erpnext.stock.stock_custom_methods.validate_quality_inspection","erpnext.stock.stock_custom_methods.validate_for_gift_voucher"],
 		"on_update": "erpnext.stock.stock_custom_methods.item_validate_methods"
 
 	},
