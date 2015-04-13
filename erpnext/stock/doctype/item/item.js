@@ -214,13 +214,20 @@ get_server_fields('get_parameter_details',d.parameter,'',doc ,cdt, cdn,1, functi
 }
 
 
-cur_frm.cscript.item_group =function(doc, cdt, cdn){
-	doc.has_serial_no = 'No'
-	if(doc.item_group == 'Tailoring'){
-		doc.has_serial_no = 'Yes'
-	}
-	refresh_field('has_serial_no')
-}
+// cur_frm.cscript.item_group =function(doc, cdt, cdn){
+// 	doc.has_serial_no = 'No'
+// 	console.log("in if conasdddddd")
+// 	if(doc.item_group == 'Tailoring'){
+// 		doc.has_serial_no = 'Yes'
+// 	}
+// 	if(doc.item_group == 'Gift Voucher'){
+// 			console.log("in if con")
+// 			doc.has_serial_no = 'Yes'
+// 			doc.is_purchase_item = 'No'
+// 	}
+// 	refresh_field('has_serial_no')
+// 	refresh_field('is_purchase_item')
+// }
 
 //for Slide Show
 
@@ -257,14 +264,22 @@ cur_frm.cscript.item_group =function(doc, cdt, cdn){
 		doc.has_serial_no = 'Yes'
 		refresh_field('has_serial_no')
 	}
-	else if(doc.item_group=="Fabric"){
+	if(doc.item_group=="Fabric"){
 		doc.stock_uom="Meter"
 		refresh_field('stock_uom')
 	}
-	else if(doc.item_group=="Merchandise"){
+	if(doc.item_group=="Merchandise"){
 		doc.stock_uom="Nos"
 		refresh_field('stock_uom')
+	}if(doc.item_group == 'Gift Voucher'){
+			doc.has_serial_no = 'Yes'
+			doc.is_purchase_item = 'No'
+			refresh_field('has_serial_no')
+			refresh_field('is_purchase_item')
+			
 	}
+
+
 }
 
 cur_frm.cscript.raw_item_code=function(doc,cdt,cdn){
@@ -292,4 +307,13 @@ cur_frm.cscript.is_stock_item = function(doc){
 		doc.has_serial_no = 'Yes'
 	}
 	refresh_field('has_serial_no')
+}
+
+
+cur_frm.cscript.is_purchase_item = function(doc){
+
+if(doc.item_group == 'Gift voucher' && doc.is_purchase_item=='Yes'){
+		alert("Item Group 'Gift Voucher' can not have 'Is Purchase Item' to Yes")
+	}
+	refresh_field('is_purchase_item')
 }

@@ -143,6 +143,16 @@
    "precision": ""
   }, 
   {
+   "depends_on": "eval:doc.mode_of_payment=='Gift Voucher'", 
+   "fieldname": "gv_serial_no", 
+   "fieldtype": "Link", 
+   "label": "GV Serial No", 
+   "options": "Serial No", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "depends_on": "eval:doc.mode_of_payment=='Redeem'", 
    "fieldname": "redeem_points", 
    "fieldtype": "Int", 
    "label": "Redeem Points", 
@@ -247,7 +257,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-03-30 02:32:32.199591", 
+ "modified": "2015-04-06 03:06:35.237365", 
  "modified_by": "Administrator", 
  "module": "Dashboard", 
  "name": "Cashier Payment", 

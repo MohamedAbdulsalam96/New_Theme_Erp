@@ -13,6 +13,8 @@ from frappe.model.naming import make_autoname
 from erpnext.stock.utils import get_incoming_rate
 from tools.custom_data_methods import get_user_branch, get_branch_cost_center, get_branch_warehouse, find_next_process
 from tools.tools_management.custom_methods import cut_order_generation
+import random
+import string
 
 def create_production_process(doc, method):
 	for d in doc.get('work_order_distribution'):
@@ -889,4 +891,95 @@ def get_Trials_Info(self):
 				return False
 	return True
 
+def update_serial_no_for_gift_voucher(doc,method):
+	if doc.is_pos == True:
+		update_serial_no(doc,method)
+
+
+def update_serial_no(doc,method):
+	for row in doc.get('entries') if  doc.get('entries') else doc.get('delivery_note_details'):		
+		item_group = frappe.db.get_value('Item',row.item_code,'item_group')
+		if item_group == 'Gift Voucher':
+			serial_no_list = row.serial_no.split('\n')
+			for serial_no in serial_no_list:
+				my_doc = frappe.get_doc('Serial No',serial_no)
+				my_doc.gift_voucher_amount = row.rate
+				my_doc.save(ignore_permissions=True)
+
+
+def validation_for_jv_creation(doc,method):
+	for row in doc.get('merchandise_item'):
+		if frappe.db.get_value('Item',row.merchandise_item_code,'item_group') == 'Gift Voucher':
+			check_gift_voucher_account()
+			check_availability_of_gift_voucher(row.merchandise_item_code,row.merchandise_qty,doc.customer)
+		if row.free == 'Yes':
+			create_jv(doc.name,cint(row.merchandise_qty),row.merchandise_item_code)
+
+
+def check_for_pos(doc,method):
+	if doc.is_pos == True:
+		for row in doc.get('entries'):
+			if frappe.db.get_value('Item',row.merchandise_item_code,'item_group') == 'Gift Voucher' and row.amount==0:
+				check_gift_voucher_account()
+				check_availability_of_gift_voucher(row.merchandise_item_code,row.merchandise_qty,doc.customer)
+				create_jv(doc.name,cint(row.merchandise_qty),row.merchandise_item_code)
+
+
+
+
+def check_gift_voucher_account():
+	company = frappe.db.get_value('Global Defaults',None,'default_company')
+	gift_voucher_account = frappe.db.get_value('Company',company,'gift_voucher_account')
+	if not gift_voucher_account:
+		frappe.throw("Please Set Gift Voucher Account in default company")
+	return gift_voucher_account	
+
+
+
+def check_availability_of_gift_voucher(item_code,quantity,customer):
+	if item_code and quantity:
+		warehouse = frappe.db.get_value('Branch',get_user_branch(),'warehouse')
+		count = frappe.db.sql(""" select count(sn.name) from `tabSerial No` sn join `tabGift Voucher` gv on sn.name = gv.serial_no
+			where sn.item_code='{0}' and sn.warehouse='{1}' and sn.status='Available' and gv.to_date >curdate()  """.format(item_code,warehouse),as_list=True)
+		if count[0][0] >= quantity:
+			pass
+		else:
+			frappe.throw("Gift voucher Not available for {0} ".format(item_code))	
+
+
+
+
+def create_jv(sales_invoice_no, quantity,item_code):
+	company = frappe.db.get_value('Global Defaults',None,'default_company')
+	cost_center = frappe.db.get_value('Company',company,'cost_center')
+	marketing_account = frappe.db.sql("select name from `tabAccount` where name like '%Marketing Expenses%' limit 1 ",as_list=1)
+	jv = frappe.new_doc('Journal Voucher')
+	jv.voucher_type = 'Journal Entry'
+	jv.cheque_no = ''.join(random.choice(string.ascii_uppercase) for i in range(7))
+	jv.posting_date = nowdate()
+	jv.fiscal_year = frappe.db.get_value('Global Defaults', None, 'current_fiscal_year')
+	jv.cheque_date = nowdate()
+	jv.save(ignore_permissions=True)
+	other_details = [{'account':marketing_account[0][0],'debit':cint(frappe.db.get_value('Item',item_code,'redeem_amount')) * quantity,'cost_center':get_branch_cost_center(get_user_branch()) or cost_center },{'account':check_gift_voucher_account(),'credit':cint(frappe.db.get_value('Item',item_code,'redeem_amount')) * quantity,'cost_center':get_branch_cost_center(get_user_branch()) or cost_center}]
+	make_gl_entry(jv.name, other_details)
+	jv = frappe.get_doc('Journal Voucher', jv.name)
+	jv.submit()
+	return jv.name
+
+def make_gl_entry(parent,args):
+	frappe.errprint(args)
+	for s in args:
+		frappe.errprint(s.get('account'))
+		jvd = frappe.new_doc('Journal Voucher Detail')
+		jvd.parent = parent
+		jvd.parenttype = 'Journal Voucher'
+		jvd.mode = s.get('mode')
+		jvd.parentfield = 'entries'
+		jvd.cost_center = s.get('cost_center')
+		jvd.account = s.get('account')
+		jvd.credit = s.get('credit')
+		jvd.debit = s.get('debit')
+		jvd.against_invoice = s.get('invoice')
+		jvd.save()
+	return "Done"					
 

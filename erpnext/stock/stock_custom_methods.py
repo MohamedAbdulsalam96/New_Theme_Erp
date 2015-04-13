@@ -294,6 +294,8 @@ def update_details(value, name):
 def custom_validateItem_methods(doc, method):
 	set_default_values(doc)
 	make_barcode(doc)
+	validate_for_gift_voucher(doc,method)
+	check_for_gv_redeem_amount(doc,method)
 
 def set_default_values(doc):
 	doc.default_warehouse = frappe.db.get_value('Branch', doc.default_branch, 'warehouse')
@@ -395,3 +397,18 @@ def validate_quality_inspection(doc,method):
 				for key,value in eval(row_dict).items():
 					if value['quality_check'] == 'checked':
 						frappe.throw(_(" Please Fill 'Inspection Required' field in Inspection Criteria Section to YES "))
+
+
+
+def validate_for_gift_voucher(doc,method):
+	if doc.item_group == 'Gift Voucher' and doc.is_stock_item == 'No':
+		frappe.msgprint("Item Group 'Gift Voucher' can not have 'Is Stock Item' to No")
+	elif doc.item_group == 'Gift Voucher' and doc.is_stock_item == 'Yes' and doc.has_serial_no == 'No':
+		frappe.msgprint("Item Group 'Gift Voucher' can not have 'Has Serial No' to NO")	
+
+			
+def check_for_gv_redeem_amount(doc,method):
+	if doc.item_group == 'Gift Voucher' and  not doc.redeem_amount:
+		frappe.throw("Item Group 'Gift Voucher' can not have 'Redeem Amount' to null")
+
+

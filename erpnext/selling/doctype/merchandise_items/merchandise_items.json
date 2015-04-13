@@ -103,6 +103,14 @@
    "set_only_once": 0
   }, 
   {
+   "fieldname": "free", 
+   "fieldtype": "Select", 
+   "label": "Is Free Gift Voucher", 
+   "options": "\nYes\nNo", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "allow_on_submit": 0, 
    "fieldname": "merchandise_size", 
    "fieldtype": "Link", 
@@ -916,7 +924,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-04-02 06:04:51.411800", 
+ "modified": "2015-04-10 08:46:37.318977", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Merchandise Items", 

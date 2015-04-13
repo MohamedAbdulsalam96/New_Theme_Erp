@@ -90,6 +90,20 @@ cur_frm.fields_dict.default_expense_account.get_query = function(doc) {
 	}
 }
 
+
+cur_frm.fields_dict.gift_voucher_account.get_query = function(doc) {
+	return{
+		filters:{
+			'company': doc.name,
+			'group_or_ledger': "Ledger",
+			"report_type": "Profit and Loss"
+		}
+	}
+}
+
+
+
+
 cur_frm.fields_dict.default_income_account.get_query = function(doc) {
 	return{
 		filters:{
