@@ -26,7 +26,6 @@ class StockLedgerEntry(Document):
 	def on_submit(self):
 		self.check_stock_frozen_date()
 		self.actual_amt_check()
-
 		from erpnext.stock.doctype.serial_no.serial_no import process_serial_no
 		process_serial_no(self)
 
