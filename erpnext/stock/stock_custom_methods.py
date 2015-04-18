@@ -69,6 +69,7 @@ def make_stock_entry(doc, target_branch):
 	se.f_branch = doc.from_warehouse
 	se.to_warehouse = get_branch_warehouse(doc.t_branch)
 	se.branch = target_branch
+	se.fiscal_year = frappe.db.get_value('Global Defaults',None,'current_fiscal_year')
 	se.save(ignore_permissions=True)
 	return se.name
 
@@ -235,14 +236,10 @@ def make_sales_bom_item(obj, d):
 	return "Done"
 
 def update_sales_bom_item(parent, doc):
+	obj = frappe.get_doc('Sales BOM', parent)
 	for d in doc.get('sales_bom_item'):
-		name = frappe.db.get_value('Sales BOM Item', {'item_code': d.item_code, 'parent': parent, 'parenttype':'Sales BOM'}, 'name')
-		if name:
-			frappe.db.sql("update `tabSales BOM Item` set qty=%s where name='%s'"%(d.qty, name))
-		else:
-			obj = frappe.get_doc('Sales BOM', parent)
-			make_sales_bom_item(obj, d)
-			obj.save()
+		make_sales_bom_item(obj, d)
+	obj.save()
 
 def validate_sales_bom(doc):
 	if not doc.get('sales_bom_item'):

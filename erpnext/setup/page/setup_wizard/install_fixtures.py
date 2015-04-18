@@ -155,6 +155,7 @@ def install(country=None):
 		{'doctype': 'Mode of Payment', 'mode_of_payment': _('Wire Transfer')},
 		{'doctype': 'Mode of Payment', 'mode_of_payment': _('Redeem')},
 		{'doctype': 'Mode of Payment', 'mode_of_payment': _('Bank Draft')},
+		{'doctype': 'Mode of Payment', 'mode_of_payment': _('Gift Voucher')},
 
 		# Activity Type
 		{'doctype': 'Activity Type', 'activity_type': _('Planning')},

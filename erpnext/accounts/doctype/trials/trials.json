@@ -20,6 +20,7 @@
    "fieldname": "sales_invoice", 
    "fieldtype": "Data", 
    "label": "Sales Invoice", 
+   "options": "", 
    "permlevel": 0, 
    "precision": "", 
    "read_only": 1
@@ -184,7 +185,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-03-27 05:58:37.527016", 
+ "modified": "2015-04-17 06:25:51.162673", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Trials", 

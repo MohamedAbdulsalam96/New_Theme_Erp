@@ -223,13 +223,13 @@ def create_stock_entry(doc, data):
  	ste.purpose_type = 'Material Receipt'
  	ste.purpose ='Material Receipt'
  	ste.branch = get_user_branch()
- 	make_stock_entry_of_child(ste,data)
+ 	make_stock_entry_of_child(ste,data,doc)
  	ste.save(ignore_permissions=True)
  	st = frappe.get_doc('Stock Entry', ste.name)
  	st.submit()
  	return ste.name
 
-def make_stock_entry_of_child(obj, data):
+def make_stock_entry_of_child(obj, data,doc):
  	if data.tailoring_item:
  		st = obj.append('mtn_details',{})
 		st.t_warehouse = frappe.db.get_value('Branch',get_user_branch(),'warehouse')
@@ -242,6 +242,7 @@ def make_stock_entry_of_child(obj, data):
 		st.qty = data.tailor_qty or 1
 		st.transfer_qty = data.tailor_qty or 1
 		st.incoming_rate = 1.00
+		st.sales_invoice_no = doc.name
 		company = frappe.db.get_value('Global Defaults', None, 'default_company')
 		st.expense_account = 'Stock Adjustment - '+frappe.db.get_value('Company', company, 'abbr')
 		st.cost_center = 'Main - '+frappe.db.get_value('Company', company, 'abbr')
@@ -572,6 +573,7 @@ def stock_entry_for_out(args, target_branch, sn_list, qty):
 			stock_entry_of_child(obj, args, target_branch, sn_list, qty)
 			obj.posting_date = nowdate()
 			obj.posting_time = nowtime()
+			obj.fiscal_year = frappe.db.get_value('Global Defaults',None,'current_fiscal_year')
 			obj.save(ignore_permissions=True)
 		else:
 			parent = make_StockEntry(args, target_branch, sn_list, qty)
@@ -586,6 +588,7 @@ def make_StockEntry(args, target_branch, sn_list, qty):
  	ste.branch = get_user_branch()
  	ste.posting_date = nowdate()
  	ste.posting_time = nowtime()
+ 	ste.fiscal_year = frappe.db.get_value('Global Defaults',None,'current_fiscal_year')
  	ste.from_warehouse = get_branch_warehouse(get_user_branch())
  	ste.t_branch = target_branch
  	stock_entry_of_child(ste, args, target_branch, sn_list, qty)
@@ -967,7 +970,6 @@ def create_jv(sales_invoice_no, quantity,item_code):
 	return jv.name
 
 def make_gl_entry(parent,args):
-	frappe.errprint(args)
 	for s in args:
 		frappe.errprint(s.get('account'))
 		jvd = frappe.new_doc('Journal Voucher Detail')
