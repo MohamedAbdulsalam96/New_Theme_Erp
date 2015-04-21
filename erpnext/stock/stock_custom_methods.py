@@ -222,24 +222,32 @@ def make_sales_bom(doc):
 		if not parent:
 			sb = frappe.new_doc('Sales BOM')
 			sb.new_item_code = doc.name
-			for d in doc.get('sales_bom_item'):
-				make_sales_bom_item(sb, d)
+			make_sales_bom_item(doc, sb)
 			sb.save(ignore_permissions = True)
 		elif cint(doc.is_clubbed_product) == 1 and parent:
 			update_sales_bom_item(parent, doc)
 		delete_unnecessay_records(doc)
 
-def make_sales_bom_item(obj, d):
-	sbi= obj.append('sales_bom_items', {})
-	sbi.item_code = d.item_code
-	sbi.qty = d.qty
+def update_sales_bom_item(parent, doc):
+	obj = frappe.get_doc('Sales BOM', parent)	
+	make_sales_bom_item(doc, obj)
+	obj.save(ignore_permissions=True)
+
+def make_sales_bom_item(doc, obj):
+	for d in doc.get('sales_bom_item'):
+		sbi= obj.append('sales_bom_items', {})
+		sbi.item_code = d.item_code
+		sbi.type_of_bom = 'Yes'
+		sbi.qty = d.qty
+		sbi.idx = d.idx
 	return "Done"
 
-def update_sales_bom_item(parent, doc):
-	obj = frappe.get_doc('Sales BOM', parent)
-	for d in doc.get('sales_bom_item'):
-		make_sales_bom_item(obj, d)
-	obj.save()
+def delete_unnecessay_records(doc):
+	frappe.db.sql(''' delete from `tabSales BOM Item` where parent = "%s" and 
+		type_of_bom <> "Yes" and parenttype= "Sales BOM" '''%(doc.name))
+	
+	frappe.db.sql(''' update `tabSales BOM Item` set type_of_bom = "No" where
+		parent = "%s" and parenttype = "Sales BOM"'''%(doc.name))
 
 def validate_sales_bom(doc):
 	if not doc.get('sales_bom_item'):
@@ -255,14 +263,6 @@ def check_duplicate_item_code(doc):
 			frappe.throw('Item Code can not be duplicate')
 		item_code_list.append(d.item_code)
 
-def delete_unnecessay_records(doc):
-	sales_bom_item_list = []
-	for s in doc.get('sales_bom_item'):
-		sales_bom_item_list.append(frappe.db.get_value('Sales BOM Item', {'item_code':s.item_code, 'parent': s.parent, 'parenttype': 'Sales BOM'}, 'name'))
-	bom_list =  "','".join(sales_bom_item_list)
-	if bom_list:
-		frappe.db.sql("""delete from `tabSales BOM Item` 
-			where parenttype not in('Item') and name not in %s"""%("('"+bom_list+"')"))
 
 def update_user_permissions_for_user(doc, method):
 	assigen_user_permission(doc.branch, doc.email)
