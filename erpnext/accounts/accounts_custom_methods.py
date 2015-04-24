@@ -92,17 +92,20 @@ def create_work_order_measurement(data, wo_name, item_code):
 
 def create_process_wise_warehouse_detail(data, wo_name, item_code):
 	if wo_name:
+		previous_process_branch = get_user_branch()
 		for proc_wh in frappe.db.sql("""select process_name, warehouse, idx, actual_fabric,branch_list from `tabProcess Item`
 			where parent = '%s'"""%item_code,as_list=1):
 			warehouse_list = []
 			if proc_wh[4]:
-				warehouse_list = proc_wh[4].split('\n')	
+				warehouse_list = proc_wh[4].split('\n')
+				warehouse_list = [warehouse for warehouse in warehouse_list if warehouse]	
 			mi = wo_name.append('process_wise_warehouse_detail', {})
 			mi.process = proc_wh[0]
-			if get_user_branch() in warehouse_list:
-				mi.warehouse = get_user_branch()
+			if previous_process_branch in warehouse_list:
+				mi.warehouse = previous_process_branch
 			else:
 				mi.warehouse = proc_wh[1]
+			previous_process_branch = mi.warehouse
 			mi.idx = proc_wh[2]
 			mi.actual_fabric = cint(proc_wh[3])
 			# mi.parent = wo_name
@@ -125,6 +128,8 @@ def create_process_allotment(doc, data):
 		 	pa.process_work_order = data.tailor_work_order
 		 	pa.qc = cint(s.quality_check)
 		 	pa.work_order = data.tailor_work_order
+		 	pa.total_expense = data.expense
+		 	pa.total_invoice_amount = doc.rounded_total_export
 		 	# Suyash 'Customer name field added in process allotment'
 		 	pa.customer_name = doc.customer
 		 	pa.status = 'Pending'
@@ -399,6 +404,7 @@ def make_order(doc, d, qty, item_code, parent=None):
 		e.refer_doc = d.name
 		e.tailor_fabric_qty = frappe.db.get_value('Size Item', {'parent':d.tailoring_item_code, 'size':d.tailoring_size, 'width':d.width }, 'fabric_qty')
 		e.tailor_warehouse = d.tailoring_branch
+		e.expense = d.total_expenses
 		if not e.tailor_work_order:
 			e.tailor_work_order = create_work_order(doc, d, e.serial_no_data, item_code, qty, parent)
 			update_serial_no_with_wo(e.serial_no_data, e.tailor_work_order)
@@ -971,7 +977,6 @@ def create_jv(sales_invoice_no, quantity,item_code):
 
 def make_gl_entry(parent,args):
 	for s in args:
-		frappe.errprint(s.get('account'))
 		jvd = frappe.new_doc('Journal Voucher Detail')
 		jvd.parent = parent
 		jvd.parenttype = 'Journal Voucher'
