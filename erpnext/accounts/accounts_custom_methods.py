@@ -128,7 +128,7 @@ def create_process_allotment(doc, data):
 		 	pa.process_work_order = data.tailor_work_order
 		 	pa.qc = cint(s.quality_check)
 		 	pa.work_order = data.tailor_work_order
-		 	pa.total_expense = data.expense
+		 	# pa.total_expense = data.expense
 		 	pa.total_invoice_amount = doc.rounded_total_export
 		 	# Suyash 'Customer name field added in process allotment'
 		 	pa.customer_name = doc.customer
@@ -404,7 +404,7 @@ def make_order(doc, d, qty, item_code, parent=None):
 		e.refer_doc = d.name
 		e.tailor_fabric_qty = frappe.db.get_value('Size Item', {'parent':d.tailoring_item_code, 'size':d.tailoring_size, 'width':d.width }, 'fabric_qty')
 		e.tailor_warehouse = d.tailoring_branch
-		e.expense = d.total_expenses
+		# e.expense = d.total_expenses
 		if not e.tailor_work_order:
 			e.tailor_work_order = create_work_order(doc, d, e.serial_no_data, item_code, qty, parent)
 			update_serial_no_with_wo(e.serial_no_data, e.tailor_work_order)
