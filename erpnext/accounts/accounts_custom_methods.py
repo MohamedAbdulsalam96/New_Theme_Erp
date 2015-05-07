@@ -558,7 +558,6 @@ def release_work_order(doc):
 		s= {'work_order': doc.name, 'status': 'Release', 'item': doc.item_code}
 		details = open_next_branch(frappe.db.get_value('Production Dashboard Details',{'work_order': doc.name}, 'name'), 1)
 		# add_to_serial_no(details, s.get('work_order'))
-		frappe.errprint(details)
 		if details:
 			sn_list = frappe.db.get_value('Work Order', doc.name, 'serial_no_data')
 			parent = stock_entry_for_out(s, details.branch, sn_list, frappe.db.get_value('Work Order', doc.name, 'item_qty'))
