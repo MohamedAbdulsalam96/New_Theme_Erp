@@ -46,19 +46,22 @@ class SalarySlip(TransactionBase):
 		mapper = {'overtime': ['Overtime', drawings_overtime_details[0].get('overtime') if len(drawings_overtime_details) > 0 else 0.0]}
 
 		for types in mapper:
-			d = self.append('earning_details', {})
-			d.e_type =mapper.get(types)[0]
-			d.e_amount = mapper.get(types)[1]
-			d.e_modified_amount = mapper.get(types)[1]
+			if mapper.get(types)[1]:
+				d = self.append('earning_details', {})
+				d.e_type =mapper.get(types)[0]
+				d.e_amount = mapper.get(types)[1]
+				d.e_modified_amount = mapper.get(types)[1]
 
 		mapper = {'drawings': ['Drawings', drawings_overtime_details[0].get('drawings') if len(drawings_overtime_details) > 0 else 0.0],'Loan Details': ['Loan', loan_details[0].get('emi') if len(loan_details) > 0 else 0.0]}
-
+		
 
 
 		for types in mapper:
-			d = self.append('deduction_details', {})
-			d.d_type = mapper.get(types)[0]
-			d.d_modified_amount = flt(mapper.get(types)[1])
+			if flt(mapper.get(types)[1]):
+				d = self.append('deduction_details', {})
+				d.d_type = mapper.get(types)[0]
+				d.d_amount = flt(mapper.get(types)[1])
+				d.d_modified_amount = flt(mapper.get(types)[1])
 
 	def	get_mapper_details(self):
 
@@ -73,7 +76,7 @@ class SalarySlip(TransactionBase):
 
 		self.deduction = drawings_overtime_details
 
-		loan_details=frappe.db.sql(""" select group_concat(name) as name,sum(emi) as emi from `tabLoan` where employee_id='%s' and payment_type='Monthly'  and  ('%s' between from_date and to_date  or  '%s' between from_date and to_date) """%(self.employee,m['month_start_date'],m['month_end_date']),as_dict=1,debug=True)
+		loan_details=frappe.db.sql(""" select group_concat(name) as name,sum(emi) as emi from `tabLoan` where employee_id='%s' and payment_type='Monthly'  and  ('%s' between from_date and to_date  or  '%s' between from_date and to_date) """%(self.employee,m['month_start_date'],m['month_end_date']),as_dict=1)
 
 		return drawings_overtime_details ,loan_details
 
@@ -81,10 +84,30 @@ class SalarySlip(TransactionBase):
 
 	def pull_emp_details(self):
 		emp = frappe.db.get_value("Employee", self.employee,
-			["bank_name", "bank_ac_no"], as_dict=1)
+			["bank_name", "bank_ac_no",'branch','department','designation'], as_dict=1)
 		if emp:
 			self.bank_name = emp.bank_name
 			self.bank_account_no = emp.bank_ac_no
+			self.branch = emp.branch
+			self.department = emp.department
+			self.designation = emp.designation
+
+	# def pull_wages_for_employee(self):
+	# 	if self.employee and self.month and self.fiscal_year:
+	# 		m = frappe.get_doc('Salary Manager').get_month_details(self.fiscal_year, self.month)
+	# 		wages = frappe.db.sql("""  SELECT
+	# 			    ifnull(sum(tailor_wages),0)
+	# 			FROM
+	# 			    `tabEmployee Details`
+	# 			WHERE
+	# 			    employee='{0}'
+	# 			AND ste_no = 'Completed'
+	# 			AND modified BETWEEN '{1}' AND '{2}' """.format(self.employee,m['month_start_date'], m['month_end_date']),as_list=1)	
+	# 		if wages:
+	# 			for d in self.get('earning_details'):
+	# 				if d.e_type == 'Wages':
+	# 					d.e_modified_amount = wages[0][0]
+
 
 	def get_leave_details(self, lwp=None):
 		if not self.fiscal_year:
