@@ -48,6 +48,7 @@ def create_work_order_style(data, wo_name, item_code):
 		styles = frappe.db.sql(""" select distinct style, abbreviation from `tabStyle Item` where parent = '%s'
 			"""%(item_code),as_dict=1)
 		if styles:
+			table_view = 'Right'
 			for s in styles:
 				image_viewer, default_value = get_styles_DefaultValues(s.style, item_code)  #Newly Added
 				ws = wo_name.append('wo_style', {})
@@ -58,7 +59,8 @@ def create_work_order_style(data, wo_name, item_code):
 				# ws.parent = wo_name
 				# ws.parentfield = 'wo_style'
 				# ws.parenttype = 'Work Order'
-				ws.table_view = 'Right'
+				ws.table_view = 'Left' if table_view =='Right' else 'Right'
+				table_view = ws.table_view
 				# ws.save(ignore_permissions =True)
 	return True
 
@@ -128,7 +130,7 @@ def create_process_allotment(doc, data):
 		 	pa.process_work_order = data.tailor_work_order
 		 	pa.qc = cint(s.quality_check)
 		 	pa.work_order = data.tailor_work_order
-		 	# pa.total_expense = data.expense
+		 	pa.total_expense = data.expense
 		 	pa.total_invoice_amount = doc.rounded_total_export
 		 	# Suyash 'Customer name field added in process allotment'
 		 	pa.customer_name = doc.customer
@@ -166,7 +168,7 @@ def create_trials(data, obj):
  		if trials:
  			for trial in trials:
  				s = obj.append('trials_transaction',{})
-				s.trial_no = trial.idx
+				s.trial_no = trial.trial_no
 				s.trial_date = trial.trial_date
 				s.work_order = data.tailor_work_order
 				s.status= 'Pending'
@@ -404,7 +406,7 @@ def make_order(doc, d, qty, item_code, parent=None):
 		e.refer_doc = d.name
 		e.tailor_fabric_qty = frappe.db.get_value('Size Item', {'parent':d.tailoring_item_code, 'size':d.tailoring_size, 'width':d.width }, 'fabric_qty')
 		e.tailor_warehouse = d.tailoring_branch
-		# e.expense = d.total_expenses
+		e.expense = d.total_expenses
 		if not e.tailor_work_order:
 			e.tailor_work_order = create_work_order(doc, d, e.serial_no_data, item_code, qty, parent)
 			update_serial_no_with_wo(e.serial_no_data, e.tailor_work_order)
@@ -436,7 +438,7 @@ def get_first_serial_no(serial_no_data):
 	return serial_no
 
 def schedules_date(parent, item, work_order, trial_date, customer_name):
-	trials = frappe.db.sql("select branch_dict from `tabProcess Item` where parent='%s' order by idx"%(item), as_dict=1)
+	trials = frappe.db.sql("select branch_dict from `tabProcess Item` where parent='%s' and trials=1  order by idx"%(item), as_dict=1)
 	if trials:
 		for t in trials:
 			if t.branch_dict:
@@ -452,7 +454,7 @@ def schedules_date(parent, item, work_order, trial_date, customer_name):
 					d.quality_check = 1 if branch_dict.get(cstr(s)).get('quality_check') == 'checked' else 0
 					d.amend = 1 if branch_dict.get(cstr(s)).get('amended') == 'checked' else 0
 					d.trial_branch = get_user_branch()
-					d.idx = cstr(s + 1)
+					# d.idx = cstr(s + 1)
 					# d.parent = parent
 					d.work_order = work_order
 					# d.parenttype = 'Trials'
@@ -556,10 +558,12 @@ def release_work_order(doc):
 		s= {'work_order': doc.name, 'status': 'Release', 'item': doc.item_code}
 		details = open_next_branch(frappe.db.get_value('Production Dashboard Details',{'work_order': doc.name}, 'name'), 1)
 		# add_to_serial_no(details, s.get('work_order'))
-		sn_list = frappe.db.get_value('Work Order', doc.name, 'serial_no_data')
-		parent = stock_entry_for_out(s, details.branch, sn_list, frappe.db.get_value('Work Order', doc.name, 'item_qty'))
-		update_work_order_status(doc.name, 'Release')
-		cut_order_generation(doc.name, doc.sales_invoice_no)	
+		frappe.errprint(details)
+		if details:
+			sn_list = frappe.db.get_value('Work Order', doc.name, 'serial_no_data')
+			parent = stock_entry_for_out(s, details.branch, sn_list, frappe.db.get_value('Work Order', doc.name, 'item_qty'))
+			update_work_order_status(doc.name, 'Release')
+			cut_order_generation(doc.name, doc.sales_invoice_no)	
 
 def add_to_serial_no(args, work_order, sn_list=None, qc=0, emp=None):
 	if sn_list:
@@ -737,7 +741,7 @@ def make_sn_detail(serial_no, args, work_order, qc, emp):
 	snd.parentfield = 'serial_no_detail'
 	snd.assigned_person = emp
 	snd.status = 'Assigned'
-	snd.idx_no = args.idx
+	# snd.idx_no = args.idx
 	snd.parent = serial_no
 	snd.save(ignore_permissions=True)
 
@@ -785,9 +789,9 @@ def make_stock_entry_against_qc(doc, method):
 def update_trials_status(self):
 	if self.trial_no and self.tdd and self.pdd:
 		frappe.db.sql(""" update `tabTrial Dates` set production_status='Closed'
-			where parent='%s' and trial_no='%s'"""%(self.tdd, cint(self.trial_no)))
+			where parent='%s' and trial_no='%s' and process='%s' """%(self.tdd, cint(self.trial_no),self.process))
 		frappe.db.sql(""" update `tabProcess Log` set completed_status = 'Yes'
-			where trials=%s and parent = '%s'	"""%(cint(self.trial_no), self.pdd))
+			where trials=%s and parent = '%s'	and process_name='%s' """%(cint(self.trial_no), self.pdd,self.process))
 
 def update_QI_for_SerialNo(doc, data):
 	sn_list = cstr(doc.serial_no_data).split('\n')
@@ -805,6 +809,7 @@ def make_ste_for_QI(self, data):
 	target_branch = get_branch(self, details)
 	args = {'work_order': self.work_order, 'status': 'Release', 'item': self.item_code}
 	parent = stock_entry_for_out(args, target_branch, self.serial_no_data, self.sample_size)
+
 	if parent and self.tdd and self.trial_no:
 		frappe.db.sql("""update `tabTrial Dates` set quality_check_status='Completed' where 
 			parent='%s' and trial_no = '%s'"""%(self.tdd, self.trial_no))
@@ -988,5 +993,23 @@ def make_gl_entry(parent,args):
 		jvd.debit = s.get('debit')
 		jvd.against_invoice = s.get('invoice')
 		jvd.save()
-	return "Done"					
+	return "Done"
 
+def get_earning_type(doctype, txt, searchfield, start, page_len, filters):
+	return frappe.db.sql(""" select name from `tabEarning Type` where docstatus != 2 and name not in ('Extra Charges','Overtime','Wages') """)						
+
+
+def get_deduction_type(doctype, txt, searchfield, start, page_len, filters):
+	return frappe.db.sql(""" select name from `tabDeduction Type` where docstatus != 2 and name not in ('Late Work','Drawings','Loan') """)						
+
+
+@frappe.whitelist()
+def get_all_serial_no(filters):
+	filters = eval(filters)
+	if filters.get('trial_no'):
+		return frappe.db.sql(""" select name from `tabSerial No` where name in (select
+			trials_serial_no_status from `tabTrials` where work_order='%s') and warehouse='%s'
+			and (select status from `tabWork Order` where name='%s') = 'Release'"""%(filters.get('work_order'), get_branch_warehouse(get_user_branch()), filters.get('work_order')),as_list=1)
+	else:
+		return frappe.db.sql(""" select concat(name) from `tabSerial No` where warehouse = '%s' and work_order='%s' 
+			and (select status from `tabWork Order` where name='%s') = 'Release'"""%(get_branch_warehouse(get_user_branch()), filters.get('work_order'), filters.get('work_order')),as_list=1)
