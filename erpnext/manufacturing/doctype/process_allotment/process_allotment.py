@@ -11,6 +11,7 @@ from tools.custom_data_methods import get_user_branch, get_branch_cost_center, g
 import datetime
 from tools.custom_data_methods import generate_barcode
 from tools.custom_data_methods import gererate_QRcode
+import pdb
 
 class ProcessAllotment(Document):
 
@@ -92,24 +93,18 @@ class ProcessAllotment(Document):
 		return tl.name
 
 	def start_process_for_serialNo(self, data):
-		frappe.errprint("start processs for serial no")
-		frappe.errprint(data)
 		if data.employee_status == 'Assigned':
 			idx = get_idx_for_serialNo(data, self.pdd, self.process)
 			details = open_next_branch(self.pdd, idx)
 			add_to_serial_no(details, self.process_work_order, data.tailor_serial_no, data.qc_required, data.employee_name)
 		else:
-			frappe.errprint("in else ljkjjlkjljkljl")
 			self.update_sn_status(data)
 			if data.employee_status == 'Completed' and not data.ste_no:
-				frappe.errprint("in 213")
 				details = find_next_process(self.pdd, self.process, data.tailor_process_trials)
 				if cint(data.qc_required)==1:
-					frappe.errprint("in if loop ")
 					if data.tailor_process_trials and cint(frappe.db.get_value('Trial Dates',{'parent':self.trial_dates, 'trial_no':data.tailor_process_trials}, 'quality_check')) != 1:
 						data.ste_no = self.make_ste(details, data)
 					else:
-						frappe.errprint("in else loop")
 						data.ste_no = self.make_qc(details, data)
 				else:
 					data.ste_no = self.make_ste(details, data)
@@ -117,7 +112,6 @@ class ProcessAllotment(Document):
 	def make_qc(self, details, data):
 		sn_list = self.get_not_added_sn(data.tailor_serial_no, 'serial_no_data', 'Quality Inspection')
 		if sn_list:
-			frappe.errprint("in make qc")
 			qi = frappe.new_doc('Quality Inspection')
 			qi.inspection_type = 'In Process'
 			qi.report_date = nowdate()
@@ -190,6 +184,10 @@ class ProcessAllotment(Document):
 							new_sn_list = serial_no
 		else:
 			new_sn_list = sn_list
+		
+		duplicate_list = new_sn_list.split('\n')
+		unique_list = set(duplicate_list)
+		new_sn_list = '\n'.join(unique_list)
 		return new_sn_list
 
 	def check_available(self, serial_no, sn_list):
@@ -215,7 +213,7 @@ class ProcessAllotment(Document):
 			frappe.throw(_("Only one serial no is allocated for trial no"))
 		if args.employee_status == 'Completed' and args.tailor_process_trials:
 			details = frappe.db.sql("""select name, production_status from `tabTrial Dates` where
-				parent='%s' and trial_no='%s'"""%(self.trial_dates, args.tailor_process_trials), as_list=1)
+				parent='%s' and trial_no='%s' and process='%s' """%(self.trial_dates, args.tailor_process_trials,self.process), as_list=1)
 			if details:
 				if details[0][1] != 'Closed' and cint(self.qc) != 1:
 					frappe.db.sql(""" update `tabTrial Dates` set production_status='Closed'
@@ -320,8 +318,31 @@ class ProcessAllotment(Document):
 		date = get_datetime(date)
 		date = datetime.datetime.strftime(date, '%Y-%m-%d %H:%M:%S')
 		return date
-			
 
+	def calculate_wage(self):
+		if self.process_tailor:
+			amount = frappe.db.sql(""" SELECT
+   							 type_of_payment,
+							    CASE
+							        WHEN type_of_payment='Amount'
+							        THEN cost
+							        WHEN type_of_payment='Percent'
+							        THEN total_percentage
+							    END  as amount
+							FROM
+							    `tabEmployeeSkill`
+							WHERE
+							    process='{0}'
+							AND item_code='{1}' and parent='{2}'  """.format(self.process,self.item,self.process_tailor),as_dict=1)
+			if amount:
+				serial_list = self.serial_no_data.split('\n')
+				serial_list = [serial for serial in serial_list if serial]
+				if amount[0].get('type_of_payment') == 'Percent' and self.payment=='Yes':
+					self.wages_for_single_piece = (( flt(self.total_invoice_amount) - flt(self.total_expense) ) * flt(amount[0].get('amount')/100))
+					self.wages = (( flt(self.total_invoice_amount) - flt(self.total_expense) ) * flt(amount[0].get('amount')/100)) * flt(len(serial_list))
+				if amount[0].get('type_of_payment') == 'Amount' and self.payment =='Yes':
+					self.wages_for_single_piece = flt(amount[0].get('amount'))
+					self.wages = flt(amount[0].get('amount')) * flt(len(serial_list))	
 	# def make_stock_entry(self, t_branch, args):
 	# 	ste = frappe.new_doc('Stock Entry')
 	# 	ste.purpose_type = 'Material Out'
@@ -562,6 +583,8 @@ class ProcessAllotment(Document):
 		emp.latework = self.latework
 		emp.tailor_serial_no = self.serial_no_data
 		emp.cost = self.cost
+		emp.wages_per_single_piece = flt(self.wages_for_single_piece)
+		emp.tailor_wages = flt(self.wages)
 		emp.qc_required = cint(self.qc)
 		self.save()
 		return "Done"
@@ -577,6 +600,7 @@ class ProcessAllotment(Document):
 					if self.emp_status == 'Assigned':
 						self.check_PrevStatus(s) # Check prev is completed 
 						self.Next_process_assign(s) # If next process open then current has no
+						self.check_previous_process_assign(s)
 					
 	def check_PrevStatus(self, serial_no):
 		if frappe.db.get_value('Serial No Detail', {'parent': serial_no}, 'name'):
@@ -611,6 +635,13 @@ class ProcessAllotment(Document):
 		if data:
 			if frappe.db.get_value('Serial No Detail', {'parent': serial_no, 'process_data': data[0][0]}, 'name'):
 				frappe.throw(_("Not allow to make changes in current process"))
+
+	def check_previous_process_assign(self, serial_no):
+		data = frappe.db.sql("""select process_data from `tabProcess Log` where parent='%s' and 
+				process_data < '%s' limit 1"""%(self.pdd, self.name), as_list=1)
+		if data:
+			if not frappe.db.get_value('Serial No Detail', {'parent': serial_no, 'process_data': data[0][0]}, 'name'):
+				frappe.throw(_("Previous Process are uncomplete"))			
 
 	def validate_processStatus(self, serial_no):
 		check_dict = self.get_dic_List(serial_no)

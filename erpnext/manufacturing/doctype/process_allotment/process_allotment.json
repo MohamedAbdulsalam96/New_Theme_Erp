@@ -240,16 +240,6 @@
    "precision": ""
   }, 
   {
-   "default": "Yes", 
-   "depends_on": "", 
-   "fieldname": "payment", 
-   "fieldtype": "Select", 
-   "label": "Payment", 
-   "options": "\nYes\nNo", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
    "fieldname": "serial_no", 
    "fieldtype": "Link", 
    "hidden": 0, 
@@ -259,12 +249,18 @@
    "precision": ""
   }, 
   {
-   "depends_on": "", 
-   "fieldname": "wages", 
-   "fieldtype": "Currency", 
-   "label": "Wages", 
+   "fieldname": "add_all_serial_no", 
+   "fieldtype": "Button", 
+   "label": "Add All Serial No ", 
    "permlevel": 0, 
-   "precision": "2"
+   "precision": ""
+  }, 
+  {
+   "fieldname": "serial_no_data", 
+   "fieldtype": "Small Text", 
+   "label": "Serial No Data", 
+   "permlevel": 0, 
+   "precision": ""
   }, 
   {
    "fieldname": "customer_trials", 
@@ -275,36 +271,16 @@
    "precision": ""
   }, 
   {
-   "default": "No", 
-   "depends_on": "", 
-   "fieldname": "deduct_late_work", 
-   "fieldtype": "Select", 
-   "label": "Deduct Late Work", 
-   "options": "\nYes\nNo", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
-   "depends_on": "", 
-   "description": "Time in Min", 
-   "fieldname": "latework", 
-   "fieldtype": "Data", 
-   "label": "Latework", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
-   "depends_on": "", 
-   "fieldname": "cost", 
-   "fieldtype": "Currency", 
-   "label": "Cost", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
    "fieldname": "assigned", 
    "fieldtype": "Button", 
    "label": "Add", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "clear_all", 
+   "fieldtype": "Button", 
+   "label": "Clear All", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -341,13 +317,6 @@
    "read_only": 1
   }, 
   {
-   "fieldname": "serial_no_data", 
-   "fieldtype": "Small Text", 
-   "label": "Serial No Data", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
    "fieldname": "work_qty", 
    "fieldtype": "Int", 
    "label": "Qty", 
@@ -380,6 +349,58 @@
    "label": "Extra Charge Amount", 
    "permlevel": 0, 
    "precision": "2"
+  }, 
+  {
+   "default": "Yes", 
+   "depends_on": "", 
+   "fieldname": "payment", 
+   "fieldtype": "Select", 
+   "label": "Payment", 
+   "options": "\nYes\nNo", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "wages_for_single_piece", 
+   "fieldtype": "Currency", 
+   "label": "Wages for Single Piece", 
+   "permlevel": 0, 
+   "precision": "2"
+  }, 
+  {
+   "depends_on": "", 
+   "fieldname": "wages", 
+   "fieldtype": "Currency", 
+   "label": "Wages", 
+   "permlevel": 0, 
+   "precision": "2"
+  }, 
+  {
+   "default": "No", 
+   "depends_on": "", 
+   "fieldname": "deduct_late_work", 
+   "fieldtype": "Select", 
+   "label": "Deduct Late Work", 
+   "options": "\nYes\nNo", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "depends_on": "", 
+   "description": "Time in Min", 
+   "fieldname": "latework", 
+   "fieldtype": "Data", 
+   "label": "Latework", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "depends_on": "", 
+   "fieldname": "cost", 
+   "fieldtype": "Currency", 
+   "label": "Cost", 
+   "permlevel": 0, 
+   "precision": ""
   }, 
   {
    "fieldname": "section_break_23", 
@@ -484,7 +505,7 @@
   {
    "fieldname": "section_break_17", 
    "fieldtype": "Section Break", 
-   "hidden": 1, 
+   "hidden": 0, 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -549,7 +570,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-03-26 09:39:20.823136", 
+ "modified": "2015-05-13 05:28:23.475634", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

@@ -60,5 +60,14 @@ cur_frm.cscript.validate = function(doc, cdt, cdn) {
 }
 
 cur_frm.fields_dict.employee.get_query = function(doc,cdt,cdn) {
-	return{ query: "erpnext.controllers.queries.employee_query" }
+	return{ filters:{has_salary_structure:'Yes'} }
+}
+
+
+cur_frm.fields_dict.earning_details.grid.get_field('e_type').get_query = function(doc,cdt,cdn) {
+		return{	query:"erpnext.accounts.accounts_custom_methods.get_earning_type"}
+}
+
+cur_frm.fields_dict.deduction_details.grid.get_field('d_type').get_query = function(doc,cdt,cdn) {
+		return{	query:"erpnext.accounts.accounts_custom_methods.get_deduction_type"}
 }

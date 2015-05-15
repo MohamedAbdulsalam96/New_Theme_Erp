@@ -71,6 +71,7 @@
    "reqd": 1
   }, 
   {
+   "depends_on": "eval:doc.type_of_salary == 'Monthly'", 
    "fieldname": "month", 
    "fieldtype": "Select", 
    "label": "Month", 
@@ -144,7 +145,7 @@
  "icon": "icon-cog", 
  "idx": 1, 
  "issingle": 1, 
- "modified": "2014-06-04 06:46:39.437061", 
+ "modified": "2015-04-28 03:36:51.082576", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "Salary Manager", 

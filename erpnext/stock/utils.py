@@ -127,7 +127,6 @@ def get_valid_serial_nos(sr_nos, qty=0, item_code=''):
 	"""split serial nos, validate and return list of valid serial nos"""
 	# TODO: remove duplicates in client side
 	serial_nos = cstr(sr_nos).strip().replace(',', '\n').split('\n')
-
 	valid_serial_nos = []
 	for val in serial_nos:
 		if val:

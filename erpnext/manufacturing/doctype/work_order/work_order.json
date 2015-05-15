@@ -63,6 +63,7 @@
   {
    "fieldname": "sales_invoice_no", 
    "fieldtype": "Data", 
+   "in_list_view": 1, 
    "label": "Sales Invoice No", 
    "options": "", 
    "permlevel": 0, 
@@ -413,7 +414,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-04-01 09:41:50.114060", 
+ "modified": "2015-05-13 05:26:42.127367", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Work Order", 

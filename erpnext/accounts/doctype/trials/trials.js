@@ -48,13 +48,35 @@ cur_frm.cscript.set_value= function(doc, cdt, cdn, prev_args){
 	window.location.reload();
 }
 
-cur_frm.cscript.finished_all_trials = function(doc){
+cur_frm.cscript.finished_all_trials = function(doc,dt,dn){
 	var cl = doc.trial_dates || [ ]
+	var flag = 0
 	$.each(cl, function(i){
-		if(cl[i].production_status!='Closed'){
-			cl[i].skip_trial = parseInt(doc.finished_all_trials)
+		if(cl[i].production_status!='Closed' && cl[i].work_status == 'Open'){
+                  flag = 1
+                   msgprint("Trial is Open for Process {0} in Row {1} So,can not cancel all remaining trials. Please Complete that trial For Cancellation of Remaining Trials".replace('{0}',cl[i].process).replace('{1}',cl[i].idx))
+                   return false
 		}
 	})
+
+
+
+   if (flag == 0){
+
+	$.each(cl, function(i){
+		if(cl[i].production_status!='Closed' && cl[i].work_status == 'Pending' && cl[i].skip_trial != 1){
+			cl[i].skip_trial = parseInt(doc.finished_all_trials)
+		get_server_fields('update_process_allotment',cl[i].process, '', doc, dt, dn,1, function(){
+			refresh_field('trial_dates')
+		})	
+
+
+		}
+	})
+
+
+  }
+
 	refresh_field('trial_dates')
 }
 

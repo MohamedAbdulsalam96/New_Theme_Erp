@@ -440,15 +440,15 @@ def get_first_serial_no(serial_no_data):
 def schedules_date(parent, item, work_order, trial_date, customer_name):
 	trials = frappe.db.sql("select branch_dict from `tabProcess Item` where parent='%s' and trials=1  order by idx"%(item), as_dict=1)
 	if trials:
-		for t in trials:
+		for index,t in enumerate(trials):
 			if t.branch_dict:
 				branch_dict = eval(t.branch_dict)
-				for s in range(0, len(branch_dict)):
+				for inner_index,s in enumerate(range(0, len(branch_dict))):
 					d = parent.append('trial_dates',{})
 					d.process = branch_dict.get(cstr(s)).get('process')
 					d.trial_no = branch_dict.get(cstr(s)).get('trial')
 					d.trial_date = trial_date if cint(d.trial_no) == 1 else ''
-					d.work_status = 'Open' if cint(d.trial_no) == 1 else 'Pending'
+					d.work_status = 'Open' if cint(d.trial_no) == 1 and index == 0 and inner_index == 0 else 'Pending'
 					d.subject = 'Customer %s: First Trial for Item %s'%(customer_name, frappe.db.get_value('Item', item, 'item_name')) if cint(d.trial_no) == 1 else ''
 					d.actual_fabric = 1 if branch_dict.get(cstr(s)).get('actual_fabric') == 'checked' else 0
 					d.quality_check = 1 if branch_dict.get(cstr(s)).get('quality_check') == 'checked' else 0
@@ -459,7 +459,7 @@ def schedules_date(parent, item, work_order, trial_date, customer_name):
 					d.work_order = work_order
 					# d.parenttype = 'Trials'
 					# d.parentfield = 'trial_dates'
-					# d.save(ignore_permissions=True)
+					# d.save(ignore_permissions=True)		
 	return "Done"
 
 def validate_work_order_assignment(doc):
@@ -514,11 +514,26 @@ def update_serial_no_with_wo(serial_no_list, work_order):
 
 @frappe.whitelist()
 def get_process_detail(name):
-	return frappe.db.sql("""select process_data, process_name, 
-		ifnull(trials,'No') as trials, (select ifnull(qi_status, '') from `tabProcess Allotment`
-			where name =a.process_data) as qi_status from `tabProcess Log` a
-		where parent ='%s' and branch = '%s' and ifnull(completed_status, 'No')= 'No'
-		order by process_data, trials"""%(name, get_user_branch()),as_dict=1)
+	branch_cond = ''
+	branch = get_user_branch()
+	if branch:
+		branch_cond = "and a.branch = '%s' "%(branch)
+	return frappe.db.sql("""SELECT
+				    a.process_data,
+				    a.process_name,
+				    ifnull(pa.process_trials,'') AS trials,
+				    ifnull(pa.qi_status,'') as qi_status
+				FROM
+				    `tabProcess Log` a
+				JOIN
+				    `tabProcess Allotment` pa
+				ON
+				    a.process_data = pa.name
+				WHERE
+				    a.parent = '%s' %s
+				group by a.process_name
+				ORDER BY
+				    a.process_data"""%(name,branch_cond),as_dict=1)
 
 def invoice_validation_method(doc, method):
 	if not doc.branch:

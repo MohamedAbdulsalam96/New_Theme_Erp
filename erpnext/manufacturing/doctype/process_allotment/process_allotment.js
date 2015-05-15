@@ -28,7 +28,7 @@ cur_frm.cscript.status = function(doc, cdt, cdn){
 // var sn_list=[]
 cur_frm.cscript.refresh = function(doc, cdt, cdn){
 	sn_list=[];
-	//cur_frm.cscript.toogle_field(doc)
+	cur_frm.cscript.toogle_field(doc)
 	// get_server_fields('show_trials_details', '','',doc, cdt, cdn, 1, function(){
 	// 	refresh_field('trials_transaction')
 	// })
@@ -76,8 +76,19 @@ cur_frm.cscript.emp_status= function(doc, cdt, cdn){
 		get_server_fields('find_to_time','','',doc, cdt, cdn, 1, function(){
 			refresh_field(['end_date', 'completed_time'])
 		})
+		get_server_fields('calculate_wage','','', doc, cdt, cdn, 1, function(){
+			refresh_field(['wages','wages_for_single_piece'])
+		})
+
+
 	}
-	refresh_field(['process_status', 'completed_time', 'start_date', 'work_qty'])
+if (doc.emp_status == 'Assigned' ||  doc.emp_status == 'Reassigned')
+		{
+			doc.wages = ''
+			doc.wages_for_single_piece = ''
+	}
+
+	refresh_field(['process_status', 'completed_time', 'start_date', 'work_qty','wages','wages_for_single_piece'])
 }
 
 cur_frm.cscript.process_tailor=function(doc,cdt,cdn){
@@ -89,6 +100,7 @@ cur_frm.cscript.process_tailor=function(doc,cdt,cdn){
 
 
 	}
+
 	
 		
 }
@@ -102,8 +114,9 @@ cur_frm.cscript.clear_field= function(doc){
 		doc.completed_time = ''
  		doc.serial_no = ''
 		doc.serial_no_data = ''
+		
 	}
-	refresh_field(['process_status', 'completed_time', 'start_date', 'work_qty', 'end_date', 'estimated_time', 'serial_no', 'serial_no_data'])
+	refresh_field(['process_status', 'completed_time', 'start_date', 'work_qty', 'end_date', 'estimated_time', 'serial_no', 'serial_no_data','wages'])
 }
 
 cur_frm.cscript.toogle_field = function(doc){
@@ -112,7 +125,7 @@ cur_frm.cscript.toogle_field = function(doc){
 	{
 		doc.process_status = 'Closed'
 		// hide_field([ 'start_date', 'end_date']);
-		unhide_field([ 'completed_time', 'payment', 'extra_charge', 'deduct_late_work']);
+		unhide_field([ 'completed_time', 'payment', 'extra_charge', 'deduct_late_work','wages_for_single_piece']);
 		payment_dict = {'wages': doc.payment, 'latework': doc.deduct_late_work, 'cost': doc.deduct_late_work, 'extra_charge': doc.extra_charge_amount}
 		for (key in payment_dict){
 			if (payment_dict[key] == 'Yes'){
@@ -122,14 +135,15 @@ cur_frm.cscript.toogle_field = function(doc){
 			}
 			refresh_field(key)
 		}
-	}else if(doc.emp_status=='Assigned' || doc.emp_status=='Reassigned'){
+	}else if(doc.emp_status=='Assigned' || doc.emp_status=='Reassigned' || doc.emp_status==''){
 		unhide_field(['start_date', 'end_date', 'estimated_time'])
-		hide_field([ 'completed_time', 'payment', 'extra_charge', 'deduct_late_work']);
+		hide_field([ 'completed_time', 'payment', 'extra_charge', 'deduct_late_work','wages_for_single_piece']);
 		doc.process_tailor = ''
 		doc.employee_name = ''
 		doc.end_date = ''
 		doc.estimated_time = ''
 		doc.completed_time = ''
+		doc.task =''
 		
 		if(!doc.process_trials){
 			doc.serial_no = ''
@@ -147,7 +161,8 @@ cur_frm.cscript.assigned= function(doc, cdt, cdn){
 		if(status=='true')
 		{
 			get_server_fields('assign_task_to_employee','','',doc, cdt, cdn,1, function(){
-				refresh_field('employee_details')	
+				refresh_field('employee_details')
+				refresh_field('task')	
 			})	
 		}
 	}else{
@@ -157,7 +172,7 @@ cur_frm.cscript.assigned= function(doc, cdt, cdn){
 }
 
 cur_frm.cscript.validate_mandatory_fields= function(doc){
-	data = {'Tailor': doc.process_tailor, 'Start Date': doc.start_date, 'End Date': doc.end_date, 'Serial No': doc.serial_no,'Employee Name':doc.employee_name,'Serial No Data':doc.serial_no_data,'Qty':doc.work_qty}
+	data = {'Tailor': doc.process_tailor, 'Start Date': doc.start_date, 'End Date': doc.end_date,'Employee Name':doc.employee_name,'Serial No Data':doc.serial_no_data,'Qty':doc.work_qty}
 
 	if(doc.emp_status=='Completed'){
 		data['Completed Time']=doc.completed_time
@@ -298,4 +313,40 @@ cur_frm.cscript.calculate_qty = function(doc){
 	}
 	doc.work_qty = qty
 	refresh_field('work_qty')
+}
+
+
+cur_frm.cscript.add_all_serial_no= function(doc, cdt, cdn){
+	frappe.call({
+		method:"erpnext.accounts.accounts_custom_methods.get_all_serial_no",
+		args:{'filters': {'branch': doc.branch, 'process': doc.process, 'work_order': doc.process_work_order, 'trial_no':doc.process_trials}},
+		callback:function(r){
+			if (r.message){
+				doc.serial_no_data = ''
+				$.each(r.message,function(key,value){
+					doc.serial_no_data = doc.serial_no_data+value[0] +'\n'
+					 
+				})
+				doc.work_qty = r.message.length
+				refresh_field('serial_no_data')
+				refresh_field('work_qty')
+				get_server_fields('calculate_estimates_time','','',doc, cdt, cdn,1, function(){
+					refresh_field(['estimated_time', 'end_date'])	
+				})
+			}
+		}
+
+	})
+
+
+}
+
+cur_frm.cscript.clear_all= function(doc, cdt, cdn){
+
+  var clear_list = ['serial_no_data','emp_status','process_tailor','employee_name','serial_no','start_date','end_date','estimated_time','completed_time','wages_for_single_piece','wages','latework','cost']
+  $.each(clear_list,function(key,value){
+  	doc[value] = ''
+  	refresh_field(value)
+  })
+
 }

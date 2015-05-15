@@ -112,7 +112,7 @@ doc_events = {
 
 	},
 	"Employee":{
-		"validate": "erpnext.stock.stock_custom_methods.update_user_permissions_for_emp"
+		"validate": ["erpnext.stock.stock_custom_methods.update_user_permissions_for_emp","erpnext.stock.stock_custom_methods.validate_emp_skill_table"]
 	},
 	"Quality Inspection":{
 		"on_update" : "erpnext.accounts.accounts_custom_methods.update_QI_status",

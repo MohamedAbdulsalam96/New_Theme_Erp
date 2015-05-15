@@ -7,4 +7,8 @@ import frappe
 from frappe.model.document import Document
 
 class Branch(Document):
-	pass
+	def validate(self):
+		special_char_list = ['@',"'",'"','$',"\\\\","\\",'#','%','*','&','^']
+		for key in special_char_list:
+			if key in self.branch_abbreviation:
+				frappe.throw(("Special Character {0} not allowed in Branch Abbreviation").format(key))

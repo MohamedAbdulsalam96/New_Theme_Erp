@@ -408,4 +408,16 @@ def check_for_gv_redeem_amount(doc,method):
 	if doc.item_group == 'Gift Voucher' and  not doc.redeem_amount:
 		frappe.throw("Item Group 'Gift Voucher' can not have 'Redeem Amount' to null")
 
-
+def validate_emp_skill_table(doc,method):
+	skill_list = []
+	for row in doc.get('employeeskills'):
+		if skill_list:		
+			for my_list in skill_list: 
+				if [row.process,row.item_code,row.type_of_payment] == my_list:
+					frappe.throw("Duplicate Entry of Process '{0}' on Item '{1}' for type of payment '{2}' In Employee Skill Table".format(row.process,row.item_code,row.type_of_payment))
+				elif [row.process,row.item_code] == [my_list[0],my_list[1]]:
+					frappe.throw("Both Type of Payment Amount and Percent is not allowed for Process '{0}' on Item '{1}' In Employee Skill Table".format(row.process,row.item_code,row.type_of_payment))
+			else:
+				skill_list.append([row.process,row.item_code,row.type_of_payment])
+		else:
+			skill_list.append([row.process,row.item_code,row.type_of_payment])

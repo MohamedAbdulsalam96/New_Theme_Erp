@@ -1,6 +1,6 @@
 {
  "allow_copy": 0, 
- "allow_import": 0, 
+ "allow_import": 1, 
  "allow_rename": 0, 
  "autoname": "AD.#####", 
  "creation": "2014-11-09 15:52:12.874946", 
@@ -132,7 +132,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-03-07 05:33:18.613977", 
+ "modified": "2015-04-27 07:39:39.764748", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "HR Daily Activities", 

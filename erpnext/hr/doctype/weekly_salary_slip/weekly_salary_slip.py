@@ -4,7 +4,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
-from frappe.utils import add_days, cint, cstr, flt, getdate, nowdate, rounded
+from frappe.utils import add_days, cint, cstr, flt, getdate, nowdate, rounded ,date_diff
 from frappe.model.naming import make_autoname
 
 from frappe import msgprint, _
@@ -24,6 +24,7 @@ class WeeklySalarySlip(TransactionBase):
 			# struct = self.check_sal_struct()
 			# if struct:
 			self.pull_sal_struct()
+			self.pull_emp_details()
 
 	def check_sal_struct(self):
 		struct = frappe.db.sql("""select name from `tabSalary Structure`
@@ -38,7 +39,7 @@ class WeeklySalarySlip(TransactionBase):
 		self.total_days_in_month=7-len(holidays)
 
 	def set_to_date(self,args):
-		d2=add_days(args['month_start_date'],7)
+		d2=add_days(args['month_start_date'],6)
 		self.to_date=d2
 
 
@@ -48,6 +49,7 @@ class WeeklySalarySlip(TransactionBase):
 		mapper = {'wages': ['Wages', earnings_details[0].get('wages') if len(earnings_details) > 0 else 0.0 ], 
 		'extra_amt': ['Extra Charges', earnings_details[0].get('extra_amt') if len(earnings_details) > 0 else 0.0 ], 
 		'overtime': ['Overtime', drawings_overtime_details[0].get('overtime') if len(drawings_overtime_details) > 0 else 0.0]}
+
 
 		self.set('earning_details',[])
 		for types in mapper:
@@ -64,19 +66,20 @@ class WeeklySalarySlip(TransactionBase):
 		for types in mapper:
 			d = self.append('deduction_details', {})
 			d.d_type = mapper.get(types)[0]
+			d.d_amount = mapper.get(types)[1]
 			d.d_modified_amount = mapper.get(types)[1]
 
 	def get_mapper_details(self):
-		earnings_details = frappe.db.sql("""select sum(tailor_wages) as wages , sum(ifnull(tailor_extra_amt,0)) as extra_amt , sum(cost) as cost, group_concat(ed.name) as name
+		earnings_details = frappe.db.sql("""select ifnull(sum(tailor_wages),0.0) as wages , ifnull(sum(tailor_extra_amt),0.0) as extra_amt , ifnull(sum(cost),0.0) as cost, group_concat(ed.name) as name
 						from `tabEmployee Details` ed, `tabTime Log` tl
 							where employee_status = 'Completed' 
 								and tailor_task is not null 
-								and date(tl.to_time) < date('%s')
+								and date(tl.to_time) BETWEEN date('%s') AND date('%s')
 								and ed.tailor_task = tl.task
 								and tl.name = ed.time_log_name
-								and ifnull(ed.flag, 'No') != 'Yes'
+								and ifnull(ed.flag, 'No') = 'Yes'
 								and ed.employee = '%s'
-						"""%(self.to_date, self.employee), as_dict=1)
+						"""%(self.from_date,self.to_date, self.employee), as_dict=1)
 
 		drawings_overtime_details = frappe.db.sql("""select sum(dd.drawing_amount) as drawings, sum(dd.overtime) as overtime, group_concat(name) as name from `tabDaily Drawing` dd 
 				where dd.employee_id = '%(employee)s' 
@@ -85,17 +88,20 @@ class WeeklySalarySlip(TransactionBase):
 						and  STR_TO_DATE('%(to_date)s','%(format)s')"""%{'format': '%Y-%m-%d', 
 						'from_date': self.from_date, 'to_date': self.to_date, 'employee':self.employee},as_dict=1)
 
-		loan_details=frappe.db.sql(""" select  group_concat(name) as name,sum(emi) as emi from `tabLoan` where employee_id='%(employee)s' and payment_type='Weekly'  and pending_amount > 0 and  ( STR_TO_DATE('%(from_date)s','%(format)s') between from_date and to_date  or  STR_TO_DATE('%(to_date)s','%(format)s') between from_date and to_date )"""
+		loan_details=frappe.db.sql(""" select  group_concat(name) as name,sum(emi) as emi from `tabLoan` where employee_id='%(employee)s' and payment_type='Weekly'  and pending_amount > 0 AND docstatus !=2 and  ( STR_TO_DATE('%(from_date)s','%(format)s') between from_date and to_date  or  STR_TO_DATE('%(to_date)s','%(format)s') between from_date and to_date )"""
 			%{'format': '%Y-%m-%d','from_date':self.from_date,'to_date':self.to_date,'employee':self.employee},as_dict=1)
 
 		return earnings_details, drawings_overtime_details ,loan_details
 
 	def pull_emp_details(self):
 		emp = frappe.db.get_value("Employee", self.employee,
-			["bank_name", "bank_ac_no"], as_dict=1)
+			["bank_name", "bank_ac_no",'branch','department','designation'], as_dict=1)
 		if emp:
 			self.bank_name = emp.bank_name
 			self.bank_account_no = emp.bank_ac_no
+			self.branch = emp.branch
+			self.department = emp.department
+			self.designation = emp.designation
 
 	def get_leave_details(self, lwp=None):
 		if not self.fiscal_year:
@@ -109,14 +115,12 @@ class WeeklySalarySlip(TransactionBase):
 		holidays = self.get_holidays_for_employee(m)
 		m["month_days"]=7
 
-
 		if not cint(frappe.db.get_value("HR Settings", "HR Settings",
 			"include_holidays_in_total_working_days")):
 				m["month_days"] -= len(holidays)
 				# week_days -= len(holidays)
 				if m["month_days"] < 0:
 					frappe.throw(_("There are more holidays than working days this month."))
-
 		if not lwp:
 			lwp = self.calculate_lwp(holidays, m)
 		self.total_days_in_month = m['month_days']
@@ -129,7 +133,6 @@ class WeeklySalarySlip(TransactionBase):
 		payment_days = m['month_days']
 		emp = frappe.db.sql("select date_of_joining, relieving_date from `tabEmployee` \
 			where name = %s", self.employee, as_dict=1)[0]
-
 		if emp['relieving_date']:
 			if getdate(emp['relieving_date']) > m['month_start_date'] and \
 				getdate(emp['relieving_date']) < m['month_end_date']:
@@ -140,10 +143,9 @@ class WeeklySalarySlip(TransactionBase):
 		if emp['date_of_joining']:
 			if getdate(emp['date_of_joining']) > m['month_start_date'] and \
 				getdate(emp['date_of_joining']) < m['month_end_date']:
-					payment_days = payment_days - getdate(emp['date_of_joining']).day + 1
+					payment_days = payment_days - getdate(emp['date_of_joining']).day + 1					
 			elif getdate(emp['date_of_joining']) > m['month_end_date']:
 				payment_days = 0
-
 		return payment_days
 
 	def get_holidays_for_employee(self, m):
@@ -151,15 +153,15 @@ class WeeklySalarySlip(TransactionBase):
 		holidays = frappe.db.sql("""select t1.holiday_date
 			from `tabHoliday` t1, tabEmployee t2
 			where t1.parent = t2.holiday_list and t2.name = %s
-			and t1.holiday_date between %s and %s""",
-			(self.employee, m['month_start_date'], m['month_end_date']))
+			and t1.holiday_date between %s and %s """,
+			(self.employee,self.from_date ,self.to_date))
 		if not holidays:
 			holidays = frappe.db.sql("""select t1.holiday_date
 				from `tabHoliday` t1, `tabHoliday List` t2
 				where t1.parent = t2.name and ifnull(t2.is_default, 0) = 1
 				and t2.fiscal_year = %s
 				and t1.holiday_date between %s and %s""", (self.fiscal_year,
-					m['month_start_date'], m['month_end_date']))
+					self.from_date ,self.to_date))
 		holidays = [cstr(i[0]) for i in holidays]
 		return holidays
 
@@ -182,18 +184,29 @@ class WeeklySalarySlip(TransactionBase):
 		return lwp
 
 	def check_existing(self):
-		ret_exist = frappe.db.sql("""select name from `tabWeekly Salary Slip`
-			where employee='%(employee)s' and docstatus=1 and ( STR_TO_DATE('%(from_date)s','%(format)s') between from_date and to_date  or  STR_TO_DATE('%(to_date)s','%(format)s') between from_date and to_date )"""
-			%{'format': '%Y-%m-%d','from_date':self.from_date,'to_date':self.to_date,'employee':self.employee},as_list=1,debug=True)
-	
+		ret_exist = frappe.db.sql("""SELECT
+									    name
+									FROM
+									    `tabWeekly Salary Slip`
+									WHERE
+									    employee='%(employee)s'
+									AND docstatus =1 AND salary_type='%(type_of_sal)s'
+									AND (
+									        STR_TO_DATE('%(from_date)s','%(format)s') BETWEEN from_date AND to_date
+									    OR  STR_TO_DATE('%(to_date)s','%(format)s') BETWEEN from_date AND to_date
+									    OR  from_date BETWEEN STR_TO_DATE('%(from_date)s','%(format)s') AND STR_TO_DATE('%(to_date)s',
+									        '%(format)s')
+									    OR  from_date BETWEEN STR_TO_DATE('%(from_date)s','%(format)s') AND STR_TO_DATE('%(to_date)s',
+									        '%(format)s')  )
+									AND fiscal_year = '%(fiscal_year)s'
+									AND company = '%(company)s' """%{'format': '%Y-%m-%d','from_date':self.from_date,'to_date':self.to_date,'employee':self.employee,'fiscal_year':self.fiscal_year,'company':self.company,'type_of_sal':self.salary_type},as_list=1)					
 		if ret_exist:
-			self.employee = ''
 			frappe.throw(_(" Weekly Salary Slip of employee {0} already created for this month").format(self.employee))
 
 	def validate(self):
 		from frappe.utils import money_in_words
 		self.check_existing()
-
+		self.check_valid_dates()
 		if not (len(self.get("earning_details")) or
 			len(self.get("deduction_details"))):
 				self.get_emp_and_leave_details()
@@ -203,10 +216,18 @@ class WeeklySalarySlip(TransactionBase):
 		if not self.net_pay:
 			self.calculate_net_pay()
 
+		if self.rounded_total < 0:
+			frappe.throw("Weekly salary Slip can not be created for Employee {0} from period  {1} to {2} beacause Rounded Total Is less than 0 i.e [{3}] ".format(self.employee,self.from_date,self.to_date,self.rounded_total))	
 		company_currency = get_company_currency(self.company)
 		self.total_in_words = money_in_words(self.rounded_total, company_currency)
 
 		set_employee_name(self)
+
+	def check_valid_dates(self):
+		if self.salary_type == 'Weekly':
+			diff = date_diff(self.to_date,self.from_date)
+			if diff != 6:
+				frappe.throw("Dates not in same week")
 
 	def calculate_earning_total(self):
 		self.gross_pay = flt(self.arrear_amount) + flt(self.leave_encashment_amount)

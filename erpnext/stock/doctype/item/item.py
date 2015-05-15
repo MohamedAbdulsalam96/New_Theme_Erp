@@ -87,7 +87,6 @@ class Item(WebsiteGenerator):
 
 		to_remove = []
 		for d in self.get("uom_conversion_details"):
-			frappe.errprint(d.name)
 			if d.conversion_factor == 1 and d.uom != self.stock_uom:
 				to_remove.append(d)
 

@@ -299,6 +299,20 @@ def get_data():
 					"name": "Pending SO Items For Purchase Request",
 					"doctype": "Sales Order"
 				},
+				{
+					"type": "report",
+					"is_query_report": True,
+					"icon": "icon-file-text",
+					"name": "Employee Work Status",
+					"doctype": "Process Allotment"
+				},
+				{
+					"type": "report",
+					"is_query_report": True,
+					"icon": "icon-file-text",
+					"name": "Gift Voucher Sales Report",
+					"doctype": "Gift Voucher"
+				},
 			]
 		},
 	]

@@ -214,20 +214,7 @@ get_server_fields('get_parameter_details',d.parameter,'',doc ,cdt, cdn,1, functi
 }
 
 
-// cur_frm.cscript.item_group =function(doc, cdt, cdn){
-// 	doc.has_serial_no = 'No'
-// 	console.log("in if conasdddddd")
-// 	if(doc.item_group == 'Tailoring'){
-// 		doc.has_serial_no = 'Yes'
-// 	}
-// 	if(doc.item_group == 'Gift Voucher'){
-// 			console.log("in if con")
-// 			doc.has_serial_no = 'Yes'
-// 			doc.is_purchase_item = 'No'
-// 	}
-// 	refresh_field('has_serial_no')
-// 	refresh_field('is_purchase_item')
-// }
+
 
 //for Slide Show
 

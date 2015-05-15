@@ -13,8 +13,8 @@ class BarcodeLabelPrint(Document):
 			self.offset = 0
 		if x == 'onload':
 			self.offset = 0
-			# frappe.db.sql(""" delete from `tabSerial No Details`  """)
-			# frappe.db.commit()
+			frappe.db.sql(""" delete from `tabSerial No Details`  """)
+			frappe.db.commit()
 
 
 		sql_query =""" SELECT
@@ -77,9 +77,7 @@ class BarcodeLabelPrint(Document):
 	def get_offset(self):
 		offset = ''
 		if self.offset:
-			frappe.errprint(self.offset)
 			offset = "offset %s"%(self.offset)
-			frappe.errprint(offset)
 			return offset
 		else:
 			return ''

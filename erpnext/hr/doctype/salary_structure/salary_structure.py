@@ -37,7 +37,10 @@ class SalaryStructure(Document):
 		return ret
 
 	def make_table(self, doct_name, tab_fname, tab_name):
-		list1 = frappe.db.sql("select name from `tab%s` where docstatus != 2" % doct_name)
+		if doct_name == 'Earning Type':
+			list1 = frappe.db.sql("select name from `tab%s` where docstatus != 2 and name not in ('Extra Charges','Overtime','Wages')" % doct_name)
+		if doct_name == 'Deduction Type':
+			list1 = frappe.db.sql("select name from `tab%s` where docstatus != 2 and name not in ('Late Work','Drawings','Loan')" % doct_name)
 		for li in list1:
 			child = self.append(tab_fname, {})
 			if(tab_fname == 'earning_details'):

@@ -52,10 +52,10 @@ class Trials(Document):
 
 	def skip_unfinished_trials(self):
 		for d in self.get('trial_dates'):
-			if d.work_status != 'Open':
+			if d.work_status != 'Open' and d.process == self.finish_trial_for_process:
 				d.skip_trial = 1
 				frappe.db.sql(""" update `tabProcess Log` set skip_trial = 1 where trials = '%s'
-					and parent = '%s'"""%(d.trial_no, self.pdd))
+					and parent = '%s' and process_name ='%s' """%(d.trial_no, self.pdd,self.finish_trial_for_process))
 		return "Done"
 
 	def update_trials_status(self):
@@ -247,6 +247,13 @@ class Trials(Document):
 
 	def PermissionException(self):
 		frappe.throw(_("Not allowed to edit once it is closed"))
+
+
+	def update_process_allotment(self,process):
+		if process:
+			frappe.db.sql("""update `tabProcess Allotment` set process_trials='' , qc=0 where pdd = '%s' 
+				and process='%s'"""%(self.pdd, process))
+			self.save()
 
 @frappe.whitelist()
 def get_serial_no_data(work_order):

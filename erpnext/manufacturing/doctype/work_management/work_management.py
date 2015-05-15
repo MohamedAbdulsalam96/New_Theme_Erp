@@ -9,27 +9,63 @@ from frappe.utils import add_days, cint, cstr, date_diff, flt, getdate, nowdate,
 from frappe.model.document import Document
 
 class WorkManagement(Document):
-	def get_invoice_details(self, invoice_no=None):
-		self.set('production_details', [])
-		sales_invoices = self.get_invoice(invoice_no)
+	def get_invoice_details(self, type_of_request=None):
+		if type_of_request != 'more':
+			self.set('production_details', [])
+			self.offset = 0
+			
+		sales_invoices = self.get_invoice(self.sales_invoice_no)
 		if sales_invoices:
-			for si_no in sales_invoices:
-				work_order_release = frappe.db.get_value('Work Order', si_no.work_order, 'status')
-				branch = frappe.db.get_value('User',frappe.session.user,'branch')
-				if frappe.db.get_value('Process Log',{'parent': si_no.name, 'branch': branch},'name') and work_order_release=='Release':
-					si = self.append('production_details', {})
-					self.create_invoice_bundle(si_no, si)
-		return "Done"
+			for si_no in sales_invoices:				
+				si = self.append('production_details', {})
+				self.create_invoice_bundle(si_no, si)
+			self.offset = len(self.get('production_details'))
+			offset_no =self.offset
+			return{
+				   'offset':offset_no
+				}
 
 	def get_invoice(self, invoice_no=None):
-		cond = "1=1"
+		branch_cond = ''
+		cond = "and 1=1"
 		if invoice_no and not self.services:
-			cond = "sales_invoice_no='%s'"%(invoice_no)
+			cond = "and pdd.sales_invoice_no='%s'"%(invoice_no)
 		elif self.services and not invoice_no:
-			cond = "tailoring_service='%s'"%(self.services)
+			cond = "and pdd.tailoring_service='%s'"%(self.services)
 		elif self.services and invoice_no:
-			cond = "sales_invoice_no='%s' and tailoring_service='%s'"%(invoice_no, self.services)
-		return frappe.db.sql("select * from `tabProduction Dashboard Details` where %s order by sales_invoice_no desc"%(cond),as_dict=1)
+			cond = "and pdd.sales_invoice_no='%s' and pdd.tailoring_service='%s'"%(invoice_no, self.services)
+		branch = frappe.db.get_value('User',frappe.session.user,'branch')
+		if branch:
+			branch_cond = "and pl.branch ='%s' "%(branch)
+		return frappe.db.sql("""SELECT
+								    distinct(pdd.sales_invoice_no),
+								    pdd.article_code,
+								    pdd.article_qty,
+								    pdd.work_order,
+								    pdd.stock_entry,
+								    pdd.name,
+								    pdd.fabric_qty,
+								    pdd.fabric_code,
+								    pdd.serial_no,
+								    pdd.size,
+								    pdd.status,
+								    pdd.trial_no
+
+								FROM
+								    `tabProduction Dashboard Details` pdd
+								JOIN
+								    `tabWork Order` wo
+								ON
+								    pdd.work_order = wo.name
+								JOIN
+								    `tabProcess Log` pl
+								ON
+								    pl.parent = pdd.name
+								WHERE
+								    wo.status = 'Release'
+								{0}  {1}
+								ORDER BY
+								    pdd.creation DESC limit 10 {2}""".format(branch_cond,cond,self.get_offset()),as_dict=1)
 
 	def create_invoice_bundle(self, invoice_detail, si):
 		color = {'Completed':'green','Pending':'red', 'Trial':'#1F8C83'}
@@ -65,3 +101,10 @@ class WorkManagement(Document):
 	# 	if inv_no and item_code:
 	# 		cond = "sales_invoice= '%s' and article_code='%s'"%(inv_no, item_code)
 	# 	frappe.db.sql("delete from `tabProduction Details` where %s"%(cond))
+
+
+	def get_offset(self):
+		offset = ''
+		if self.offset:
+			offset = "offset %s"%(self.offset)
+		return offset

@@ -7,7 +7,6 @@ cur_frm.cscript.gift_voucher_item_name = function (doc,dt,dn){
 		args:{'item_code':doc.gift_voucher_item_name},
 		callback:function(r){
 			if(r.message){
-				console.log(r.message)
 				doc.item_name = r.message[0]
 				doc.gift_voucher_amount = r.message[1]
 				refresh_field('item_name')

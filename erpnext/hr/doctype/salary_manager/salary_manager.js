@@ -11,23 +11,80 @@ var display_activity_log = function(msg) {
 //Create salary slip
 //-----------------------
 cur_frm.cscript.create_salary_slip = function(doc, cdt, cdn) {
+
 	var callback = function(r, rt){
 		if (r.message)
 			display_activity_log(r.message);
 	}
-	return $c('runserverobj', args={'method':'create_sal_slip','docs':doc},callback);
+	
+	
+	if (doc.type_of_salary == 'Monthly'){
+		return $c('runserverobj', args={'method':'create_sal_slip','docs':doc},callback);
+	}
+	else if(doc.type_of_salary == 'Weekly' || doc.type_of_salary == 'LumpSum'){
+		flag =  cur_frm.cscript.validate_for_weekly_lumpsum(doc,cdt,cdn)
+		flag2 = cur_frm.cscript.date_validation(doc,cdt,cdn)
+		
+		if (flag == 0 && flag2== 0 && doc.type_of_salary == 'Weekly' ){
+				return $c('runserverobj', args={'method':'create_weekly_sal_slip','docs':doc},callback);
+		}else if(flag == 0  && doc.type_of_salary == 'LumpSum'){
+				return $c('runserverobj', args={'method':'create_weekly_sal_slip','docs':doc},callback);
+		}
+		
+	}
+	else
+	{
+		msgprint("Please Select Type of Salary Option")
+	}
 }
 
 cur_frm.cscript.submit_salary_slip = function(doc, cdt, cdn) {
-	var check = confirm(__("Do you really want to Submit all Salary Slip for month {0} and year {1}", [doc.month, doc.fiscal_year]));
+	if (doc.type_of_salary == 'Monthly'){
+		var check = confirm(__("Do you really want to Submit all {0} Salary Slip for month {1} and year {2}", [doc.type_of_salary,doc.month, doc.fiscal_year]));
+	}else{
+		var check = confirm(__("Do you really want to Submit all {0} Salary Slip for year {1} of week {2} to {3} ", [doc.type_of_salary,doc.fiscal_year,doc.from_date,doc.to_date]));	
+	}
+	
 	if(check){
 		var callback = function(r, rt){
 			if (r.message)
 				display_activity_log(r.message);
 		}
+
+	if (doc.type_of_salary == 'Monthly'){
 		return $c('runserverobj', args={'method':'submit_salary_slip','docs':doc},callback);
 	}
+	else if(doc.type_of_salary == 'Weekly' || doc.type_of_salary == 'LumpSum'){
+		flag =  cur_frm.cscript.validate_for_weekly_lumpsum(doc,cdt,cdn)
+		flag2 = cur_frm.cscript.date_validation(doc,cdt,cdn)
+		if (flag == 0 && flag2== 0 && doc.type_of_salary == 'Weekly'){
+				return $c('runserverobj', args={'method':'submit_weekly_salary_slip','docs':doc},callback);
+			}
+		else if(flag == 0  && doc.type_of_salary == 'LumpSum'){
+				return $c('runserverobj', args={'method':'submit_weekly_salary_slip','docs':doc},callback);
+		}
+	}
+	else
+		{
+			msgprint("Please Select Type of Salary Option")
+		}
+		
+	}
 }
+
+cur_frm.cscript.validate_for_weekly_lumpsum = function (doc,cdt,cdn){
+	var flag = 0
+	var my_obj = {'From Date':doc.from_date,'To Date':doc.to_date}
+		$.each(my_obj,function(key,value){
+			if (!value){
+				msgprint("Please Select {0} Option".replace('{0}',key))
+				flag = 1
+				return false;
+			}
+		})
+	return flag	
+}
+
 
 cur_frm.cscript.make_bank_voucher = function(doc,cdt,cdn){
     if(doc.company && doc.month && doc.fiscal_year){
@@ -58,5 +115,51 @@ cur_frm.cscript.make_jv = function(doc, dt, dn) {
 
 		loaddoc('Journal Voucher', jv.name);
 	}
-	return $c_obj(doc, 'get_acc_details', '', call_back);
+	if (doc.type_of_salary == 'Weekly'){
+		flag = cur_frm.cscript.date_validation(doc,dt,dn)
+		if (flag == 0){
+			return $c_obj(doc, 'get_acc_details', '', call_back);
+		 }
+
+	}
+	else{
+		return $c_obj(doc, 'get_acc_details', '', call_back);
+	}
+	
 }
+
+
+cur_frm.cscript.from_date = function(doc,cdt,cdn){
+	if(doc.type_of_salary == 'Weekly'){
+	doc.to_date = frappe.datetime.add_days(doc.from_date,6)
+	refresh_field('to_date')
+	cur_frm.cscript.date_validation(doc,cdt,cdn)
+	}
+
+	
+}
+
+cur_frm.cscript.to_date = function(doc,cdt,cdn){
+	// doc.from_date = frappe.datetime.add_days(doc.to_date,-6)
+	// refresh_field('from_date')
+	if(doc.type_of_salary == 'Weekly'){
+	cur_frm.cscript.date_validation(doc,cdt,cdn)
+    }
+	
+}
+
+
+
+cur_frm.cscript.date_validation = function(doc,cdt,cdn){
+	var flag = 0
+	if (doc.from_date && doc.to_date){
+		if(doc.type_of_salary == 'Weekly' && frappe.datetime.get_diff(doc.to_date, doc.from_date) != 6){
+			flag = 1
+			msgprint("Dates not in same week")
+			
+			
+		}
+		return flag
+	}
+	
+}	

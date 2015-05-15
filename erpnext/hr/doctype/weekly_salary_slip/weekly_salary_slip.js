@@ -4,40 +4,42 @@ cur_frm.add_fetch('employee', 'company', 'company');
 cur_frm.cscript.from_date= function(doc, cdt, cdn) {
 	if (doc.from_date && doc.to_date)
 	{
-		if(doc.salary_type == 'Weekly' && frappe.datetime.get_diff(doc.to_date, doc.from_date) <= 8){
+		if(doc.salary_type == 'Weekly' && frappe.datetime.get_diff(doc.to_date, doc.from_date) == 6){
 			var arg = {'month_start_date':doc.from_date, 'month_end_date':doc.to_date}
 			get_server_fields('get_week_details',JSON.stringify(arg),doc.to_date,doc, cdt, cdn, 1 , function(r){
 
 			refresh_field('total_days_in_month')	
 			});
 		}
-		else{
+		else if (doc.salary_type == 'Weekly'){
 			msgprint("Dates not is same week")
 		}
      
 	}
 
-	if (doc.from_date && doc.salary_type=='Weekly'){
-		var arg = {'month_start_date':doc.from_date}
-		get_server_fields('set_to_date',JSON.stringify(arg),doc.to_date,doc, cdt, cdn, 1 , function(r){
+	// if (doc.from_date && doc.salary_type=='Weekly'){
+	// 	var arg = {'month_start_date':doc.from_date}
+	// 	get_server_fields('set_to_date',JSON.stringify(arg),doc.to_date,doc, cdt, cdn, 1 , function(r){
 
-			refresh_field('to_date')
-			});
-	}
+	// 		refresh_field('to_date')
+	// 		});
+	// }
 
 	
 };
 
 cur_frm.cscript.to_date= function(doc, cdt, cdn) {
+	
 	if (doc.from_date && doc.to_date)
 	{
-		if(doc.salary_type == 'Weekly' && frappe.datetime.get_diff(doc.to_date, doc.from_date) <= 8){
+
+		if(doc.salary_type == 'Weekly' && frappe.datetime.get_diff(doc.to_date, doc.from_date) == 6){
 			var arg = {'month_start_date':doc.from_date, 'month_end_date':doc.to_date}
 			get_server_fields('get_week_details',JSON.stringify(arg),doc.to_date,doc, cdt, cdn, 1 , function(r){
 				refresh_field('total_days_in_month');
 			});
 		}
-		else{
+		else if(doc.salary_type == 'Weekly'){
 			msgprint("Dates not is same week")
 		}
 	}
@@ -167,7 +169,7 @@ cur_frm.cscript.validate = function(doc, dt, dn) {
 
 cur_frm.fields_dict.employee.get_query = function(doc,cdt,cdn) {
 	return{
-		query: "erpnext.controllers.queries.employee_query"
+		filters:{'has_salary_structure':'No','type_of_salary':doc.salary_type},
 	}		
 }
 

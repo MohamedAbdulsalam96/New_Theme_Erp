@@ -123,6 +123,13 @@
    "precision": ""
   }, 
   {
+   "fieldname": "wages_per_single_piece", 
+   "fieldtype": "Currency", 
+   "label": "Wages Per Single Piece", 
+   "permlevel": 0, 
+   "precision": "2"
+  }, 
+  {
    "fieldname": "tailor_wages", 
    "fieldtype": "Currency", 
    "label": "Wages", 
@@ -219,7 +226,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-02-21 02:31:06.546879", 
+ "modified": "2015-04-28 02:29:36.299551", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Employee Details", 

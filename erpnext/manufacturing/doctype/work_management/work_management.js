@@ -1,18 +1,37 @@
 cur_frm.cscript.onload= function(doc ,cdt,cdn){
+	var x = 'onload'
+	doc.sales_invoice_no = ''
+	doc.services = ''
 	get_server_fields('get_invoice_details', '','',doc,cdt,cdn , 1 , function(){
 		refresh_field('production_details')
+		refresh_field('offset')
 	})
+
+	refresh_field('sales_invoice_no')
+	refresh_field('services')	
 }
 
 cur_frm.cscript.sales_invoice_no = function(doc, cdt, cdn){
-	get_server_fields('get_invoice_details', doc.sales_invoice_no,'',doc,cdt,cdn , 1 , function(){
+	var x= 'search'
+	get_server_fields('get_invoice_details', x,'',doc,cdt,cdn , 1 , function(){
 		refresh_field('production_details')
+		refresh_field('offset')
 	})	
 }
 
 cur_frm.cscript.services = function(doc, cdt, cdn){
-	get_server_fields('get_invoice_details', doc.sales_invoice_no,'',doc,cdt,cdn , 1 , function(){
+	var x= 'search'
+	get_server_fields('get_invoice_details', x,'',doc,cdt,cdn , 1 , function(){
 		refresh_field('production_details')
+		refresh_field('offset')
+	})	
+}
+
+cur_frm.cscript.more = function(doc, cdt, cdn){
+	var x = 'more'
+	get_server_fields('get_invoice_details',x,'',doc,cdt,cdn , 1 , function(){
+		refresh_field('production_details')
+		refresh_field('offset')
 	})	
 }
 
