@@ -1,0 +1,18 @@
+{
+ "add_total_row": 0, 
+ "apply_user_permissions": 1, 
+ "creation": "2015-04-27 04:02:46.904492", 
+ "disabled": 0, 
+ "docstatus": 0, 
+ "doctype": "Report", 
+ "is_standard": "Yes", 
+ "modified": "2015-05-22 06:17:44.026370", 
+ "modified_by": "Administrator", 
+ "module": "Selling", 
+ "name": "Employee Work Status", 
+ "owner": "Administrator", 
+ "query": "SELECT\n    ed.employee                     AS \"Employee:Link/Employee:100\",\n    ed.employee_name                AS \"Employee Name:Data:140\",\n    pa.item                         AS \"Item:Link/Item:150\",\n    pa.name                         AS \"Process No:Link/Process Allotment:140\",\n    pa.process                      AS \"Process:Link/Process:100\",\n    ed.employee_status              AS \"Status:Data:100\",\n    ed.tailor_process_trials        AS \"Trial No:Data:100\",\n    ed.assigned_work_qty            AS \"Quantity:Data:100\",\n    ed.wages_per_single_piece       AS \"Tailor Wages Per Single piece:Data:200\",\n    ed.tailor_wages                 AS \"Total Tailor Wages:Data:150\",\n    ifnull(ed.tailor_extra_amt,0.0) AS \"Extra Amount:Data:100\",\n    ed.cost                         AS \"Late Work Cost:Data:100\",\n    pa.sales_invoice_no             AS \"Sales Invoice No:Link/Sales Invoice:150\",\n    ed.employee_work_order          AS \"Work Order No:Link/Work Order:150\",\n    ed.tailor_serial_no             AS \"Tailor Serial No:Data:200\",\n    ed.tailor_from_time             AS \"From Time:Datetime:200\",\n    tl.to_time                      AS \"To Time:Datetime:200\",\n    ed.work_completed_time          AS \"Actual Time Taken:Data:150\"\nFROM\n    `tabEmployee Details` ed\nJOIN\n    `tabProcess Allotment` pa\nON\n    ed.parent = pa.name\nLEFT JOIN\n    `tabTime Log` tl\nON\n    tl.name = ed.time_log_name\nORDER BY\n    ed.modified DESC", 
+ "ref_doctype": "Process Allotment", 
+ "report_name": "Employee Work Status", 
+ "report_type": "Query Report"
+}
