@@ -78,6 +78,7 @@ doc_events = {
 	},
 	"Work Order":{
 		"validate":["erpnext.stock.stock_custom_methods.work_barcode","erpnext.stock.stock_custom_methods.work_qrcode"],
+		"on_submit" : ["erpnext.accounts.accounts_custom_methods.make_schedule_for_trials"]
 	},
 	"User": {
 		"validate": "erpnext.hr.doctype.employee.employee.validate_employee_role",
@@ -99,10 +100,10 @@ doc_events = {
 
 	},
 	"Sales Invoice": {
-		"on_update" : ["erpnext.accounts.accounts_custom_methods.create_serial_no"],#"tools.tools_management.custom_methods.update_work_order","tools.tools_management.custom_methods.create_se_or_mr"],
-		"validate"  : ["erpnext.accounts.accounts_custom_methods.add_data_in_work_order_assignment", "tools.tools_management.custom_methods.validate_reserve_fabric", "tools.tools_management.custom_methods.merge_tailoring_items", "erpnext.accounts.accounts_custom_methods.invoice_validation_method"],
+		"on_update" : ["erpnext.accounts.accounts_custom_methods.create_serial_no",],#"tools.tools_management.custom_methods.update_work_order","tools.tools_management.custom_methods.create_se_or_mr"],
+		"validate"  : ["erpnext.accounts.accounts_custom_methods.validate_for_duplicate_item","erpnext.accounts.accounts_custom_methods.validate_for_split_qty","erpnext.accounts.accounts_custom_methods.validate_for_item_qty","erpnext.accounts.accounts_custom_methods.add_data_in_work_order_assignment","erpnext.accounts.accounts_custom_methods.validation_for_deleted_rows", "tools.tools_management.custom_methods.merge_tailoring_items", "erpnext.accounts.accounts_custom_methods.invoice_validation_method"],
 		# "on_submit" : ["erpnext.accounts.accounts_custom_methods.create_production_process","tools.tools_management.custom_methods.sales_invoice_on_submit_methods","erpnext.accounts.accounts_custom_methods.validate_sales_invoice","tools.tools_management.custom_methods.create_se_or_mr", "mreq.mreq.page.sales_dashboard.sales_dashboard.create_swatch_item_po", "erpnext.accounts.accounts_custom_methods.update_WoCount","erpnext.accounts.accounts_custom_methods.update_serial_no_for_gift_voucher"],
-		"on_submit" : ["erpnext.accounts.accounts_custom_methods.create_production_process","tools.tools_management.custom_methods.sales_invoice_on_submit_methods","erpnext.accounts.accounts_custom_methods.validate_sales_invoice","tools.tools_management.custom_methods.create_se_or_mr", "mreq.mreq.page.sales_dashboard.sales_dashboard.create_swatch_item_po", "erpnext.accounts.accounts_custom_methods.update_WoCount","erpnext.accounts.accounts_custom_methods.validation_for_jv_creation"],
+		"on_submit" : ["erpnext.accounts.accounts_custom_methods.validate_for_reserve_qty","erpnext.accounts.accounts_custom_methods.validate_all_wo_submitted","tools.tools_management.custom_methods.create_se_or_mr","erpnext.accounts.accounts_custom_methods.create_production_process","tools.tools_management.custom_methods.sales_invoice_on_submit_methods","erpnext.accounts.accounts_custom_methods.validate_sales_invoice","mreq.mreq.page.sales_dashboard.sales_dashboard.create_swatch_item_po", "erpnext.accounts.accounts_custom_methods.update_WoCount","erpnext.accounts.accounts_custom_methods.validation_for_jv_creation"],
 		"on_cancel" : ["tools.tools_management.custom_methods.delete_project_aginst_si", "erpnext.accounts.accounts_custom_methods.delete_production_process"]
 	},
 	"Item":{

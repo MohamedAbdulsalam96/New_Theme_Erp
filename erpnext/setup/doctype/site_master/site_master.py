@@ -128,11 +128,11 @@ def multitenanct(from_test=False):
 
 def validate_validity(doc, method):
 	from frappe.utils import get_url, cstr
-	if doc.get("__islocal") and get_url()!='http://smarttailor':
-		res =''
-	 	# res = frappe.db.sql("select name from `tabUser` where name='Administrator' and no_of_users >0")
+	if doc.get("__islocal") and get_url()!='http://demo.tailorpad.com':
+		#res =''
+	 	res = frappe.db.sql("select name from `tabUser` where name='apiuser' and no_of_users >0")
 	 	if  res:
-	 			frappe.db.sql("update `tabUser`set no_of_users=no_of_users-1  where name='Administrator'")
+	 			frappe.db.sql("update `tabUser`set no_of_users=no_of_users-1  where name='apiuser'")
 				from frappe.utils import nowdate,add_months,cint
 		else:
 			res1 = frappe.db.sql("select count(name) from `tabUser`")
@@ -145,14 +145,14 @@ def validate_validity(doc, method):
 				#Comment by rohit
 	 			# frappe.throw(_("Your User Creation limit is exceeded . Please contact administrator"))
 
-	elif(get_url()!='http://smarttailor'):
-		frappe.errprint("updating existing user not smarttailor")
+	# elif(get_url()!='http://admin.tailorpad.com'):
+	# 	frappe.errprint("updating existing user not admin.tailorpad.com")
 		
 
 def update_users(doc, method):
 	#doc.add_validity=''
 	from frappe.utils import get_url, cstr
-	if get_url()=='http://smarttailor':
+	if get_url()=='http://admin.tailorpad.com':
 		if not doc.enabled :
 			abc=frappe.db.sql("""select name from `tabUser` where name=%s and enabled=0""", doc.name)
 			if abc:

@@ -334,8 +334,8 @@ def create_width():
 
 def create_branch(args):
 	branch_dict={
-	"Manufacturing":["","India","Administrative Expenses","","Main","INR","Manufacturing","Production"],
-	"Showroom":["50","India","Administrative Expenses","Administrator","Main","INR","Showroom","Showroom"]
+	"Manufacturing":["","India","Administrative Expenses","","Main","INR","Manufacturing","Production", "MN"],
+	"Showroom":["50","India","Administrative Expenses","Administrator","Main","INR","Showroom","Showroom", "SHR"]
 	}
 	for key in branch_dict:
 		frappe.get_doc({
@@ -348,7 +348,8 @@ def create_branch(args):
 		"cost_center":branch_dict[key][4] + " - " + args.get("company_abbr"),
 		"currency":branch_dict[key][5],
 		"warehouse":branch_dict[key][6] + " - " + args.get("company_abbr"),
-		"branch_type":branch_dict[key][7]
+		"branch_type":branch_dict[key][7],
+		"branch_abbreviation" : branch_dict[key][8]
 		}).insert()
 
 def create_price_lists(args):

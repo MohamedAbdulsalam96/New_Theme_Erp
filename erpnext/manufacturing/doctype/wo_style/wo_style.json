@@ -86,6 +86,13 @@
    "set_only_once": 0
   }, 
   {
+   "fieldname": "define_cost_to_tailor", 
+   "fieldtype": "Button", 
+   "label": "Define Cost to Tailor", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "allow_on_submit": 0, 
    "fieldname": "image_viewer", 
    "fieldtype": "Text", 
@@ -205,6 +212,13 @@
    "label": "Note", 
    "permlevel": 0, 
    "precision": ""
+  }, 
+  {
+   "fieldname": "process_wise_tailor_cost", 
+   "fieldtype": "Small Text", 
+   "label": "Process Wise Tailor Cost", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -214,7 +228,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-05-07 02:22:08.745285", 
+ "modified": "2015-05-18 06:04:45.771748", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "WO Style", 

@@ -193,6 +193,13 @@
    "precision": ""
   }, 
   {
+   "fieldname": "fabric_source_details", 
+   "fieldtype": "Small Text", 
+   "label": "Fabric Source Details", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "column_break_11", 
    "fieldtype": "Column Break", 
    "permlevel": 0, 
@@ -206,6 +213,14 @@
    "precision": "2"
   }, 
   {
+   "fieldname": "reserve_fabric_qty", 
+   "fieldtype": "Data", 
+   "label": "Reserve Fabric Qty", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "depends_on": "eval:doc.fabric_code", 
    "fieldname": "reserve_fabric", 
    "fieldtype": "Button", 
    "label": "Reserve Fabric", 
@@ -277,6 +292,13 @@
    "reqd": 1, 
    "search_index": 0, 
    "set_only_once": 0
+  }, 
+  {
+   "fieldname": "previous_quantity", 
+   "fieldtype": "Int", 
+   "label": "Previous Quantity", 
+   "permlevel": 0, 
+   "precision": ""
   }, 
   {
    "fieldname": "check_split_qty", 
@@ -978,7 +1000,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-12-28 23:21:40.702887", 
+ "modified": "2015-05-30 03:19:25.727756", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Sales Invoice Items", 

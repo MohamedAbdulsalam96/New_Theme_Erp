@@ -311,6 +311,7 @@ def make_barcode_log(doctype_name, barcode_id, path, barcode_description):
 	blog.path = path
 	blog.barcode_description = barcode_description
 	blog.save(ignore_permissions=True)
+
 def my_random_string(doc,method):
 	if not doc.stock_in:
 		alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"

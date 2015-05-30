@@ -303,13 +303,6 @@ def get_data():
 					"type": "report",
 					"is_query_report": True,
 					"icon": "icon-file-text",
-					"name": "Employee Work Status",
-					"doctype": "Process Allotment"
-				},
-				{
-					"type": "report",
-					"is_query_report": True,
-					"icon": "icon-file-text",
 					"name": "Gift Voucher Sales Report",
 					"doctype": "Gift Voucher"
 				},

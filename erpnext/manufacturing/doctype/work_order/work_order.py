@@ -118,6 +118,42 @@ class WorkOrder(Document):
 		self.update_status('Completed')
 		# self.set_work_order()
 		release_work_order(self)
+		self.add_total_cost_to_customer()
+
+	
+	def add_total_cost_to_customer(self):
+		if self.sales_invoice_no and self.item_qty:
+			total_customer_cost = self.get_total_customer_cost() * flt(self.item_qty)
+			if total_customer_cost != 0.0:
+				company = frappe.db.get_value('Global Defaults',None,'default_company')
+				if company:
+					bank_account = frappe.db.get_value('Company',company,'default_bank_account')
+					if bank_account: 
+						si = frappe.get_doc('Sales Invoice',self.sales_invoice_no)	
+						for d in si.get('other_charges'):
+							if d.charge_type == 'Actual':
+								d.rate = flt(d.rate) + flt(total_customer_cost)
+								si.save()
+								break
+						else:				
+							doc = si.append('other_charges',{})		
+							doc.charge_type = 'Actual'
+							doc.description = 'Cost to customer for tailoring product'
+							doc.account_head = bank_account
+							doc.rate = flt(total_customer_cost)
+							si.save()
+					else:
+						frappe.throw("Set Default Bank Account For Company {0} ".format(company))
+				else:
+					frappe.throw("Set Default Company in Global Defaults")				
+
+
+	def get_total_customer_cost(self):
+		total_cost_to_customer = 0.0
+		for d in self.get('wo_style'):
+			total_cost_to_customer += flt(d.cost_to_customer)
+		return total_cost_to_customer	 	
+
 
 	def on_cancel(self):
 		self.update_status('Pending')

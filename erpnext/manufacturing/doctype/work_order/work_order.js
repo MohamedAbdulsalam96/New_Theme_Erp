@@ -96,7 +96,7 @@ cur_frm.cscript.view = function(doc, cdt, cdn){
                        <tbody></tbody>\
                        </table>").appendTo($(fd.styles_name.wrapper))
 
-					columns =[['Style','10'],['Image','40'],['Value','40']]
+					columns =[['Style','10'],['Image','40'],['Value','40'],['Cost To Customer','50']]
 					var me = this;
 					$.each(columns, 
                        function(i, col) {                  
@@ -120,11 +120,12 @@ cur_frm.cscript.view = function(doc, cdt, cdn){
                                       e.default_value = $(this).attr('value')
                                       e.abbreviation = $(this).attr('abbr')
                                       e.cost_to_customer = $(this).attr('customer_cost')
-                                      e.cost_to_tailor = $(this).attr('tailor_cost')                           
+                                      e.process_wise_tailor_cost = $(this).attr('tailor_cost')                           
                                });
                      
                        $("<td>").html($(d[1]).find('img')).appendTo(row);
-                       $("<td>").html(d[2]).appendTo(row);                    
+                       $("<td>").html(d[2]).appendTo(row);
+                       $("<td>").html(d[4]).appendTo(row);                     
                });
 					
 					dialog.show();
@@ -226,3 +227,97 @@ cur_frm.fields_dict['style_work_order'].get_query = function(doc) {
 		}
 	}
 }
+
+{% include 'stock/custom_items.js' %}
+cur_frm.script_manager.make(erpnext.stock.CustomItem);
+
+
+// cur_frm.cscript.define_cost_to_tailor = function(doc, cdt, cdn){
+//         var d = locals[cdt][cdn]
+//         init_cost_to_tailor(d)
+//         render_cost_to_tailor_form(d)
+//         add_cost_to_tailor(d)
+//         save_tailor_cost(d)
+
+//     }
+// function init_cost_to_tailor(d){
+//          this.dialog = new frappe.ui.Dialog({
+//             title:__('Cost To Tailor'),
+//             fields: [
+//                 {fieldtype:'Link', fieldname:'process',options:'Process', label:__('Process'), reqd:false,
+//                     description: __("")},
+//                 {fieldtype:'Button', fieldname:'add_tailor_cost', label:__('Add'), reqd:false,
+//                     description: __("")},
+//                 {fieldtype:'HTML', fieldname:'tailor_cost_name', label:__('Styles'), reqd:false,
+//                     description: __("")},
+//                 {fieldtype:'Button', fieldname:'create_new', label:__('Ok') }
+//             ]
+//         })
+//         $('.modal-content').css('width', '800px')
+//         $('[data-fieldname = "create_new"]').css('margin-left','100px')
+//         this.control_tailor_cost = this.dialog.fields_dict;
+//         this.div = $('<div id="myGrid" style="width:100%;height:200px;margin:10px;overflow-y:scroll;"><table class="table table-bordered" style="background-color: #f9f9f9;height:10px" id="mytable">\
+//                     <thead><tr ><td>Process</td><td>Tailor Cost</td><td>Remove</td></tr></thead><tbody></tbody></table></div>').appendTo($(this.control_tailor_cost.tailor_cost_name.wrapper))
+
+//         this.dialog.show();
+
+
+//   }
+// function render_cost_to_tailor_form(d){
+//         var me = this
+//         if(d.process_wise_trial_cost_){
+//             tailor_dict = JSON.parse(d.process_wise_trial_cost_)
+//             console.log(tailor_dict)
+//             $.each(tailor_dict,function(key,value){
+//                 $(me.div).find('#mytable tbody').append('<tr id="my_row"><td>'+key+'</td>\
+//                 <td><input class="text_box" data-fieldtype="Int" type="Textbox" value='+value+'>\
+//                 </td><td>&nbsp;<button  class="remove">X</button></td></tr>')
+//                  me.remove_row()
+//             })
+//         }   
+
+
+
+//     }
+// function add_cost_to_tailor(d){
+
+//         var me = this;
+//         this.table;
+//         $(this.control_tailor_cost.add_tailor_cost.input).click(function(){
+//             this.table = $(me.div).find('#mytable tbody').append('<tr id="my_row"><td>'+me.control_tailor_cost.process.input.value+'</td>\
+//                 <td><input class="text_box" data-fieldtype="Int" type="Textbox">\
+//                 </td><td>&nbsp;<button  class="remove">X</button></td></tr>')
+//             me.remove_row()
+//         })
+
+//     }
+// function save_tailor_cost(d){
+
+//         var me = this;
+       
+//         $(this.control_tailor_cost.create_new.input).click(function(){
+//              var tailor_cost_dict = {}
+//              $('#mytable tr#my_row ').each(function(i,value){
+//                 var $td = $(this).find('td')
+//                   var process_name = ''
+//                 $($td).each(function(inner_index){
+                  
+//                     if(inner_index == 0){
+//                         process_name = $(this).text()
+//                         tailor_cost_dict[$(this).text()]=''
+//                     }
+//                     if(inner_index == 1){
+//                         tailor_cost_dict[process_name]=$(this).find('input').val()
+//                     }
+                   
+//                 })
+
+//              })
+//         d.process_wise_trial_cost_ = JSON.stringify(tailor_cost_dict)
+//         refresh_field('wo_style')
+//         me.dialog.hide()
+
+//         })
+        
+        
+//     }

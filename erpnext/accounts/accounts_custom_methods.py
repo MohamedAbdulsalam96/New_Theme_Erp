@@ -30,9 +30,9 @@ def create_work_order(doc, data, serial_no, item_code, qty, parent_item_code):
 	wo.sales_invoice_no = doc.name
 	wo.customer_name = frappe.db.get_value('Customer',wo.customer,'customer_name')
 	wo.item_qty = qty
-	if doc.trial_date and frappe.db.get_value('Process Item', {'parent': item_code, 'trials':1}, 'name'):
-		wo.trial_no = 1
-		wo.trial_date = doc.trial_date
+	# if doc.trial_date and frappe.db.get_value('Process Item', {'parent': item_code, 'trials':1}, 'name'):
+	# 	wo.trial_no = 1
+	# 	wo.trial_date = doc.trial_date
 	wo.fabric__code = get_dummy_fabric(item_code) or data.fabric_code
 	wo.serial_no_data = serial_no
 	wo.branch = data.tailoring_warehouse
@@ -45,8 +45,22 @@ def create_work_order(doc, data, serial_no, item_code, qty, parent_item_code):
 
 def create_work_order_style(data, wo_name, item_code):
 	if wo_name and item_code:
-		styles = frappe.db.sql(""" select distinct style, abbreviation from `tabStyle Item` where parent = '%s'
-			"""%(item_code),as_dict=1)
+		styles = frappe.db.sql(""" SELECT DISTINCT
+							    si.style,
+							    si.abbreviation,
+							    (
+							        SELECT
+							            MAX(siii.process_wise_tailor_cost)
+							        FROM
+							            `tabStyle Item` siii
+							        WHERE
+							            default_values=1
+							        AND siii.style = si.style
+							        AND siii.parent = '%s' ) AS process_wise_tailor_cost
+							FROM
+							    `tabStyle Item` as si
+							WHERE
+							    parent = '%s' """%(item_code,item_code),as_dict=1)
 		if styles:
 			table_view = 'Right'
 			for s in styles:
@@ -56,6 +70,7 @@ def create_work_order_style(data, wo_name, item_code):
 				ws.abbreviation  = s.abbreviation
 				ws.image_viewer = image_viewer
 				ws.default_value = default_value
+				ws.process_wise_tailor_cost = s.process_wise_tailor_cost
 				# ws.parent = wo_name
 				# ws.parentfield = 'wo_style'
 				# ws.parenttype = 'Work Order'
@@ -136,17 +151,18 @@ def create_process_allotment(doc, data):
 		 	pa.customer_name = doc.customer
 		 	pa.status = 'Pending'
 		 	pa.item = data.tailoring_item
-		 	if doc.trial_date and cint(s.trials) == 1:
+		 	if cint(s.trials) == 1 and i == 1 and data.trials:
 		 		pa.process_trials = 1
 		 		pa.emp_status = 'Assigned'
 		 		pa.qc = cint(frappe.db.get_value('Trial Dates', {'parent': data.trials, 'trial_no':1, 'process': pa.process}, 'quality_check')) or 0
+		 		i= i + 1
 		 	pa.branch = frappe.db.get_value('Process Wise Warehouse Detail',{'parent':data.tailor_work_order,'process':pa.process}, 'warehouse')
 		 	pa.serials_data = data.serial_no_data
 		 	pa.finished_good_qty = data.tailor_qty
 		 	create_material_issue(data, pa)
 		 	create_trials(data, pa)
 		 	pa.save(ignore_permissions=True)
-		 	i= i + 1
+		 	
 		 	process_list.append((pa.name).encode('ascii', 'ignore'))
  	return process_list
 
@@ -370,9 +386,9 @@ def validate_sales_invoice(doc, method):
 def add_data_in_work_order_assignment(doc, method):
 	validate_branch(doc)
 	if not doc.get('work_order_distribution'):
-		doc.set('work_order_distribution',[])
+		doc.set('work_order_distribution',[])	
 	for d in doc.get('sales_invoice_items_one'):
-		if not frappe.db.get_value('Work Order Distribution', {'refer_doc':d.name},'refer_doc'):
+		if not frappe.db.get_value('Work Order Distribution', {'tailoring_item':d.tailoring_item_code,'parent':doc.name},'name'):
 			if cint(d.check_split_qty)==1:
 				split_qty = eval(d.split_qty_dict)
 				for s in split_qty:
@@ -403,32 +419,34 @@ def make_order(doc, d, qty, item_code, parent=None):
 		# e.parent = doc.name
 		e.serial_no_data = generate_serial_no(doc, item_code, qty)
 		e.tailor_fabric= d.fabric_code
-		e.refer_doc = d.name
 		e.tailor_fabric_qty = frappe.db.get_value('Size Item', {'parent':d.tailoring_item_code, 'size':d.tailoring_size, 'width':d.width }, 'fabric_qty')
 		e.tailor_warehouse = d.tailoring_branch
 		e.expense = d.total_expenses
 		if not e.tailor_work_order:
 			e.tailor_work_order = create_work_order(doc, d, e.serial_no_data, item_code, qty, parent)
 			update_serial_no_with_wo(e.serial_no_data, e.tailor_work_order)
-		if not e.trials and frappe.db.get_value('Process Item', {'parent':item_code, 'trials':1}, 'name') and doc.trial_date:
-			e.trials = make_schedule_for_trials(doc, d, e.tailor_work_order, item_code, e.serial_no_data)
-		# e.save()
+		# if not e.trials and frappe.db.get_value('Process Item', {'parent':item_code, 'trials':1}, 'name') and doc.trial_date:
+		# 	e.trials = make_schedule_for_trials(doc, d, e.tailor_work_order, item_code, e.serial_no_data)
+		# #e.save()
 		return "Done"
 
-def make_schedule_for_trials(doc, args, work_order, item_code, serial_no_data):
-	s =frappe.new_doc('Trials')
-	s.item_code = item_code
-	s.trials_serial_no = s.trials_serial_no_status = get_first_serial_no(serial_no_data)
-	s.sales_invoice = doc.name
-	s.serial_no_data = serial_no_data
-	s.customer = doc.customer
-	s.customer_name = doc.customer_name
-	s.branch = get_user_branch()
-	s.item_name = frappe.db.get_value('Item', item_code, 'item_name')
-	s.work_order = work_order
-	schedules_date(s, item_code, work_order, doc.trial_date, s.customer_name)
-	s.save(ignore_permissions=True)	
-	return s.name
+def make_schedule_for_trials(doc,method):
+	if doc.trial_date and frappe.db.get_value('Process Item', {'parent':doc.item_code, 'trials':1}, 'name'):
+		s =frappe.new_doc('Trials')
+		s.item_code = doc.item_code
+		s.trials_serial_no = s.trials_serial_no_status = get_first_serial_no(doc.serial_no_data)
+		s.sales_invoice = doc.sales_invoice_no
+		s.serial_no_data = doc.serial_no_data
+		s.customer = doc.customer
+		s.customer_name = doc.customer_name
+		s.branch = get_user_branch()
+		s.item_name = frappe.db.get_value('Item', doc.item_code, 'item_name')
+		s.work_order = doc.name
+		schedules_date(s, doc.item_code, doc.name,doc.trial_date,doc.customer_name)
+		s.save(ignore_permissions=True)	
+		update_work_order_distribution(doc.item_code,doc.sales_invoice_no,doc.name,s.name)
+		doc.trial_no = 1
+		return s.name
 
 def get_first_serial_no(serial_no_data):
 	serial_no = ''
@@ -436,6 +454,14 @@ def get_first_serial_no(serial_no_data):
 	if sn:
 		serial_no = sn[0]
 	return serial_no
+
+def update_work_order_distribution(item_code,sales_invoice,work_order,trial_name):
+	wod_name = frappe.db.get_value('Work Order Distribution',{'parent':sales_invoice,'tailor_work_order':work_order},'name')
+	if wod_name and trial_name:
+		wo_doc = frappe.get_doc('Work Order Distribution',wod_name)
+		wo_doc.trials = trial_name
+		wo_doc.save(ignore_permissions=True)
+
 
 def schedules_date(parent, item, work_order, trial_date, customer_name):
 	trials = frappe.db.sql("select branch_dict from `tabProcess Item` where parent='%s' and trials=1  order by idx"%(item), as_dict=1)
@@ -571,13 +597,13 @@ def get_status(work_order):
 def release_work_order(doc):
 	if doc.status != 'Release' and cint(frappe.db.get_value('Sales Invoice', doc.sales_invoice_no, 'release')) == 1:
 		s= {'work_order': doc.name, 'status': 'Release', 'item': doc.item_code}
-		details = open_next_branch(frappe.db.get_value('Production Dashboard Details',{'work_order': doc.name}, 'name'), 1)
+		# details = open_next_branch(frappe.db.get_value('Production Dashboard Details',{'work_order': doc.name}, 'name'), 1)
 		# add_to_serial_no(details, s.get('work_order'))
-		if details:
-			sn_list = frappe.db.get_value('Work Order', doc.name, 'serial_no_data')
-			parent = stock_entry_for_out(s, details.branch, sn_list, frappe.db.get_value('Work Order', doc.name, 'item_qty'))
-			update_work_order_status(doc.name, 'Release')
-			cut_order_generation(doc.name, doc.sales_invoice_no)	
+		update_work_order_status(doc.name, 'Release')
+		branch = frappe.db.get_value('Process Wise Warehouse Detail',{'parent':doc.name, 'idx':1}, 'Warehouse')
+		sn_list = frappe.db.get_value('Work Order', doc.name, 'serial_no_data')
+		parent = stock_entry_for_out(s, branch, sn_list, frappe.db.get_value('Work Order', doc.name, 'item_qty'))
+		cut_order_generation(doc.name, doc.sales_invoice_no)	
 
 def add_to_serial_no(args, work_order, sn_list=None, qc=0, emp=None):
 	if sn_list:
@@ -1027,3 +1053,105 @@ def get_all_serial_no(filters):
 	else:
 		return frappe.db.sql(""" select concat(name) from `tabSerial No` where warehouse = '%s' and work_order='%s' 
 			and (select status from `tabWork Order` where name='%s') = 'Release'"""%(get_branch_warehouse(get_user_branch()), filters.get('work_order'), filters.get('work_order')),as_list=1)
+
+
+def validate_all_wo_submitted(doc,method):
+	wo_details = frappe.db.sql("select name from `tabWork Order` where sales_invoice_no = '{0}'  ".format(doc.name),as_list=1)
+	for work_order in wo_details:
+		if frappe.db.get_value("Work Order",work_order[0],'docstatus') != 1:
+			frappe.throw("Sales Invoice {0} can not be Submiited beacause Work order {1} is not Submitted".format(doc.name,work_order[0]))
+
+
+def validate_for_item_qty(doc,method):
+	for row in doc.get('sales_invoice_items_one'):
+		if row.previous_quantity:
+			if cint(row.previous_quantity) != cint(row.tailoring_qty):
+				frappe.throw("{0} item quantity has been edited from {1} to {2} for Row {3} .Please Reset it to Previous quantity {4} ".format(row.tailoring_item_code,row.previous_quantity,row.tailoring_qty,row.idx,row.previous_quantity))
+		else:
+			total_qty = frappe.db.sql("select sum(tailor_qty) as qty from `tabWork Order Distribution` where tailoring_item='%s' and parent='%s' "%(row.tailoring_item_code,doc.name),as_list=1)
+			if total_qty[0][0]:
+				if cint(total_qty[0][0]) != cint(row.tailoring_qty):
+					frappe.throw("{0} item quantity has been edited from {1} to {2} for Row {3} .Please Reset it to Previous quantity {4} ".format(row.tailoring_item_code,cint(total_qty[0][0]),row.tailoring_qty,row.idx,cint(total_qty[0][0])))
+
+
+def validate_for_duplicate_item(doc,method):
+	item_list = []
+	for row in doc.get('sales_invoice_items_one'):
+		if row.tailoring_item_code in item_list:
+			frappe.throw("Duplicate Entry Of Item {0} not allowed".format(row.tailoring_item_code))
+		else:
+			item_list.append(row.tailoring_item_code)
+
+def validate_for_split_qty(doc,method):
+	for row in doc.get('sales_invoice_items_one'):
+		if row.check_split_qty and not row.split_qty_dict:
+			frappe.throw("Split Quantity is not booked against item '{0}' for row {1}.Please click on 'Split Qty' Button for Booking purpose Else uncheck option 'Check Split Qty' on row {2} ".format(row.tailoring_item_code,row.idx,row.idx))
+		if not row.check_split_qty and  row.split_qty_dict:
+			frappe.throw("Please check option 'Check Split Qty' for row {0} because Split quantity is booked against item '{1}'".format(row.idx,row.tailoring_item_code))
+		total_qty = 0.0
+		if row.check_split_qty and  row.split_qty_dict:
+			split_qty_dict = eval(row.split_qty_dict)
+			for split_row in split_qty_dict:
+				qty = split_qty_dict.get(split_row).get('qty')
+				total_qty += cint(qty)
+			if total_qty != row.tailoring_qty:
+				frappe.throw("Split Qty booked for item '{0}' on row {1} is not equal to Quantity {2}".format(row.tailoring_item_code,row.idx,row.tailoring_qty))
+
+@frappe.whitelist()
+def delete_wo_distribution_entries(row_name,name):
+	if row_name and name:
+		# item_code = frappe.db.sql("select tailoring_item_code from `tabSales Invoice Items` where name='%s' "%(row_name),as_list=1)
+		# if item_code[0][0]:
+		# 	frappe.db.sql("delete from `tabWork Order Distribution` where tailoring_item='%s' and parent ='%s'  "%(item_code[0][0],name))
+		pass
+
+
+def validation_for_deleted_rows(doc,method):
+	validate_for_wod_deleted_rows(doc,method)
+	validate_for_sales_item_one_deleted_rows(doc,method)
+	
+
+
+def validate_for_wod_deleted_rows(doc,method):
+	for sales_row in doc.get('sales_invoice_items_one'):
+		total_qty = 0.0
+		idx_list = []
+		flag_for_new_item = True
+		for wo_row in doc.get('work_order_distribution'):
+			if wo_row.tailoring_item == sales_row.tailoring_item_code:
+				flag_for_new_item = False
+				total_qty += cint(wo_row.tailor_qty)
+				idx_list.append(cstr(wo_row.idx))	
+		
+		if cint(total_qty) != cint(sales_row.tailoring_qty) and flag_for_new_item == False:
+			idx_string = ''
+			if idx_list:
+				idx_string = "for row no %s in Work Order Distribution Table &"%(','.join(idx_list))
+			frappe.throw("Difference between quantity in Tailoring Product table & Work Order Distribution table for Item  '{0}' because you have deleted some rows from Work Order Distribution table.Please delete rows against item '{1}' {2} for row no {3} in Tailoring Product Table".format(sales_row.tailoring_item_code,sales_row.tailoring_item_code,idx_string,sales_row.idx))				
+	
+
+def validate_for_sales_item_one_deleted_rows(doc,method):
+	wo_dict = {}
+	for wo_row in doc.get('work_order_distribution'):
+		if not wo_dict.has_key(cstr(wo_row.tailoring_item)): 
+			wo_dict[cstr(wo_row.tailoring_item)] = wo_row.tailor_qty
+		else:	
+			wo_dict[wo_row.tailoring_item] = cint(wo_dict[wo_row.tailoring_item]) + cint(wo_row.tailor_qty)
+	
+	for key,value in wo_dict.items():
+		total_qty = 0.0
+		for sales_row in doc.get('sales_invoice_items_one'):
+			if key == sales_row.tailoring_item_code:
+				total_qty = cint(sales_row.tailoring_qty)
+				break
+		if total_qty != cint(value):
+			frappe.throw("Difference between quantity in Tailoring Product table & Work Order Distribution table for Item  '{0}' because you have deleted rows from Tailoring Product table.Please delete rows against item '{1}' From Work Order Distribution table. ".format(key,key))				
+						
+
+
+
+def validate_for_reserve_qty(doc,method):
+	for row in doc.get('sales_invoice_items_one'):
+		if row.fabric_code:
+			if not row.reserve_fabric_qty:
+				frappe.throw("Fabric is not Reserved for Item {0} for row {1}".format(row.tailoring_item_code,row.idx))	

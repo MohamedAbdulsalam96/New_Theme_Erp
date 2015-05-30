@@ -216,7 +216,102 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
                 $(me.div).find('#mytable tbody tr:eq('+i+') td:eq(3) .quality_check').prop('checked','checked')
             }
         })
+    },
+
+    define_cost_to_tailor:function(doc, cdt, cdn){
+        var d = locals[cdt][cdn]
+        this.init_cost_to_tailor(d)
+        this.render_cost_to_tailor_form(d)
+        this.add_cost_to_tailor(d)
+        this.save_tailor_cost(d)
+
+    },
+    init_cost_to_tailor:function(d){
+
+         this.dialog = new frappe.ui.Dialog({
+            title:__('Cost To Tailor'),
+            fields: [
+                {fieldtype:'Link', fieldname:'process',options:'Process', label:__('Process'), reqd:false,
+                    description: __("")},
+                {fieldtype:'Button', fieldname:'add_tailor_cost', label:__('Add'), reqd:false,
+                    description: __("")},
+                {fieldtype:'HTML', fieldname:'tailor_cost_name', label:__('Styles'), reqd:false,
+                    description: __("")},
+                {fieldtype:'Button', fieldname:'create_new', label:__('Ok') }
+            ]
+        })
+        $('.modal-content').css('width', '800px')
+        $('[data-fieldname = "create_new"]').css('margin-left','100px')
+        this.control_tailor_cost = this.dialog.fields_dict;
+        this.div = $('<div id="myGrid" style="width:100%;height:200px;margin:10px;overflow-y:scroll;"><table class="table table-bordered" style="background-color: #f9f9f9;height:10px" id="mytable">\
+                    <thead><tr ><td>Process</td><td>Tailor Cost</td><td>Remove</td></tr></thead><tbody></tbody></table></div>').appendTo($(this.control_tailor_cost.tailor_cost_name.wrapper))
+
+        this.dialog.show();
+
+
+    },
+    render_cost_to_tailor_form:function(d){
+        var me = this
+        if(d.process_wise_tailor_cost){
+            tailor_dict = JSON.parse(d.process_wise_tailor_cost)
+            $.each(tailor_dict,function(key,value){
+                $(me.div).find('#mytable tbody').append('<tr id="my_row"><td>'+key+'</td>\
+                <td><input class="text_box" data-fieldtype="Int" type="Textbox" value='+value+'>\
+                </td><td>&nbsp;<button  class="remove">X</button></td></tr>')
+                 me.remove_row()
+            })
+        }   
+
+
+
+    },
+    add_cost_to_tailor:function(d){
+
+        var me = this;
+        this.table;
+        $(this.control_tailor_cost.add_tailor_cost.input).click(function(){
+            this.table = $(me.div).find('#mytable tbody').append('<tr id="my_row"><td>'+me.control_tailor_cost.process.input.value+'</td>\
+                <td><input class="text_box" data-fieldtype="Int" type="Textbox">\
+                </td><td>&nbsp;<button  class="remove">X</button></td></tr>')
+            me.remove_row()
+        })
+
+    },
+     save_tailor_cost:function(d){
+
+       var me = this
+       
+        $(this.control_tailor_cost.create_new.input).click(function(){
+             var tailor_cost_dict = {}
+             $('#mytable tr#my_row').each(function(i,value){
+                var $td = $(this).find('td')
+                  var process_name = ''
+                $($td).each(function(inner_index){
+                  
+                    if(inner_index == 0){
+                        process_name = $(this).text()
+                        tailor_cost_dict[$(this).text()]=''
+                    }
+                    if(inner_index == 1){
+                        tailor_cost_dict[process_name]=$(this).find('input').val()
+                    }
+                   
+                })
+
+             })
+        d.process_wise_tailor_cost = JSON.stringify(tailor_cost_dict)
+        refresh_field('style_item')
+        refresh_field(['wo_style',d.name,'process_wise_tailor_cost'])
+        $('#mytable').remove()
+        me.dialog.hide()
+
+        })
+        
+        
     }
+
+
+
 })
 
 

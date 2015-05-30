@@ -91,6 +91,14 @@
    "read_only": 1
   }, 
   {
+   "fieldname": "processwise_trial_details", 
+   "fieldtype": "Small Text", 
+   "label": "Processwise Trial Details", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
    "fieldname": "column_break_3", 
    "fieldtype": "Column Break", 
    "permlevel": 0, 
@@ -510,6 +518,13 @@
    "precision": ""
   }, 
   {
+   "fieldname": "serial_no_list", 
+   "fieldtype": "Small Text", 
+   "label": "Serial No List", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "process_no", 
    "fieldtype": "Int", 
    "label": "Process No", 
@@ -570,7 +585,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-05-13 05:28:23.475634", 
+ "modified": "2015-05-30 03:23:39.211754", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

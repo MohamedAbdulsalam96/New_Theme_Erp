@@ -13,6 +13,7 @@ cur_frm.pformat.print_heading = 'Invoice';
 {% include 'accounts/doctype/sales_taxes_and_charges_master/sales_taxes_and_charges_master.js' %}
 {% include 'accounts/doctype/sales_invoice/pos.js' %}
 
+expense_flag = false
 frappe.provide("erpnext.accounts");
 erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.extend({
 	onload: function() {
@@ -40,6 +41,51 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 			locals.DocType[cur_frm.doctype].default_print_format = "POS Invoice";
 			cur_frm.setup_print_layout();
 		}
+
+
+
+		flag =false	
+		role_list = ['System Manager']
+		$.each(role_list,function(j){
+
+		if(in_list(user_roles,role_list[j])){
+			  			flag = true
+			  			return false
+				  	}	
+       		})
+       
+      if (flag == false){
+
+        frappe.call({
+			method:"mreq.mreq.page.sales_dashboard.sales_dashboard.get_release_status",
+			callback:function(r){
+               var release = r.message[0][0]
+             
+               if (release == 0){
+               	     hide_field('release')
+                  }
+              }
+
+
+		  });
+
+        }      
+
+         frappe.call({
+			method:"mreq.mreq.page.sales_dashboard.sales_dashboard.get_expenses_status",
+			callback:function(r){
+               var release = r.message[0][0]
+             
+               if (release == 1){
+       					expense_flag = true
+                  }
+              }
+
+
+		  });
+					
+
+
 	},
 
 	refresh: function(doc, dt, dn) {
@@ -420,7 +466,33 @@ refresh_field('sales_invoice_items_one')
 })
 }
 cur_frm.cscript.tailoring_qty = function(doc, cdt, cdn){
+var d = locals[cdt][cdn]
 cur_frm.cscript.calculate_tailoring_amount(doc, cdt, cdn);
+  if (expense_flag == true && d.tailoring_item_code){
+  	frappe.call({
+			method:"mreq.mreq.page.sales_dashboard.sales_dashboard.get_expenses",
+			args:{"item_code":d.tailoring_item_code},
+			callback:function(r){
+               if (r.message){
+       					d.total_expenses = parseFloat(r.message) * parseFloat(d.tailoring_qty) 
+       					refresh_field('sales_invoice_items_one')
+                  }
+              }
+
+
+		 });
+
+
+
+   }
+
+  if (d.fabric_qty){
+  	d.fabric_qty  = parseFloat(d.fabric_qty) * parseFloat(d.tailoring_qty)
+  	refresh_field('fabric_qty') 
+  }
+
+
+
 }	
 cur_frm.cscript.tailoring_rate = function(doc, cdt, cdn){
 cur_frm.cscript.calculate_tailoring_amount(doc, cdt, cdn);
@@ -483,7 +555,17 @@ refresh_field('merchandise_item')
 cur_frm.cscript.calculate_net_total(doc, cdt, cdn)
 }
 cur_frm.cscript.sales_invoice_items_one_remove = function(doc, cdt, cdn){
-cur_frm.cscript.calculate_net_total(doc, cdt, cdn)
+	cur_frm.cscript.calculate_net_total(doc, cdt, cdn)
+	frappe.call({
+		method:"erpnext.accounts.accounts_custom_methods.delete_wo_distribution_entries",
+		args:{'row_name':cdn,'name':doc.name},
+		callback:function(r){
+			refresh_field('work_order_distribution')
+		}
+
+	})
+
+
 }
 cur_frm.cscript.merchandise_item_remove = function(doc, cdt, cdn){
 cur_frm.cscript.calculate_net_total(doc, cdt, cdn)
@@ -514,9 +596,9 @@ cur_frm.fields_dict['sales_invoice_items_one'].grid.get_field('tailoring_item_co
 
 cur_frm.fields_dict['merchandise_item'].grid.get_field('merchandise_item_code').get_query = function(doc) {
 	return{
-		filters: {
-			'item_group': 'Merchandise'
-		}
+		filters: [
+			['Item', 'item_group', 'in',['Merchandise', 'Fabric', 'Fabric Swatch Item','Gift Voucher'] ]
+		]
 	}
 }
 
@@ -561,13 +643,17 @@ $.extend(cur_frm.cscript, new erpnext.stock.SplitQty({frm: cur_frm}));
 
 
 // cur_frm.script_manager.make(erpnext.account.CustomJs);
-var fabric_detail = {}
+
 
 cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
 	var e =locals[cdt][cdn]
-	var image_data;
+
+	if(e.fabric_qty){
+			var fabric_detail = {}
+
+	var total_qty = 0.0;
 	var dialog = new frappe.ui.Dialog({
-			title:__(e.field_name+' Styles'),
+			title:__('Reserve Fabric'),
 			fields: [
 				{fieldtype:'HTML', fieldname:'styles_name', label:__('Styles'), reqd:false,
 					description: __("")},
@@ -593,7 +679,7 @@ cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
                        <tbody></tbody>\
                        </table>").appendTo($(fd.styles_name.wrapper))
 
-					columns =[['','10'],['Warehouse','40'],['Qty','40']]
+					columns =[['Branch','40'],['Qty','40'], ['Reserv Qty', 50]]
 					var me = this;
 					$.each(columns, 
                        function(i, col) {                  
@@ -601,35 +687,89 @@ cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
                                .appendTo(me.table.find("thead tr"));
                   }	);
 					
+					
 					$.each(result_set, function(i, d) {
 						var row = $("<tr>").appendTo(me.table.find("tbody"));
-                       $("<td>").html('<input type="radio" name="sp" value="'+d[0]+'">')
-                       		   .attr("style", d[0])
-                               .attr("image", d[1])
-                               .appendTo(row)
-                               .click(function() {
-                                      if(fabric_detail[d[1]]){
-                                      	fabric_detail[d[1]].push([e.fabric_code, e.fabric_qty, e.tailoring_item_code])
-                                      }
-                                      else{
-                                      	fabric_detail[d[1]] = []
-                                       	fabric_detail[d[1]].push([e.fabric_code, e.fabric_qty, e.tailoring_item_code])
-                                       }
-                               });
+						$("<td>").html(d[2]).appendTo(row);
+	                    $("<td>").html(d[1]).appendTo(row); 
+	                    if(doc.branch == d[2]){
+	                    	if (parseInt(d[1]) < parseInt(e.fabric_qty)){
+	                    	$("<td>").html('<input type="Textbox" class="text_box" value='+d[1]+'>').appendTo(row);	
+	                    	}
+	                    	else{
+	                    		$("<td>").html('<input type="Textbox" class="text_box" value='+e.fabric_qty+'>').appendTo(row);
+	                    	}	
+	                    	
+
+	                    }else{
+	                    	  $("<td>").html('<input type="Textbox" class="text_box">').appendTo(row);
+	                    }
+	                  
                      
-                       $("<td>").html(d[1]).appendTo(row);
-                       $("<td>").html(d[0]).appendTo(row);                    
+                      
                });
-					
+
+								
+
 					dialog.show();
 					$(fd.create_new.input).click(function() {
-						doc.fabric_details = JSON.stringify(fabric_detail)					
-						refresh_field('fabric_details')
-						e.reservation_status = 'Reserved';
-						refresh_field('reservation_status', e.name, 'sales_invoice_items_one')	
-						dialog.hide()
+						total_qty = 0.0
+						fabric_detail ={}	
+						$.each($('input.text_box'),function(){
+							if ($(this).val()){
+								fabric_detail[$(this).closest("tr").find('td:first').text()] = [e.fabric_code, $(this).closest("tr").find('.text_box').val(), e.tailoring_item_code]							
+								total_qty = parseFloat($(this).val()) + parseFloat(total_qty)
+							}
+							
+						})
+
+						 if (total_qty > parseFloat(e.fabric_qty)){
+								alert("Sum of Total Quantity entered i.e {0} is exceeding Fabric Quantity {1}".replace('{1}',e.fabric_qty).replace('{0}',total_qty))
+								dialog.show()		
+							}
+
+						else{
+							var my_fabric_details = {}
+							
+							if (doc.reserve_fabric_qty){
+								my_fabric_details = JSON.parse(doc.reserve_fabric_qty)
+							}
+							
+
+							my_fabric_details[e.tailoring_item_code] = JSON.stringify(fabric_detail)
+							e.reserve_fabric_qty = JSON.stringify(my_fabric_details)			
+							refresh_field('reserve_fabric_qty',e.name,'sales_invoice_items_one')
+							e.reservation_status = 'Reserved';
+							refresh_field('reservation_status', e.name, 'sales_invoice_items_one')	
+							me.fabric_detail = {}	
+							
+							 var $input_check = $('input[type="checkbox"]')
+										$.each($input_check,function(key,value){
+												if($(this).is(':checked') == true){
+														
+														$(this).prop('checked',false) 
+														
+												}
+										})
+										
+									
+										cur_frm.save()
+										dialog.hide()
+										$('.modal').remove()
+										
+								}	
+						
+						
 					})
 				}
 			}
 		})	
+
+	}
+	else{
+		alert("Fabric qty must be given to reserve fabric {0}".replace('{0}',e.fabric_code))
+	}
+
+
 }
+

@@ -334,15 +334,34 @@ class ProcessAllotment(Document):
 							WHERE
 							    process='{0}'
 							AND item_code='{1}' and parent='{2}'  """.format(self.process,self.item,self.process_tailor),as_dict=1)
+			
+			trial_cost = 0.0
+			tailor_cost = 0.0
+			
+			serial_list = self.serial_no_data.split('\n')
+			serial_list = [serial for serial in serial_list if serial]
+			
+			if self.process_trials:
+				trial_cost = self.calculate_trial_cost()
+			
+			for serial_no in serial_list:
+				check_dict = self.get_dic_List(serial_no)
+				if frappe.db.get_value('Serial No Detail', check_dict, 'status') == 'Reassigned':
+					break
+			else:		
+				if self.process_trials == 1 or not self.process_trials:
+					tailor_cost = self.calculate_process_wise_tailor_cost()	
+
 			if amount:
-				serial_list = self.serial_no_data.split('\n')
-				serial_list = [serial for serial in serial_list if serial]
 				if amount[0].get('type_of_payment') == 'Percent' and self.payment=='Yes':
-					self.wages_for_single_piece = (( flt(self.total_invoice_amount) - flt(self.total_expense) ) * flt(amount[0].get('amount')/100))
-					self.wages = (( flt(self.total_invoice_amount) - flt(self.total_expense) ) * flt(amount[0].get('amount')/100)) * flt(len(serial_list))
+					self.wages_for_single_piece =  ( (( flt(self.total_invoice_amount) - flt(self.total_expense) ) * flt(amount[0].get('amount')/100))  +  trial_cost  + tailor_cost )
+					self.wages = flt(self.wages_for_single_piece) * flt(len(serial_list))
 				if amount[0].get('type_of_payment') == 'Amount' and self.payment =='Yes':
-					self.wages_for_single_piece = flt(amount[0].get('amount'))
-					self.wages = flt(amount[0].get('amount')) * flt(len(serial_list))	
+					self.wages_for_single_piece = flt(amount[0].get('amount')) + trial_cost + tailor_cost
+					self.wages = flt(self.wages_for_single_piece) * flt(len(serial_list))
+			else:
+				self.wages_for_single_piece =  trial_cost + tailor_cost
+				self.wages = flt(self.wages_for_single_piece) * flt(len(serial_list))			
 	# def make_stock_entry(self, t_branch, args):
 	# 	ste = frappe.new_doc('Stock Entry')
 	# 	ste.purpose_type = 'Material Out'
@@ -378,6 +397,36 @@ class ProcessAllotment(Document):
 	# 		return name[0].current_name, name[0].next_name
 	# 	else:
 	# 		'',''
+
+	def calculate_trial_cost(self):
+		trial_cost = 0.0
+		branch_dict = frappe.db.sql(""" SELECT 
+						    branch_dict
+						FROM
+						    `tabProcess Item` as si
+						WHERE
+						    parent = '%s'
+						    and process_name = '%s'   """%(self.item,self.process),as_list=1)
+		if branch_dict and self.process_trials:
+			self.process_trials = cint(self.process_trials)
+			branch_dict[0][0] = eval(branch_dict[0][0])
+			trial_cost = flt(branch_dict[0][0].get("{0}".format(  cint(self.process_trials) - 1  )   ).get('cost'))
+		return trial_cost
+
+	
+	def calculate_process_wise_tailor_cost(self):
+		tailor_cost = 0.0
+		process_wise_tailor_cost = frappe.db.sql(""" SELECT
+							    process_wise_tailor_cost
+							FROM
+							    `tabWO Style`
+							WHERE
+							    parent = '{0}'
+							AND process_wise_tailor_cost LIKE "%{1}%"    """.format(self.work_order,self.process),as_list=1)
+		if process_wise_tailor_cost:
+			for row in process_wise_tailor_cost:
+				tailor_cost += flt(eval(row[0]).get(self.process))	
+		return tailor_cost		
 
 	def update_task(self):
 		if self.emp_status=='Assigned' and not self.get("__islocal") and self.process_tailor:
@@ -564,6 +613,7 @@ class ProcessAllotment(Document):
 	def assign_task_to_employee(self):
 		self.validate_WorkOrder_ReleaseStatus()
 		self.validate_Status()
+		self.validate_for_completed_process()
 		emp = self.append('employee_details',{})
 		emp.employee = self.process_tailor
 		emp.employee_name = frappe.db.get_value('Employee', self.process_tailor, 'employee_name')
@@ -586,8 +636,28 @@ class ProcessAllotment(Document):
 		emp.wages_per_single_piece = flt(self.wages_for_single_piece)
 		emp.tailor_wages = flt(self.wages)
 		emp.qc_required = cint(self.qc)
+		if self.emp_status == 'Completed':
+			self.add_to_completed_list()
+
 		self.save()
+		
 		return "Done"
+
+	
+	def add_to_completed_list(self):
+		self.serial_no_list = cstr(self.serial_no_list)
+		self.serial_no_list +=  self.serial_no_data	+ '\n'
+
+	def validate_for_completed_process(self):
+		if not self.process_trials and self.emp_status == 'Assigned':
+			sn_data = self.serial_no_data.split('\n')
+			sn_data = [serial for serial in sn_data if serial]
+			completed_sn_data = cstr(self.serial_no_list).split('\n')
+			if sn_data:
+				for serial_no in completed_sn_data:
+					if serial_no in sn_data:
+						frappe.throw("Serial No {0} is already completed.Please Assign Status as 'Reassigned' not 'Assigned' ".format(serial_no))
+
 
 	def validate_Status(self):
 		sn_data = cstr(self.serial_no_data).split('\n')
@@ -647,7 +717,7 @@ class ProcessAllotment(Document):
 		check_dict = self.get_dic_List(serial_no)
 		check_dict.setdefault('status', self.emp_status)
 		if frappe.db.get_value('Serial No Detail', check_dict, 'name'):
-			frappe.throw(_("Status {0} already defined").format(self.emp_status))
+			frappe.throw(_("Status {0} already defined For Serial No {1}").format(self.emp_status,serial_no))
 
 	def check_PreviousStaus(self, serial_no):
 		val = ['Assigned']
@@ -655,6 +725,7 @@ class ProcessAllotment(Document):
 			val.append('Reassigned')
 		if self.emp_status == 'Reassigned':
 			val.append('Completed')
+			val.remove('Assigned')
 			val.append('Reassigned')	 
 		check_dict = self.get_dic_List(serial_no)
 		if frappe.db.get_value('Serial No Detail', check_dict, 'status') not in val:

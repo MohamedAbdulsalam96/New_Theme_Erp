@@ -82,13 +82,20 @@ cur_frm.cscript.emp_status= function(doc, cdt, cdn){
 
 
 	}
+
 if (doc.emp_status == 'Assigned' ||  doc.emp_status == 'Reassigned')
 		{
+
 			doc.wages = ''
 			doc.wages_for_single_piece = ''
+			doc.process_tailor = ''
+			doc.serial_no = ''
+			doc.serial_no_data = ''
+			doc.employee_name = ''
+			doc.process_tailor = ''
 	}
 
-	refresh_field(['process_status', 'completed_time', 'start_date', 'work_qty','wages','wages_for_single_piece'])
+	refresh_field(['process_status', 'completed_time', 'start_date', 'work_qty','wages','wages_for_single_piece','process_tailor','serial_no','serial_no_data','employee_name','process_tailor'])
 }
 
 cur_frm.cscript.process_tailor=function(doc,cdt,cdn){
@@ -138,18 +145,12 @@ cur_frm.cscript.toogle_field = function(doc){
 	}else if(doc.emp_status=='Assigned' || doc.emp_status=='Reassigned' || doc.emp_status==''){
 		unhide_field(['start_date', 'end_date', 'estimated_time'])
 		hide_field([ 'completed_time', 'payment', 'extra_charge', 'deduct_late_work','wages_for_single_piece']);
-		doc.process_tailor = ''
-		doc.employee_name = ''
 		doc.end_date = ''
 		doc.estimated_time = ''
 		doc.completed_time = ''
 		doc.task =''
 		
-		if(!doc.process_trials){
-			doc.serial_no = ''
-			doc.serial_no_data = ''
-			doc.work_qty = ''
-		}
+
 		refresh_field(['process_tailor', 'employee_name', 'start_date', 'end_date', 'estimated_time', 'serial_no', 'serial_no_data', 'work_qty'])
 	}
 	
