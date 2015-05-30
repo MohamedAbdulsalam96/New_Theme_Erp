@@ -137,6 +137,8 @@ def create_process_allotment(doc, data):
 	process = frappe.db.sql(""" select distinct process_name,idx, quality_check,trials from `tabProcess Item` where parent = '%s' order by idx asc
 		"""%(data.tailoring_item),as_dict = 1)
 	if process:
+		trials_process = frappe.db.sql(""" select group_concat(process_name),trials from `tabProcess Item` where parent = '%s' and trials=1 group by trials
+									"""%(data.tailoring_item),as_list = 1)
 		for s in process:
 			pa = frappe.new_doc('Process Allotment')
 		 	pa.sales_invoice_no = data.parent
@@ -158,6 +160,8 @@ def create_process_allotment(doc, data):
 		 		i= i + 1
 		 	pa.branch = frappe.db.get_value('Process Wise Warehouse Detail',{'parent':data.tailor_work_order,'process':pa.process}, 'warehouse')
 		 	pa.serials_data = data.serial_no_data
+		 	pa.processwise_trial_details = "Trials are assigned for process %s"%(trials_process[0][0]) if trials_process and frappe.db.get_value('Work Order',data.tailor_work_order,'trial_date') else "Trials are not assigned"
+		 	
 		 	pa.finished_good_qty = data.tailor_qty
 		 	create_material_issue(data, pa)
 		 	create_trials(data, pa)
@@ -1155,3 +1159,34 @@ def validate_for_reserve_qty(doc,method):
 		if row.fabric_code:
 			if not row.reserve_fabric_qty:
 				frappe.throw("Fabric is not Reserved for Item {0} for row {1}".format(row.tailoring_item_code,row.idx))	
+
+
+
+def create_event_on_sales_invoice_submission(doc,method):
+	event_data = frappe.db.sql(""" SELECT
+						   group_concat(tailoring_item_code),
+						    tailoring_delivery_date
+						FROM
+						    `tabSales Invoice Items`
+						where parent='{0}'    
+						group by  tailoring_delivery_date    """.format(doc.name),as_list=1)
+	if event_data:
+		for row in event_data:
+			create_event_for_item(row,doc)
+
+
+def create_event_for_item(row,my_doc):
+	evt = frappe.new_doc('Event')
+	evt.branch = my_doc.branch 
+	evt.subject = "Customer {0}:Delivery For Item {1}".format(my_doc.customer_name,row[0])
+	evt.description = 'Dear %s, your delivery date for item "%s" with us today. Kindly Collect your item "%s". Thank you.'%(my_doc.customer_name, row[0],row[0])
+	evt.starts_on = row[1]
+	make_appointment_list(evt,my_doc.customer)
+	evt.save(ignore_permissions = True)
+
+
+def make_appointment_list(obj,customer):
+	if customer:
+		apl = obj.append('appointment_list',{})
+		apl.customer = customer
+		return "Done"
