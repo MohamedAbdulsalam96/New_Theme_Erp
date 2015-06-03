@@ -77,7 +77,6 @@ class WeeklySalarySlip(TransactionBase):
 								and date(tl.to_time) BETWEEN date('%s') AND date('%s')
 								and ed.tailor_task = tl.task
 								and tl.name = ed.time_log_name
-								and ifnull(ed.flag, 'No') = 'Yes'
 								and ed.employee = '%s'
 						"""%(self.from_date,self.to_date, self.employee), as_dict=1)
 
