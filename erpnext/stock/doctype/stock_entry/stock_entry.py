@@ -57,7 +57,7 @@ class StockEntry(StockController):
 	def on_submit(self):
 		from erpnext.stock.stock_custom_methods import validate_for_si_submitted
 		validate_for_si_submitted(self)
-
+		self.update_stock_ledger()
 		from erpnext.stock.doctype.serial_no.serial_no import update_serial_nos_after_submit
 		update_serial_nos_after_submit(self, "mtn_details")
 		self.update_production_order()
