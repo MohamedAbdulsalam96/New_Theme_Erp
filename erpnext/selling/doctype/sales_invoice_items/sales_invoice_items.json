@@ -10,6 +10,7 @@
  "document_type": "", 
  "fields": [
   {
+   "allow_on_submit": 1, 
    "fieldname": "tailoring_delivery_date", 
    "fieldtype": "Date", 
    "label": "Tailoring Delivery Date", 
@@ -1000,7 +1001,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-05-30 03:19:25.727756", 
+ "modified": "2015-06-02 02:53:29.980465", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Sales Invoice Items", 

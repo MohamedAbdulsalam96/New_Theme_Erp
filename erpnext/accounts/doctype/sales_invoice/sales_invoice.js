@@ -556,14 +556,6 @@ cur_frm.cscript.calculate_net_total(doc, cdt, cdn)
 }
 cur_frm.cscript.sales_invoice_items_one_remove = function(doc, cdt, cdn){
 	cur_frm.cscript.calculate_net_total(doc, cdt, cdn)
-	frappe.call({
-		method:"erpnext.accounts.accounts_custom_methods.delete_wo_distribution_entries",
-		args:{'row_name':cdn,'name':doc.name},
-		callback:function(r){
-			refresh_field('work_order_distribution')
-		}
-
-	})
 
 
 }
@@ -772,4 +764,5 @@ cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
 
 
 }
+
 

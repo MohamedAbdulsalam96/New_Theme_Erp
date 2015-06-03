@@ -422,3 +422,10 @@ def validate_emp_skill_table(doc,method):
 				skill_list.append([row.process,row.item_code,row.type_of_payment])
 		else:
 			skill_list.append([row.process,row.item_code,row.type_of_payment])
+
+
+def validate_for_si_submitted(doc):
+	for row in doc.get('mtn_details'):
+		if row.sales_invoice_no:
+			if not frappe.db.get_value("Sales Invoice",row.sales_invoice_no,'docstatus') == 1:
+				frappe.throw("Sales Invoice {0} must be submiited in row {1}.".format(row.sales_invoice_no,row.idx))

@@ -77,7 +77,6 @@ class SalaryManager(Document):
 			Creates salary slip for selected employees if already not created
 
 		"""
-		pdb.set_trace()
 		emp_list = self.get_emp_list()
 		ss_list = []
 		for emp in emp_list:

@@ -102,7 +102,7 @@ class ProcessAllotment(Document):
 			if data.employee_status == 'Completed' and not data.ste_no:
 				details = find_next_process(self.pdd, self.process, data.tailor_process_trials)
 				if cint(data.qc_required)==1:
-					if data.tailor_process_trials and cint(frappe.db.get_value('Trial Dates',{'parent':self.trial_dates, 'trial_no':data.tailor_process_trials}, 'quality_check')) != 1:
+					if data.tailor_process_trials and cint(frappe.db.get_value('Trial Dates',{'parent':self.trial_dates, 'trial_no':data.tailor_process_trials,'process':self.process}, 'quality_check')) != 1:
 						data.ste_no = self.make_ste(details, data)
 					else:
 						data.ste_no = self.make_qc(details, data)

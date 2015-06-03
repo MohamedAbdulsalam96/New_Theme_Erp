@@ -133,6 +133,14 @@
    "label": "Refer Doc", 
    "permlevel": 0, 
    "precision": ""
+  }, 
+  {
+   "fieldname": "clubbed_product_name", 
+   "fieldtype": "Link", 
+   "label": "Clubbed Product Name", 
+   "options": "Item", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -142,7 +150,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-05-13 03:18:38.985901", 
+ "modified": "2015-06-01 05:08:16.432649", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Work Order Distribution", 

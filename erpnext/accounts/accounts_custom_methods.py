@@ -387,12 +387,24 @@ def delte_doctype_data(production_dict):
 def validate_sales_invoice(doc, method):
 	validate_work_order_assignment(doc)
 
+def add_data_for_deleted_rows(doc,d):
+	if cint(d.check_split_qty)==1:
+		split_qty = eval(d.split_qty_dict)
+		for s in split_qty:
+			if s:
+				prepare_data_for_order(doc,d, split_qty[s]['qty'])
+	else:
+		prepare_data_for_order(doc, d, d.tailoring_qty)
+
+
+
+
 def add_data_in_work_order_assignment(doc, method):
 	validate_branch(doc)
 	if not doc.get('work_order_distribution'):
 		doc.set('work_order_distribution',[])	
 	for d in doc.get('sales_invoice_items_one'):
-		if not frappe.db.get_value('Work Order Distribution', {'tailoring_item':d.tailoring_item_code,'parent':doc.name},'name'):
+		if not frappe.db.get_value('Work Order Distribution', {'clubbed_product_name':d.tailoring_item_code,'parent':doc.name},'name'):
 			if cint(d.check_split_qty)==1:
 				split_qty = eval(d.split_qty_dict)
 				for s in split_qty:
@@ -406,7 +418,7 @@ def add_data_in_work_order_assignment(doc, method):
 def prepare_data_for_order(doc, d, qty):
 	if cint(frappe.db.get_value('Item', d.tailoring_item_code, 'is_clubbed_product')) == 1:
 		sales_bom_items = frappe.db.sql("""Select * FROM `tabSales BOM Item` WHERE 
-			parent ='%s' and parenttype = 'Sales Bom'"""%(d.tailoring_item_code), as_dict=1)
+			parent ='%s' and parenttype = 'Item'"""%(d.tailoring_item_code), as_dict=1)
 		for item in sales_bom_items:
 			make_order(doc, d, qty, item.item_code, item.parent)
 	else:
@@ -426,6 +438,10 @@ def make_order(doc, d, qty, item_code, parent=None):
 		e.tailor_fabric_qty = frappe.db.get_value('Size Item', {'parent':d.tailoring_item_code, 'size':d.tailoring_size, 'width':d.width }, 'fabric_qty')
 		e.tailor_warehouse = d.tailoring_branch
 		e.expense = d.total_expenses
+		if parent:
+			e.clubbed_product_name = parent
+		else:
+			e.clubbed_product_name = item_code	 
 		if not e.tailor_work_order:
 			e.tailor_work_order = create_work_order(doc, d, e.serial_no_data, item_code, qty, parent)
 			update_serial_no_with_wo(e.serial_no_data, e.tailor_work_order)
@@ -449,7 +465,8 @@ def make_schedule_for_trials(doc,method):
 		schedules_date(s, doc.item_code, doc.name,doc.trial_date,doc.customer_name)
 		s.save(ignore_permissions=True)	
 		update_work_order_distribution(doc.item_code,doc.sales_invoice_no,doc.name,s.name)
-		doc.trial_no = 1
+		frappe.db.sql(""" update `tabWork Order` set trial_no=1 where name='%s' """%(doc.name))
+		
 		return s.name
 
 def get_first_serial_no(serial_no_data):
@@ -493,10 +510,10 @@ def schedules_date(parent, item, work_order, trial_date, customer_name):
 	return "Done"
 
 def validate_work_order_assignment(doc):
-	if doc.get('work_order_distribution') and doc.get('sales_invoice_items_one'):
-		for d in doc.get('sales_invoice_items_one'):
-			if d.tailoring_item_code and d.tailoring_qty:
-				pass
+# 	if doc.get('work_order_distribution') and doc.get('sales_invoice_items_one'):
+# 		for d in doc.get('sales_invoice_items_one'):
+# 			if d.tailoring_item_code and d.tailoring_qty:
+	pass
 				# check_work_order_assignment(doc, d.tailoring_item_code, d.tailoring_qty)
 
 def check_work_order_assignment(doc, item_code, qty):
@@ -1072,11 +1089,24 @@ def validate_for_item_qty(doc,method):
 			if cint(row.previous_quantity) != cint(row.tailoring_qty):
 				frappe.throw("{0} item quantity has been edited from {1} to {2} for Row {3} .Please Reset it to Previous quantity {4} ".format(row.tailoring_item_code,row.previous_quantity,row.tailoring_qty,row.idx,row.previous_quantity))
 		else:
-			total_qty = frappe.db.sql("select sum(tailor_qty) as qty from `tabWork Order Distribution` where tailoring_item='%s' and parent='%s' "%(row.tailoring_item_code,doc.name),as_list=1)
+			total_qty = frappe.db.sql("select sum(tailor_qty) as qty from `tabWork Order Distribution` where  parent='%s' and clubbed_product_name='%s' "%(doc.name,row.tailoring_item_code),as_list=1)
 			if total_qty[0][0]:
-				if cint(total_qty[0][0]) != cint(row.tailoring_qty):
-					frappe.throw("{0} item quantity has been edited from {1} to {2} for Row {3} .Please Reset it to Previous quantity {4} ".format(row.tailoring_item_code,cint(total_qty[0][0]),row.tailoring_qty,row.idx,cint(total_qty[0][0])))
 
+				if cint(total_qty[0][0]) != cint(row.tailoring_qty) and not frappe.db.get_value('Item',row.tailoring_item_code,'is_clubbed_product'):
+					frappe.throw("{0} item quantity has been edited from {1} to {2} for Row {3} .Please Reset it to Previous quantity {4} ".format(row.tailoring_item_code,cint(total_qty[0][0]),row.tailoring_qty,row.idx,cint(total_qty[0][0])))
+			
+				if frappe.db.get_value('Item',row.tailoring_item_code,'is_clubbed_product'):
+					
+					sales_bom_items = frappe.db.sql("""Select item_code,qty FROM `tabSales BOM Item` WHERE 
+						parent ='%s' and parenttype = 'Item' """%(row.tailoring_item_code), as_list=1)
+					
+					single_bom_qty = 0.0
+					for row1 in sales_bom_items:
+						single_bom_qty += cint(row1[1])
+					original_qty = cint(total_qty[0][0]) / cint(single_bom_qty)	
+					if cint(total_qty[0][0]) != ( cint(row.tailoring_qty) * cint(single_bom_qty) ):		
+						frappe.throw(" Clubbed Product {0} item quantity has been edited from {1} to {2} for Row {3} .Please Reset it to Previous quantity {4} ".format(row.tailoring_item_code,original_qty,row.tailoring_qty,row.idx,original_qty ))
+						
 
 def validate_for_duplicate_item(doc,method):
 	item_list = []
@@ -1101,56 +1131,155 @@ def validate_for_split_qty(doc,method):
 			if total_qty != row.tailoring_qty:
 				frappe.throw("Split Qty booked for item '{0}' on row {1} is not equal to Quantity {2}".format(row.tailoring_item_code,row.idx,row.tailoring_qty))
 
-@frappe.whitelist()
-def delete_wo_distribution_entries(row_name,name):
-	if row_name and name:
-		# item_code = frappe.db.sql("select tailoring_item_code from `tabSales Invoice Items` where name='%s' "%(row_name),as_list=1)
-		# if item_code[0][0]:
-		# 	frappe.db.sql("delete from `tabWork Order Distribution` where tailoring_item='%s' and parent ='%s'  "%(item_code[0][0],name))
-		pass
 
 
 def validation_for_deleted_rows(doc,method):
-	validate_for_wod_deleted_rows(doc,method)
-	validate_for_sales_item_one_deleted_rows(doc,method)
+	wo_dict = validate_for_wod_deleted_rows(doc,method)
+	validate_for_sales_item_one_deleted_rows(doc,method,wo_dict)
 	
-
 
 def validate_for_wod_deleted_rows(doc,method):
-	for sales_row in doc.get('sales_invoice_items_one'):
-		total_qty = 0.0
-		idx_list = []
-		flag_for_new_item = True
-		for wo_row in doc.get('work_order_distribution'):
-			if wo_row.tailoring_item == sales_row.tailoring_item_code:
-				flag_for_new_item = False
-				total_qty += cint(wo_row.tailor_qty)
-				idx_list.append(cstr(wo_row.idx))	
-		
-		if cint(total_qty) != cint(sales_row.tailoring_qty) and flag_for_new_item == False:
-			idx_string = ''
-			if idx_list:
-				idx_string = "for row no %s in Work Order Distribution Table &"%(','.join(idx_list))
-			frappe.throw("Difference between quantity in Tailoring Product table & Work Order Distribution table for Item  '{0}' because you have deleted some rows from Work Order Distribution table.Please delete rows against item '{1}' {2} for row no {3} in Tailoring Product Table".format(sales_row.tailoring_item_code,sales_row.tailoring_item_code,idx_string,sales_row.idx))				
-	
-
-def validate_for_sales_item_one_deleted_rows(doc,method):
-	wo_dict = {}
+	wo_dict ={}
 	for wo_row in doc.get('work_order_distribution'):
-		if not wo_dict.has_key(cstr(wo_row.tailoring_item)): 
-			wo_dict[cstr(wo_row.tailoring_item)] = wo_row.tailor_qty
-		else:	
-			wo_dict[wo_row.tailoring_item] = cint(wo_dict[wo_row.tailoring_item]) + cint(wo_row.tailor_qty)
-	
-	for key,value in wo_dict.items():
-		total_qty = 0.0
-		for sales_row in doc.get('sales_invoice_items_one'):
-			if key == sales_row.tailoring_item_code:
-				total_qty = cint(sales_row.tailoring_qty)
-				break
-		if total_qty != cint(value):
-			frappe.throw("Difference between quantity in Tailoring Product table & Work Order Distribution table for Item  '{0}' because you have deleted rows from Tailoring Product table.Please delete rows against item '{1}' From Work Order Distribution table. ".format(key,key))				
+		new_qty =0.0
+		if not wo_dict.has_key(cstr(wo_row.clubbed_product_name)):
+			wo_dict[wo_row.clubbed_product_name] = {'qty':cint(wo_row.tailor_qty),'row_idx':[cstr(wo_row.idx)]} 	
+			continue
+		if wo_dict.has_key(cstr(wo_row.clubbed_product_name)):
+			new_qty   =  wo_dict[wo_row.clubbed_product_name].get('qty') +  cint(wo_row.tailor_qty)
+			wo_dict[wo_row.clubbed_product_name]['qty'] = new_qty
+			wo_dict[wo_row.clubbed_product_name].get('row_idx').append(cstr(wo_row.idx))
+	return wo_dict		
+
+
+def validate_for_sales_item_one_deleted_rows(doc,method,wo_dict):
+	sales_dict={}
+	for sales_row in doc.get('sales_invoice_items_one'):
+		sales_dict[sales_row.tailoring_item_code] = [sales_row.tailoring_qty,sales_row.idx]
+	new_validations(doc,method,sales_dict,wo_dict)	
+
+
+def new_validations(doc,method,sales_dict,wo_dict):			
+	for sales_item,value in sales_dict.items():
+		if wo_dict.has_key(sales_item):
+			if cint(value[0]) != cint(wo_dict.get(sales_item)['qty']) and not frappe.db.get_value('Item',sales_item,'is_clubbed_product'):
+				frappe.throw("You have deleted rows against item {0} from Work Order distribution table.Please delete rows against item {1} from Work Order Distribution table for rows {2} and  row {3} in Tailoring Product table ".format(sales_item,sales_item, ','.join( wo_dict.get(sales_item)['row_idx'] ),value[1] ))
+			
+			if frappe.db.get_value('Item',sales_item,'is_clubbed_product'):
+				
+				sales_bom_items = frappe.db.sql("""Select item_code,qty FROM `tabSales BOM Item` WHERE 
+							parent ='%s' and parenttype = 'Item' """%(sales_item), as_list=1)
+			
+				single_bom_qty = 0.0
+				for row in sales_bom_items:
+					single_bom_qty += cint(row[1])	
+
+				if (cint(value[0]) * single_bom_qty) != cint(wo_dict.get(sales_item)['qty']):	
+					frappe.throw("You have deleted rows for clubbed product {0} from Work Order Distribution table. Please delete rows {1} from  Work Order Distribution table and row no {2} from Tailoring Product table".format(sales_item,','.join( wo_dict.get(sales_item)['row_idx'] ),value[1] ))
+		
+		if not wo_dict.has_key(sales_item):			
+			
+			for row in doc.get('sales_invoice_items_one'):
+				if row.tailoring_item_code == sales_item:
+					add_data_for_deleted_rows(doc,row)
+
+	for wo_item,value in wo_dict.items():				
+		if not sales_dict.has_key(wo_item):
+			if not frappe.db.get_value('Item',wo_item,'is_clubbed_product'):
+				frappe.throw("You have deleted Item {0} from Tailoring Product table.Please delete row {1} from  Work Order Distribution table".format(wo_item, ','.join( wo_dict.get(wo_item)['row_idx'] ) ))
+			elif frappe.db.get_value('Item',wo_item,'is_clubbed_product'):	
+				frappe.throw("You have deleted clubbed product {0} from Tailoring Product table.Please delete rows {1} from  Work Order Distribution table".format(wo_item, ','.join( wo_dict.get(wo_item)['row_idx'] ) ))
+
+
+
+# def validate_for_wod_deleted_rows(doc,method):
+# 	for sales_row in doc.get('sales_invoice_items_one'):
+# 		if not frappe.db.get_value('Item',sales_row.tailoring_item_code,'is_clubbed_product'):
+# 			total_qty = 0.0
+# 			idx_list = []
+# 			flag_for_new_item = True
+# 			for wo_row in doc.get('work_order_distribution'):
+# 				if wo_row.tailoring_item == sales_row.tailoring_item_code and wo_row.tailoring_item == wo_row.clubbed_product_name:
+# 					flag_for_new_item = False
+# 					total_qty += cint(wo_row.tailor_qty)
+# 					idx_list.append(cstr(wo_row.idx))	
+# 			if cint(total_qty) != cint(sales_row.tailoring_qty) and flag_for_new_item == False:
+# 				idx_string = ''
+# 				if idx_list:
+# 					idx_string = "for row no %s in Work Order Distribution Table &"%(','.join(idx_list))
+# 				frappe.throw("Difference between quantity in Tailoring Product table & Work Order Distribution table for Item  '{0}' because you have deleted some rows from Work Order Distribution table.Please delete rows against item '{1}' {2} for row no {3} in Tailoring Product Table".format(sales_row.tailoring_item_code,sales_row.tailoring_item_code,idx_string,sales_row.idx))				
+		
+# 		elif frappe.db.get_value('Item',sales_row.tailoring_item_code,'is_clubbed_product'):
+# 			total_qty = 0.0
+# 			idx_list = []
+# 			flag_for_new_item = True
+			
+# 			for wo_row in doc.get('work_order_distribution'):
+# 				if wo_row.clubbed_product_name == sales_row.tailoring_item_code:
+# 					flag_for_new_item = False
+# 					total_qty += cint(wo_row.tailor_qty)
+# 					idx_list.append(cstr(wo_row.idx))
+
+# 			sales_bom_items = frappe.db.sql("""Select item_code,qty FROM `tabSales BOM Item` WHERE 
+# 							parent ='%s' and parenttype = 'Item' """%(sales_row.tailoring_item_code), as_list=1)
+			
+# 			single_bom_qty = 0.0
+			
+# 			for row in sales_bom_items:
+# 				single_bom_qty += cint(row[1])		
+			
+# 			if cint(total_qty) !=  ( cint(sales_row.tailoring_qty) * cint(single_bom_qty) ) and flag_for_new_item == False:		
+# 				idx_string = ''
+# 				if idx_list:
+# 					idx_string = "for row no %s in Work Order Distribution Table &"%(','.join(idx_list))
+# 				frappe.throw("Clubbed Product Qty for item {0} does not match with Qty in Work Order Distribution table beacause you have deleted rows from Work Order Distribution table.Please delete rows against item '{1}' {2} for row no {3} in Tailoring Product Table".format(sales_row.tailoring_item_code,sales_row.tailoring_item_code,idx_string,sales_row.idx))					
+
+# def validate_for_sales_item_one_deleted_rows(doc,method):
+# 	wo_dict = {}
+# 	for wo_row in doc.get('work_order_distribution'):
+# 		if not wo_dict.has_key(cstr(wo_row.tailoring_item)) and not wo_dict.has_key(cstr(wo_row.clubbed_product_name)):
+# 			if wo_row.clubbed_product_name == wo_row.tailoring_item: 
+# 				wo_dict[cstr(wo_row.tailoring_item)] = wo_row.tailor_qty
+# 			elif wo_row.clubbed_product_name != wo_row.tailoring_item:
+# 				wo_dict[cstr(wo_row.clubbed_product_name)] = wo_row.tailor_qty
+# 		else:
+
+# 			if wo_row.clubbed_product_name == wo_row.tailoring_item: 
+# 				wo_dict[wo_row.tailoring_item] = cint(wo_dict[wo_row.tailoring_item]) + cint(wo_row.tailor_qty)
+# 			elif wo_row.clubbed_product_name != wo_row.tailoring_item:
+# 				wo_dict[wo_row.clubbed_product_name] = cint(wo_dict[wo_row.clubbed_product_name]) + cint(wo_row.tailor_qty)
+			
+# 	for key,value in wo_dict.items():
+# 		total_qty = 0.0
+# 		clubbed_product = ''
+# 		clubbed_qty = 0.0
+# 		for sales_row in doc.get('sales_invoice_items_one'):
+# 			if key == sales_row.tailoring_item_code and not frappe.db.get_value('Item',sales_row.tailoring_item_code,'is_clubbed_product'):				
+# 				total_qty = cint(sales_row.tailoring_qty)
+# 				break	
+# 			if key == sales_row.tailoring_item_code and frappe.db.get_value('Item',sales_row.tailoring_item_code,'is_clubbed_product'):				
+# 				clubbed_product = sales_row.tailoring_item_code
+# 				clubbed_qty = sales_row.tailoring_qty
+# 				break	
+		
+# 		if frappe.db.get_value("Item",key,'is_clubbed_product'):
+# 			sales_bom_items = frappe.db.sql("""Select item_code,qty FROM `tabSales BOM Item` WHERE 
+# 							parent ='%s' and parenttype = 'Item' """%(key), as_list=1)
+			
+# 			single_bom_qty = 0.0
+# 			item_list = []
+# 			for row in sales_bom_items:
+# 				single_bom_qty += cint(row[1])
+# 				item_list.append(cstr(row[0])) 
+# 			item_string = "for item %s in Work Order Distribution Table"%(','.join(item_list))
+				
+# 			total_qty = cint(clubbed_qty)  * cint(single_bom_qty)
+# 			if total_qty != cint(value):
+# 				frappe.throw("Clubbed Product Qty for item '{0}' does not match with Qty in Work Order Distribution table beacause you have deleted rows from Tailoring Product table.Please delete rows against Item {1} from Work Order Distribution table".format(key,item_string))
 						
+# 		elif not clubbed_product and not frappe.db.get_value("Item",key,'is_clubbed_product'):
+# 			if total_qty != cint(value):
+# 				frappe.throw("Difference between quantity in Tailoring Product table & Work Order Distribution table for Item  '{0}' because you have deleted rows from Tailoring Product table.Please delete rows against item '{1}' From Work Order Distribution table. ".format(key,key))
 
 
 
@@ -1163,24 +1292,18 @@ def validate_for_reserve_qty(doc,method):
 
 
 def create_event_on_sales_invoice_submission(doc,method):
-	event_data = frappe.db.sql(""" SELECT
-						   group_concat(tailoring_item_code),
-						    tailoring_delivery_date
-						FROM
-						    `tabSales Invoice Items`
-						where parent='{0}'    
-						group by  tailoring_delivery_date    """.format(doc.name),as_list=1)
-	if event_data:
-		for row in event_data:
-			create_event_for_item(row,doc)
+	for row in doc.get('sales_invoice_items_one'):
+		create_event_for_item(row,doc)		
 
 
 def create_event_for_item(row,my_doc):
 	evt = frappe.new_doc('Event')
 	evt.branch = my_doc.branch 
-	evt.subject = "Customer {0}:Delivery For Item {1}".format(my_doc.customer_name,row[0])
-	evt.description = 'Dear %s, your delivery date for item "%s" with us today. Kindly Collect your item "%s". Thank you.'%(my_doc.customer_name, row[0],row[0])
-	evt.starts_on = row[1]
+	evt.subject = "Customer {0}:Delivery For Item {1}".format(my_doc.customer_name,row.tailoring_item_code)
+	evt.description = 'Dear %s, your delivery date for item "%s" with us today. Kindly Collect your item "%s". Thank you.'%(my_doc.customer_name, row.tailoring_item_code,row.tailoring_item_code)
+	evt.starts_on = row.tailoring_delivery_date
+	evt.sales_invoice_no = my_doc.name
+	evt.item_name = row.tailoring_item_code 
 	make_appointment_list(evt,my_doc.customer)
 	evt.save(ignore_permissions = True)
 
@@ -1190,3 +1313,8 @@ def make_appointment_list(obj,customer):
 		apl = obj.append('appointment_list',{})
 		apl.customer = customer
 		return "Done"
+
+def update_event_date(doc,method):
+	for row in doc.get('sales_invoice_items_one'):
+		frappe.db.sql("update `tabEvent` set starts_on = '%s' where sales_invoice_no='%s' and item_name ='%s' "%(row.tailoring_delivery_date,doc.name,row.tailoring_item_code))
+		frappe.db.sql(" update `tabSales Invoice Item` set delivery_date ='%s' where parent='%s' and item_code='%s' "%(row.tailoring_delivery_date,doc.name,row.tailoring_item_code))	
