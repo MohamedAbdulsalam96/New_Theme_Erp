@@ -45,22 +45,15 @@ def create_work_order(doc, data, serial_no, item_code, qty, parent_item_code):
 
 def create_work_order_style(data, wo_name, item_code):
 	if wo_name and item_code:
-		styles = frappe.db.sql(""" SELECT DISTINCT
-							    si.style,
-							    si.abbreviation,
-							    (
-							        SELECT
-							            MAX(siii.process_wise_tailor_cost)
-							        FROM
-							            `tabStyle Item` siii
-							        WHERE
-							            default_values=1
-							        AND siii.style = si.style
-							        AND siii.parent = '%s' ) AS process_wise_tailor_cost
-							FROM
-							    `tabStyle Item` as si
-							WHERE
-							    parent = '%s' """%(item_code,item_code),as_dict=1)
+		styles = frappe.db.sql(""" SELECT 
+									    si.style,
+									    si.abbreviation,
+									    si.process_wise_tailor_cost
+									FROM
+									    `tabStyle Item` AS si
+									WHERE
+									    parent = '%s'
+									group by si.style     """%(item_code),as_dict=1,debug=True)
 		if styles:
 			table_view = 'Right'
 			for s in styles:
@@ -180,6 +173,7 @@ def create_material_issue(data, obj):
  				d.raw_material_item_name = frappe.db.get_value('Item',s.raw_item_code,'item_name')
  				d.raw_sub_group = s.raw_item_sub_group or frappe.db.get_value('Item',s.raw_item_code,'item_sub_group')
  				d.uom = frappe.db.get_value('Item',s.raw_item_code,'stock_uom')
+ 				d.qty = s.qty
  	return True
 
 def create_trials(data, obj):
@@ -732,13 +726,68 @@ def update_serial_no_status(serial_no, process, process_status):
 		where name='%s'"""%(process, process_status, serial_no))
 
 def get_serial_no(doctype, txt, searchfield, start, page_len, filters):
+	return new_common_get_serial_no(filters)
+	
+def new_common_get_serial_no(filters):
 	if filters.get('trial_no'):
 		return frappe.db.sql(""" select name from `tabSerial No` where name in (select
 			trials_serial_no_status from `tabTrials` where work_order='%s') and warehouse='%s'
 			and (select status from `tabWork Order` where name='%s') = 'Release'"""%(filters.get('work_order'), get_branch_warehouse(get_user_branch()), filters.get('work_order')))
 	else:
-		return frappe.db.sql(""" select name from `tabSerial No` where warehouse = '%s' and work_order='%s' 
-			and (select status from `tabWork Order` where name='%s') = 'Release'"""%(get_branch_warehouse(get_user_branch()), filters.get('work_order'), filters.get('work_order')))
+		filters_dict = {'wo':filters.get('work_order'),'process':filters.get('process'),'warehouse': get_branch_warehouse(get_user_branch()),'cond':''}
+		idx_no = frappe.db.sql(""" select idx from  `tabProcess Wise Warehouse Detail` where parent='%(wo)s' and process='%(process)s'   """%(filters_dict),as_list=1)
+		cond = ''
+		if cint(idx_no[0][0]) !=1:
+			cond = "WHERE\
+						    (\
+						        SELECT\
+						            status\
+						        FROM\
+						            `tabSerial No Detail`\
+						        WHERE\
+						            parent=my_table.name\
+						        AND process=\
+						            (\
+						                SELECT\
+						                    process\
+						                FROM\
+						                    `tabProcess Wise Warehouse Detail`\
+						                WHERE\
+						                    parent='%(wo)s'\
+						                AND idx <\
+						                    (\
+						                        SELECT\
+						                            idx\
+						                        FROM\
+						                            `tabProcess Wise Warehouse Detail`\
+						                        WHERE\
+						                            parent='%(wo)s'\
+						                        AND process = '%(process)s' )\
+						                ORDER BY\
+						                    idx DESC limit 1 )\
+						        ORDER BY\
+						            trial_no limit 1 ) = 'Completed'"%filters_dict
+			filters_dict['cond'] = cond
+
+		return frappe.db.sql(""" SELECT
+							    my_table.name
+							FROM
+							    (
+							        SELECT
+							            name
+							        FROM
+							            `tabSerial No`
+							        WHERE
+							            warehouse = '%(warehouse)s'
+							        AND work_order='%(wo)s'
+							        AND (
+							                SELECT
+							                    status
+							                FROM
+							                    `tabWork Order`
+							                WHERE
+							                    name='%(wo)s') = 'Release') AS my_table %(cond)s """%(filters_dict),as_list=1,debug=True)
+
 
 def validate_status(serial_no, process_status):
 	mapper = {'Closed':'Open', 'Open': 'Closed'}
@@ -811,7 +860,7 @@ def update_status_to_completed(serial_no, process_data, trial_no, emp_status):
 	if trial_no:
 		cond = "trial_no = '%s'"%(trial_no)
 	name = frappe.db.sql("""select name from `tabSerial No Detail` where parent='%s'
-		and process_data='%s' and %s"""%(serial_no, process_data, cond), as_list=1)
+		and process_data='%s' and  %s"""%(serial_no, process_data, cond), as_list=1)
 	if name:
 		update_serial_no_log_status(name[0][0], emp_status)
 
@@ -1067,13 +1116,7 @@ def get_deduction_type(doctype, txt, searchfield, start, page_len, filters):
 @frappe.whitelist()
 def get_all_serial_no(filters):
 	filters = eval(filters)
-	if filters.get('trial_no'):
-		return frappe.db.sql(""" select name from `tabSerial No` where name in (select
-			trials_serial_no_status from `tabTrials` where work_order='%s') and warehouse='%s'
-			and (select status from `tabWork Order` where name='%s') = 'Release'"""%(filters.get('work_order'), get_branch_warehouse(get_user_branch()), filters.get('work_order')),as_list=1)
-	else:
-		return frappe.db.sql(""" select concat(name) from `tabSerial No` where warehouse = '%s' and work_order='%s' 
-			and (select status from `tabWork Order` where name='%s') = 'Release'"""%(get_branch_warehouse(get_user_branch()), filters.get('work_order'), filters.get('work_order')),as_list=1)
+	return new_common_get_serial_no(filters)
 
 
 def validate_all_wo_submitted(doc,method):
@@ -1318,3 +1361,7 @@ def update_event_date(doc,method):
 	for row in doc.get('sales_invoice_items_one'):
 		frappe.db.sql("update `tabEvent` set starts_on = '%s' where sales_invoice_no='%s' and item_name ='%s' "%(row.tailoring_delivery_date,doc.name,row.tailoring_item_code))
 		frappe.db.sql(" update `tabSales Invoice Item` set delivery_date ='%s' where parent='%s' and item_code='%s' "%(row.tailoring_delivery_date,doc.name,row.tailoring_item_code))	
+
+
+
+

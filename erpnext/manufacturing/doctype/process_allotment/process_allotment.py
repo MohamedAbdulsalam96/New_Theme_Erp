@@ -19,8 +19,8 @@ class ProcessAllotment(Document):
 		# self.assign_task()
 		# self.update_process_status()
 		self.make_IssueSTE()
-		self.prepare_for_time_log()
 		self.update_task()
+		self.prepare_for_time_log()
 		# self.make_auto_ste()
 		# self.auto_ste_for_trials()
 		self.procees_allotment_qrcode()
@@ -205,7 +205,7 @@ class ProcessAllotment(Document):
 		if args.tailor_serial_no:
 			serial_no_list = cstr(args.tailor_serial_no).split('\n')
 			for serial_no in serial_no_list:
-				if args.employee_status == 'Completed' or 'Reassigned' and not args.ste_no:
+				if args.employee_status == 'Completed' or  args.employee_status == 'Reassigned' and not args.ste_no:
 					update_status_to_completed(serial_no, self.name, args.tailor_process_trials, self.emp_status)
 
 	def validate_trials(self, args):
@@ -298,6 +298,7 @@ class ProcessAllotment(Document):
 
 	def find_start_time(self):
 		self.start_date = now()
+
 		return "Done"
 
 	def find_to_time(self, date_type=None):
@@ -312,7 +313,10 @@ class ProcessAllotment(Document):
 			self.completed_time = cstr(math.floor(((after - before).total_seconds()) / 60))
 		else:
 			frappe.msgprint("Start Date is not mentioned")
-		return "Done"
+		return {
+		"completed_time":self.completed_time,
+		"end_date":self.end_date
+		}
 
 	def date_formatting(self,date):
 		date = get_datetime(date)
@@ -716,6 +720,9 @@ class ProcessAllotment(Document):
 	def validate_processStatus(self, serial_no):
 		check_dict = self.get_dic_List(serial_no)
 		check_dict.setdefault('status', self.emp_status)
+		# frappe.errprint(check_dict)
+		# frappe.errprint(frappe.db.get_value('Serial No Detail', check_dict, 'name'))
+		# bjkhkk
 		if frappe.db.get_value('Serial No Detail', check_dict, 'name'):
 			frappe.throw(_("Status {0} already defined For Serial No {1}").format(self.emp_status,serial_no))
 
@@ -728,6 +735,8 @@ class ProcessAllotment(Document):
 			val.remove('Assigned')
 			val.append('Reassigned')	 
 		check_dict = self.get_dic_List(serial_no)
+		frappe.errprint(check_dict)
+		frappe.errprint(frappe.db.get_value('Serial No Detail', check_dict, 'status'))
 		if frappe.db.get_value('Serial No Detail', check_dict, 'status') not in val:
 			frappe.throw(_("Sequence is not correct or previous process is not Completed").format(self.emp_status))
 
@@ -755,6 +764,7 @@ class ProcessAllotment(Document):
 			self.estimated_time = cint(self.work_qty) * cint(frappe.db.get_value('EmployeeSkill',{'parent':self.process_tailor, 'process':self.process, 'item_code': self.item},'time'))
 			self.start_date = self.date_formatting(self.start_date)
 			self.end_date = datetime.datetime.strptime(self.start_date, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(minutes = cint(self.estimated_time))
+
 		return "Done"
 
 	def calculate_wages(self):

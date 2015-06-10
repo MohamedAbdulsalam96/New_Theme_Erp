@@ -90,7 +90,6 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 
 	refresh: function(doc, dt, dn) {
 		this._super();
-
 		cur_frm.cscript.is_opening(doc, dt, dn);
 		cur_frm.dashboard.reset();
 
@@ -671,7 +670,7 @@ cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
                        <tbody></tbody>\
                        </table>").appendTo($(fd.styles_name.wrapper))
 
-					columns =[['Branch','40'],['Qty','40'], ['Reserv Qty', 50]]
+					columns =[['Branch','40'],['Qty','40'], ['Reserve Qty', 50]]
 					var me = this;
 					$.each(columns, 
                        function(i, col) {                  
@@ -704,6 +703,13 @@ cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
 								
 
 					dialog.show();
+					 $('div.modal.in').on("hide.bs.modal", function() {
+
+                  			$('div.modal.in').remove()
+            			})
+
+
+
 					$(fd.create_new.input).click(function() {
 						total_qty = 0.0
 						fabric_detail ={}	
@@ -747,7 +753,7 @@ cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
 									
 										cur_frm.save()
 										dialog.hide()
-										$('.modal').remove()
+									$('div.modal.in').remove()
 										
 								}	
 						

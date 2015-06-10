@@ -19,6 +19,7 @@ from erpnext.controllers.recurring_document import *
 from erpnext.controllers.selling_controller import SellingController
 from tools.tools_management.custom_methods import get_merchandise_item_details, get_item_details
 from erpnext.accounts.accounts_custom_methods import update_serial_noInto
+from erpnext.stock.stock_custom_methods import split_serial_no
 
 form_grid_templates = {
 	"entries": "templates/form_grid/item_grid.html"
@@ -654,6 +655,7 @@ def make_delivery_note(source_name, target_doc=None):
 		target_doc.amount = (flt(source_doc.qty) - flt(source_doc.delivered_qty)) * \
 			flt(source_doc.rate)
 		target_doc.qty = flt(source_doc.qty) - flt(source_doc.delivered_qty)
+		target_doc.serial_no = split_serial_no(source_doc)
 
 	doclist = get_mapped_doc("Sales Invoice", source_name, 	{
 		"Sales Invoice": {

@@ -293,9 +293,10 @@
    "read_only": 0
   }, 
   {
-   "allow_on_submit": 1, 
+   "allow_on_submit": 0, 
    "fieldname": "entries", 
    "fieldtype": "Table", 
+   "hidden": 0, 
    "label": "Sales Invoice Items", 
    "oldfieldname": "entries", 
    "oldfieldtype": "Table", 
@@ -1193,7 +1194,7 @@
  "icon": "icon-file-text", 
  "idx": 1, 
  "is_submittable": 1, 
- "modified": "2015-04-06 08:45:12.538377", 
+ "modified": "2015-06-10 00:45:31.949924", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Sales Invoice", 

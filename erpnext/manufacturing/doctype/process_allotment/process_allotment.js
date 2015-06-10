@@ -1,6 +1,6 @@
 cur_frm.add_fetch('raw_material_item_code', 'item_name', 'raw_material_item_name')
 cur_frm.add_fetch('raw_material_item_code', 'stock_uom', 'uom')
-
+doc = cur_frm.doc
 cur_frm.fields_dict['sales_invoice_no'].get_query = function(doc) {
 	return {
 		filters: {
@@ -73,12 +73,16 @@ cur_frm.cscript.emp_status= function(doc, cdt, cdn){
 	doc.process_status = 'Open'
 	cur_frm.cscript.toogle_field(doc)
  if (doc.emp_status == 'Completed'){
-		get_server_fields('find_to_time','','',doc, cdt, cdn, 1, function(){
-			refresh_field(['end_date', 'completed_time'])
-		})
+		get_server_fields('find_to_time','','',doc, cdt, cdn, 1, function(r,rt){
+			doc.end_date = r['end_date']
+			doc.completed_time = r['completed_time']
+			refresh_field('end_date')
+			refresh_field('completed_time')
 		get_server_fields('calculate_wage','','', doc, cdt, cdn, 1, function(){
 			refresh_field(['wages','wages_for_single_piece'])
-		})
+			})
+	})
+		
 
 
 	}
@@ -93,16 +97,20 @@ if (doc.emp_status == 'Assigned' ||  doc.emp_status == 'Reassigned')
 			doc.serial_no_data = ''
 			doc.employee_name = ''
 			doc.process_tailor = ''
+			doc.start_date =''
+			doc.completed_time =''
+			doc.task = ''
 	}
 
-	refresh_field(['process_status', 'completed_time', 'start_date', 'work_qty','wages','wages_for_single_piece','process_tailor','serial_no','serial_no_data','employee_name','process_tailor'])
+
+	refresh_field(['process_status', 'completed_time', 'start_date', 'work_qty','wages','wages_for_single_piece','process_tailor','serial_no','serial_no_data','employee_name','process_tailor','end_date','task'])
 }
 
 cur_frm.cscript.process_tailor=function(doc,cdt,cdn){
 
 	if(doc.emp_status == 'Assigned' ||  doc.emp_status == 'Reassigned'){
 		get_server_fields('find_start_time','','', doc, cdt, cdn, 1, function(){
-			cur_frm.cscript.clear_field(doc);
+			refresh_field('start_date')
 		})
 
 
@@ -113,17 +121,15 @@ cur_frm.cscript.process_tailor=function(doc,cdt,cdn){
 }
 
 cur_frm.cscript.clear_field= function(doc){
-	if(doc.emp_status == 'Completed'){
-		doc.start_date = ''
-		doc.end_date = ''
-		doc.work_qty = ''
-		doc.estimated_time = ''
-		doc.completed_time = ''
- 		doc.serial_no = ''
-		doc.serial_no_data = ''
+	// if(doc.emp_status == 'Completed'){
+	// 	doc.start_date = ''
+	// 	doc.work_qty = ''
+	// 	doc.estimated_time = ''
+ // 		doc.serial_no = ''
+	// 	doc.serial_no_data = ''
 		
-	}
-	refresh_field(['process_status', 'completed_time', 'start_date', 'work_qty', 'end_date', 'estimated_time', 'serial_no', 'serial_no_data','wages'])
+	// }
+	//refresh_field(['process_status', 'start_date', 'work_qty', 'end_date', 'estimated_time', 'serial_no', 'serial_no_data','wages'])
 }
 
 cur_frm.cscript.toogle_field = function(doc){
@@ -133,8 +139,9 @@ cur_frm.cscript.toogle_field = function(doc){
 		doc.process_status = 'Closed'
 		// hide_field([ 'start_date', 'end_date']);
 		unhide_field([ 'completed_time', 'payment', 'extra_charge', 'deduct_late_work','wages_for_single_piece']);
-		payment_dict = {'wages': doc.payment, 'latework': doc.deduct_late_work, 'cost': doc.deduct_late_work, 'extra_charge': doc.extra_charge_amount}
+		payment_dict = {'wages': doc.payment, 'latework': doc.deduct_late_work, 'cost': doc.deduct_late_work, 'extra_charge': doc.extra_charge}
 		for (key in payment_dict){
+
 			if (payment_dict[key] == 'Yes'){
 				unhide_field(key)
 			}else{
@@ -145,10 +152,8 @@ cur_frm.cscript.toogle_field = function(doc){
 	}else if(doc.emp_status=='Assigned' || doc.emp_status=='Reassigned' || doc.emp_status==''){
 		unhide_field(['start_date', 'end_date', 'estimated_time'])
 		hide_field([ 'completed_time', 'payment', 'extra_charge', 'deduct_late_work','wages_for_single_piece']);
-		doc.end_date = ''
-		doc.estimated_time = ''
-		doc.completed_time = ''
-		doc.task =''
+		// doc.end_date = ''
+		// doc.task =''
 		
 
 		refresh_field(['process_tailor', 'employee_name', 'start_date', 'end_date', 'estimated_time', 'serial_no', 'serial_no_data', 'work_qty'])
@@ -157,13 +162,14 @@ cur_frm.cscript.toogle_field = function(doc){
 }
 
 cur_frm.cscript.assigned= function(doc, cdt, cdn){
+	console.log(doc)
 	if(doc.emp_status){
 		status = cur_frm.cscript.validate_mandatory_fields(doc)
 		if(status=='true')
 		{
 			get_server_fields('assign_task_to_employee','','',doc, cdt, cdn,1, function(){
 				refresh_field('employee_details')
-				refresh_field('task')	
+				refresh_field('task')
 			})	
 		}
 	}else{
@@ -183,6 +189,7 @@ cur_frm.cscript.validate_mandatory_fields= function(doc){
 
 		}
 	status = 'true'
+
 	for(key in data){
 		if(!data[key]){
 			alert("Mandatory Fields: "+key+"")
@@ -190,6 +197,7 @@ cur_frm.cscript.validate_mandatory_fields= function(doc){
 			break;
 		}
 	}
+
 	return status
 }
 
@@ -292,13 +300,13 @@ cur_frm.cscript.serial_no = function(doc, cdt, cdn){
 	cur_frm.cscript.calculate_qty(doc)
 	refresh_field(['serial_no_data', 'work_qty'])
 	get_server_fields('calculate_estimates_time','','',doc, cdt, cdn,1, function(){
-		refresh_field(['estimated_time', 'end_date'])	
+		refresh_field(['estimated_time', 'end_date','completed_time'])	
 	})
 }
 
 cur_frm.cscript.start_date = function(doc, cdt, cdn){
 	get_server_fields('calculate_estimates_time','','',doc, cdt, cdn,1, function(){
-		refresh_field(['estimated_time', 'end_date'])	
+		refresh_field(['estimated_time', 'end_date','completed_time'])	
 	})
 }
 
@@ -332,7 +340,7 @@ cur_frm.cscript.add_all_serial_no= function(doc, cdt, cdn){
 				refresh_field('serial_no_data')
 				refresh_field('work_qty')
 				get_server_fields('calculate_estimates_time','','',doc, cdt, cdn,1, function(){
-					refresh_field(['estimated_time', 'end_date'])	
+					refresh_field(['estimated_time', 'end_date','completed_time'])	
 				})
 			}
 		}

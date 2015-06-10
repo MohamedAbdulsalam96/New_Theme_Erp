@@ -74,15 +74,18 @@ class Trials(Document):
 		if data:
 			reverse_entry = data.reverse_entry if data.reverse_entry else ''
 			if trial_data.production_status == 'Closed' and cint(trial_data.skip_trial) != 1 and cint(self.finished_all_trials)!=1:
-				if reverse_entry == 'Pending' and trial_data.trial_branch != data.branch:
-					branch = data.branch
-					msg = cstr(trial_data.trial_no) + ' ' +cstr(trial_data.production_status)
-					self.prepare_for_ste(trial_data, branch, data, msg)
+				pass
 			else:
 				self.validate_QI_completed(trial_data, args_obj)
 				self.OpenNextTrial(trial_data)
 				if trial_data.work_status == 'Open' and cint(trial_data.skip_trial)!=1 and trial_data.production_status!='Closed':
-					self.open_trial(trial_data.quality_check, trial_data.process, trial_data)
+					if reverse_entry == 'Pending' and trial_data.trial_branch != data.branch:
+						self.open_trial(trial_data.quality_check, trial_data.process, trial_data)
+						branch = data.branch
+						msg = cstr(trial_data.trial_no) + ' ' +cstr(trial_data.production_status)
+						self.prepare_for_ste(trial_data, branch, data, msg)
+					if reverse_entry == 'Pending' and trial_data.trial_branch == data.branch:
+						self.open_trial(trial_data.quality_check, trial_data.process, trial_data)	
 
 	def validate_QI_completed(self, args, args_obj):
 		for obj in args_obj:

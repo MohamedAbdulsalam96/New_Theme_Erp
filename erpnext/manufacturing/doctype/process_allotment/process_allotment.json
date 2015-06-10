@@ -340,6 +340,12 @@
    "read_only": 1
   }, 
   {
+   "fieldname": "test_field", 
+   "fieldtype": "HTML", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "default": "No", 
    "depends_on": "", 
    "fieldname": "extra_charge", 
@@ -585,7 +591,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-05-30 03:23:39.211754", 
+ "modified": "2015-06-09 02:10:50.830540", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

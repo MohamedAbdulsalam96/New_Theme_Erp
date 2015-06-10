@@ -369,11 +369,19 @@ def stock_qrcode(doc,method):
 			doc.qrcode = '<img src="/files/QRCode/%s/%s.png">'%(doc.doctype,doc.name.replace("/","-"))
 
 def validate_serial_no_status(doc, method):
+	update_qty_in_Invoice(doc)
 	for s in doc.get('delivery_note_details'):
 		if frappe.db.get_value('Item', s.item_code, 'item_group') == 'Tailoring' and s.serial_no:
 			sn = cstr(s.serial_no).split('\n')
 			if sn:
 				throw_exception(sn)
+
+def update_qty_in_Invoice(self, type_of=None):
+	for d in self.get('delivery_note_details'):
+		if d.against_sales_invoice and d.item_code:
+			qty = flt(d.qty) * -1  if type_of == 'Cancel' else flt(d.qty)
+			frappe.db.sql(''' update `tabSales Invoice Item` set delivered_qty = ifnull(delivered_qty,0) + (%s)
+				where item_code = "%s" and parent = "%s"'''%(qty, d.item_code, d.against_sales_invoice))
 
 def throw_exception(serial_no_list):
 	for serial_no in serial_no_list:
@@ -429,3 +437,13 @@ def validate_for_si_submitted(doc):
 		if row.sales_invoice_no:
 			if not frappe.db.get_value("Sales Invoice",row.sales_invoice_no,'docstatus') == 1:
 				frappe.throw("Sales Invoice {0} must be submiited in row {1}.".format(row.sales_invoice_no,row.idx))
+
+
+def split_serial_no(doc):
+	serial_no_data = ''
+	if doc.serial_no:
+		serial_no = cstr(doc.serial_no).split('\n')
+		for sn in serial_no:
+			if frappe.db.get_value('Serial No', sn ,'status') == 'Available':
+				serial_no_data += '\n' + sn if serial_no_data else sn
+	return serial_no_data
