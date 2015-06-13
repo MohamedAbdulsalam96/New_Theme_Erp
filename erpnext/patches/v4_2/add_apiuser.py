@@ -21,6 +21,6 @@ def execute():
 		print "added all roles to apiuser"
 		print frappe.db.sql_list("""select name from tabRole""")
 		# gangadhar set password of guest
-		_update_password("apiuser", "apiuser")
+		_update_password("apiuser", "resuipa132")
 		print "updated password of apiuser"
 		frappe.db.commit()
