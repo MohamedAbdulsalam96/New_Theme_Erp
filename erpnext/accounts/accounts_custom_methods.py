@@ -680,7 +680,7 @@ def stock_entry_of_child(obj, args, target_branch, sn_list, qty):
 	ste.item_code = args.get('item')
 	ste.item_name = frappe.db.get_value('Item', ste.item_code, 'item_name')
 	ste.stock_uom = frappe.db.get_value('Item', ste.item_code, 'stock_uom')
-	company = frappe.db.get_value('GLobal Default', None, 'company')
+	company = frappe.db.get_value('Global Defaults', None, 'company')
 	ste.expense_account = frappe.db.get_value('Company', company, 'default_expense_account')
 	ste.cost_center = get_branch_cost_center(get_user_branch()) or 'Main - '+frappe.db.get_value('Company', company, 'abbr')
 	return "Done"
