@@ -130,7 +130,7 @@ def validate_validity(doc, method):
 	from frappe.utils import get_url, cstr
 	if doc.get("__islocal") and get_url()!='http://demo.tailorpad.com':
 		#res =''
-	 	res = frappe.db.sql("select name,user_name,validity from `tabUser Validity` where  user_name >0")
+	 	res = frappe.db.sql("select name,user_name,validity from `tabUser Validity` where  user_name >0",as_list=1)
 	 	if  res:
 	 			frappe.db.sql("update `tabUser Validity` set user_name=%s-1  where name=%s" (res[0][1],res[0][0]),debug=1)
 				from frappe.utils import nowdate,add_months,cint
