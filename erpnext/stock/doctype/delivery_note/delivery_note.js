@@ -24,8 +24,8 @@ erpnext.stock.DeliveryNoteController = erpnext.selling.SellingController.extend(
 					return item.against_sales_invoice ? true : false;
 				});
 
-			if(!from_sales_invoice)
-				cur_frm.add_custom_button(__('Make Invoice'), this.make_sales_invoice);
+			// if(!from_sales_invoice)
+			// 	cur_frm.add_custom_button(__('Make Invoice'), this.make_sales_invoice);
 		}
 
 		if(flt(doc.per_installed, 2) < 100 && doc.docstatus==1)

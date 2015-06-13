@@ -221,6 +221,7 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
     define_cost_to_tailor:function(doc, cdt, cdn){
         var d = locals[cdt][cdn]
         this.init_cost_to_tailor(d)
+        this.kill_dialog()
         this.render_cost_to_tailor_form(d)
         this.add_cost_to_tailor(d)
         this.save_tailor_cost(d)
@@ -247,6 +248,16 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
                     <thead><tr ><td>Process</td><td>Tailor Cost</td><td>Remove</td></tr></thead><tbody></tbody></table></div>').appendTo($(this.control_tailor_cost.tailor_cost_name.wrapper))
 
         this.dialog.show();
+
+
+    },
+    kill_dialog : function (d){
+        
+         $('div.modal.in').on("hide.bs.modal", function() {
+
+                     $('.modal-dialog').remove()
+
+            })
 
 
     },
@@ -303,7 +314,7 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
         refresh_field('style_item')
         refresh_field(['wo_style',d.name,'process_wise_tailor_cost'])
         $('#mytable').remove()
-        me.dialog.hide()
+        $('.modal-dialog').remove()
 
         })
         

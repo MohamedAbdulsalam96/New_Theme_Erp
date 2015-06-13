@@ -720,9 +720,6 @@ class ProcessAllotment(Document):
 	def validate_processStatus(self, serial_no):
 		check_dict = self.get_dic_List(serial_no)
 		check_dict.setdefault('status', self.emp_status)
-		# frappe.errprint(check_dict)
-		# frappe.errprint(frappe.db.get_value('Serial No Detail', check_dict, 'name'))
-		# bjkhkk
 		if frappe.db.get_value('Serial No Detail', check_dict, 'name'):
 			frappe.throw(_("Status {0} already defined For Serial No {1}").format(self.emp_status,serial_no))
 
@@ -735,8 +732,6 @@ class ProcessAllotment(Document):
 			val.remove('Assigned')
 			val.append('Reassigned')	 
 		check_dict = self.get_dic_List(serial_no)
-		frappe.errprint(check_dict)
-		frappe.errprint(frappe.db.get_value('Serial No Detail', check_dict, 'status'))
 		if frappe.db.get_value('Serial No Detail', check_dict, 'status') not in val:
 			frappe.throw(_("Sequence is not correct or previous process is not Completed").format(self.emp_status))
 

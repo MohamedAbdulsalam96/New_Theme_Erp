@@ -64,7 +64,7 @@ doc_events = {
 		"on_update": "erpnext.home.make_comment_feed"
 	},
 	"Stock Entry": {
-		"validate":["erpnext.stock.stock_custom_methods.my_random_string","erpnext.stock.stock_custom_methods.stock_qrcode"],
+		"validate":["erpnext.stock.stock_custom_methods.validate_bundle_abbreviation","erpnext.stock.stock_custom_methods.my_random_string","erpnext.stock.stock_custom_methods.stock_qrcode"],
 		"on_submit": ["erpnext.stock.doctype.material_request.material_request.update_completed_qty","erpnext.stock.stock_custom_methods.stock_out_entry","erpnext.stock.stock_custom_methods.in_stock_entry"],
 		"on_cancel": "erpnext.stock.doctype.material_request.material_request.update_completed_qty"
 	},

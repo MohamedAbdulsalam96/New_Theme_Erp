@@ -10,9 +10,13 @@ from frappe.model.document import Document
 
 class POSSetting(Document):
 	def validate(self):
+		self.validate_user()
 		self.check_for_duplicate()
 		self.validate_expense_account()
 		self.validate_all_link_fields()
+
+	def validate_user(self):
+		frappe.throw(_('Not allowed this is under development'))
 
 	def check_for_duplicate(self):
 		res = frappe.db.sql("""select name, user from `tabPOS Setting`

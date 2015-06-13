@@ -53,7 +53,7 @@ def create_work_order_style(data, wo_name, item_code):
 									    `tabStyle Item` AS si
 									WHERE
 									    parent = '%s'
-									group by si.style     """%(item_code),as_dict=1,debug=True)
+									group by si.style     """%(item_code),as_dict=1)
 		if styles:
 			table_view = 'Right'
 			for s in styles:
@@ -674,6 +674,9 @@ def stock_entry_of_child(obj, args, target_branch, sn_list, qty):
 	# Suyash 'sales_invoice_no and customer_name are added in custom field in stock_entry child table'
 	ste.sales_invoice_no = frappe.db.get_value('Work Order',args.get('work_order'),'sales_invoice_no') if args.get('work_order') else ''
 	ste.customer_name = frappe.db.get_value('Work Order',args.get('work_order'),'customer_name') if args.get('work_order') else ''
+	if args.get('work_order'):
+		ste.trial_date = frappe.db.get_value('Work Order',args.get('work_order'),'trial_date') or ''
+		ste.delivery_date = frappe.db.get_value('Work Order',args.get('work_order'),'delivery_date') or ''
 	ste.item_code = args.get('item')
 	ste.item_name = frappe.db.get_value('Item', ste.item_code, 'item_name')
 	ste.stock_uom = frappe.db.get_value('Item', ste.item_code, 'stock_uom')
@@ -786,7 +789,7 @@ def new_common_get_serial_no(filters):
 							                FROM
 							                    `tabWork Order`
 							                WHERE
-							                    name='%(wo)s') = 'Release') AS my_table %(cond)s """%(filters_dict),as_list=1,debug=True)
+							                    name='%(wo)s') = 'Release') AS my_table %(cond)s """%(filters_dict),as_list=1)
 
 
 def validate_status(serial_no, process_status):
@@ -1344,7 +1347,7 @@ def create_event_for_item(row,my_doc):
 	evt.branch = my_doc.branch 
 	evt.subject = "Customer {0}:Delivery For Item {1}".format(my_doc.customer_name,row.tailoring_item_code)
 	evt.description = 'Dear %s, your delivery date for item "%s" with us today. Kindly Collect your item "%s". Thank you.'%(my_doc.customer_name, row.tailoring_item_code,row.tailoring_item_code)
-	evt.starts_on = row.tailoring_delivery_date
+	evt.starts_on = row.tailoring_delivery_date or ''
 	evt.sales_invoice_no = my_doc.name
 	evt.item_name = row.tailoring_item_code 
 	make_appointment_list(evt,my_doc.customer)
@@ -1361,6 +1364,15 @@ def update_event_date(doc,method):
 	for row in doc.get('sales_invoice_items_one'):
 		frappe.db.sql("update `tabEvent` set starts_on = '%s' where sales_invoice_no='%s' and item_name ='%s' "%(row.tailoring_delivery_date,doc.name,row.tailoring_item_code))
 		frappe.db.sql(" update `tabSales Invoice Item` set delivery_date ='%s' where parent='%s' and item_code='%s' "%(row.tailoring_delivery_date,doc.name,row.tailoring_item_code))	
+		update_delivery_date_on_work_order(doc,row)
+
+def update_delivery_date_on_work_order(doc,row):
+	if frappe.db.get_value('Item',row.tailoring_item_code,'is_clubbed_product'):
+		result = frappe.db.sql(""" select name from `tabWork Order` where sales_invoice_no='%s' and parent_item_code='%s' """%(doc.name,row.tailoring_item_code	),as_list=1)
+	else:
+		result = frappe.db.sql(""" select name from `tabWork Order` where sales_invoice_no='%s' and item_code='%s' and parent_item_code is null """%(doc.name,row.tailoring_item_code),as_list=1)	
+	frappe.db.sql(""" update `tabWork Order` set delivery_date='%s' where name in (%s) """%(row.tailoring_delivery_date,','.join('"{0}"'.format(w[0]) for w in result)))
+
 
 
 

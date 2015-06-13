@@ -329,7 +329,8 @@
    "fieldtype": "Int", 
    "label": "Qty", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "task", 
@@ -591,7 +592,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-06-09 02:10:50.830540", 
+ "modified": "2015-06-12 06:26:13.657686", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

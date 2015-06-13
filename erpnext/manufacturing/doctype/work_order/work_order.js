@@ -23,7 +23,8 @@ cur_frm.cscript.validate = function(doc, cdt, cdn){
 
 cur_frm.cscript.field_name=function(doc,cdt,cdn){
 	var d=locals[cdt][cdn]
-	frappe.call({
+	if (d.field_name && doc.item_code){
+		frappe.call({
 		method:"erpnext.accounts.accounts_custom_methods.get_styles_DefaultValues",
 		args:{style:d.field_name,item_code:doc.item_code},
 		callback:function(r){
@@ -35,6 +36,9 @@ cur_frm.cscript.field_name=function(doc,cdt,cdn){
 		}
 
 	})
+
+	}
+
 }
 
 

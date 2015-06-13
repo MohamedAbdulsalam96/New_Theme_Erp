@@ -110,8 +110,61 @@ class Trials(Document):
 		if cint(args.actual_fabric) == 1:
 			fabric = frappe.db.get_value('Production Dashboard Details', self.pdd, 'fabric_code')
 		if args.work_order:
-			frappe.db.sql(""" update `tabWork Order` set trial_no='%s', trial_date='%s', fabric__code='%s'
-				where name = '%s'"""%(args.trial_no, args.trial_date, fabric, args.work_order))
+			self.update_trial_date_on_wo_si(args)
+			frappe.db.sql(""" update `tabWork Order` set trial_no='%s', fabric__code='%s'
+				where name = '%s'"""%(args.trial_no, fabric, args.work_order))
+
+	def update_trial_date_on_wo_si(self,args):
+		clubbed_product = frappe.db.get_value('Work Order',self.work_order,'parent_item_code')		
+		if clubbed_product:
+			result = frappe.db.get_value('Sales Invoice Item',{'parent':self.sales_invoice,'item_code':clubbed_product},['name','trial_date'],as_dict=1)			
+		elif not clubbed_product:
+			result = frappe.db.get_value('Sales Invoice Item',{'parent':self.sales_invoice,'item_code':self.item_code},['name','trial_date'],as_dict=1)	
+		self.update_for_recent_trial_date(args,result,clubbed_product)	
+
+	def update_for_recent_trial_date(self,args,result,clubbed_product=None):
+		if not result.get('trial_date') or self.convert_string_to_datetime(result.get('trial_date')) > self.convert_string_to_datetime(args.trial_date) if args.trial_date else '' and args.trial_date:
+			frappe.db.sql("""UPDATE
+							    `tabSales Invoice Item`
+							SET
+							    trial_date ='%s'
+							WHERE
+							    name='%s' """%(args.trial_date,result.get('name')))		
+			if clubbed_product:
+				self.update_all_wo_trial_date_for_clubbed_product(args,clubbed_product)
+			if not clubbed_product:	
+				self.update_all_wo_trial_date_for_normal_product(args)
+	
+	def convert_string_to_datetime(self,date):
+		date = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+		return date
+
+
+
+	def update_all_wo_trial_date_for_clubbed_product(self,args,clubbed_product):
+		result = frappe.db.get_values('Work Order',{'sales_invoice_no':self.sales_invoice,'parent_item_code':clubbed_product},'name',as_dict=1)			
+		frappe.db.sql(""" UPDATE
+							    `tabWork Order`
+							SET
+							    trial_date='%s'
+							WHERE
+							    name IN (%s) """%(args.trial_date,','.join('"{0}"'.format(w.get('name')) for w in result )  ))
+	
+	def update_all_wo_trial_date_for_normal_product(self,args):
+		wo_result = frappe.db.sql(""" SELECT
+										    name
+										FROM
+										    `tabWork Order`
+										WHERE
+										    sales_invoice_no='%s'
+										AND item_code='%s'
+										AND parent_item_code IS NULL """%(self.sales_invoice,self.item_code),as_list=1)
+		frappe.db.sql(""" UPDATE
+							    `tabWork Order`
+							SET
+							    trial_date='%s'
+							WHERE
+							    name IN (%s) """%(args.trial_date,','.join('"{0}"'.format(w[0]) for w in wo_result)))
 
 	def prepare_for_ste(self, trial_data, branch, data, msg):
 		parent = frappe.db.get_value('Stock Entry Detail', {'target_branch':data.branch, 'docstatus':0, 's_warehouse': get_branch_warehouse(trial_data.trial_branch)}, 'parent')
@@ -165,6 +218,9 @@ class Trials(Document):
 		# Suyash 'sales_invoice_no and customer_name are added in custom field in stock_entry child table'
 		ste.sales_invoice_no = frappe.db.get_value('Work Order',args.get('work_order'),'sales_invoice_no') if args.get('work_order') else ''
 		ste.customer_name = frappe.db.get_value('Work Order',args.get('work_order'),'customer_name') if args.get('work_order') else ''
+		if args.get('work_order'):
+			ste.trial_date = frappe.db.get_value('Work Order',args.get('work_order'),'trial_date') or ''
+			ste.delivery_date = frappe.db.get_value('Work Order',args.get('work_order'),'delivery_date') or ''
 		ste.item_code = args.get('item')
 		ste.item_name = frappe.db.get_value('Item', ste.item_code, 'item_name')
 		ste.stock_uom = frappe.db.get_value('Item', ste.item_code, 'stock_uom')

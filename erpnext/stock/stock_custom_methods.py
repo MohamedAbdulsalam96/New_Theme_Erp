@@ -16,6 +16,7 @@ import qrcode
 from PIL import Image
 import qrcode.image.pil
 from frappe.utils import cint
+from frappe.model.naming import make_autoname
 import qrcode.image.svg
 
 def update_status(doc, method):
@@ -85,7 +86,10 @@ def make_stock_entry_for_child(s, name):
 	sed.work_order = s.work_order
 	# Suyash 'sales_invoice_no and customer_name are added in custom field in stock_entry child table'
 	sed.sales_invoice_no = frappe.db.get_value('Work Order',s.work_order,'sales_invoice_no') if s.work_order else ''
-	sed.customer_name = frappe.db.get_value('Work Order',s.work_order,'customer_name') if s.work_order else ''
+	sed.customer_name = frappe.db.get_value('Work Order',s.work_order,'customer_name') if s.work_order else ''	
+	if s.work_order:
+		sed.trial_date = frappe.db.get_value('Work Order',s.work_order,'trial_date') or ''
+		sed.delivery_date = frappe.db.get_value('Work Order',s.work_order,'delivery_date') or ''
 
 	sed.uom = s.uom
 	sed.incoming_rate = s.incoming_rate
@@ -293,9 +297,19 @@ def custom_validateItem_methods(doc, method):
 	make_barcode(doc)
 	validate_for_gift_voucher(doc,method)
 	check_for_gv_redeem_amount(doc,method)
+	validate_style(doc)
 
 def set_default_values(doc):
 	doc.default_warehouse = frappe.db.get_value('Branch', doc.default_branch, 'warehouse')
+
+def validate_style(doc):
+	obj = [d.style for d in doc.get('style_item') if cint(d.default_values ==1)]
+	for d in doc.get('style_item'):
+		if not d.style in obj:
+			frappe.throw(_("Default value is not defined for style {0}").format(d.style))
+	for style in obj:
+		if cint(obj.count(style)) >1:
+			frappe.throw(_("Default value is checked more than once for style {0}").format(style))
 
 def make_barcode(doc):
 	if cint(frappe.db.get_value('Global Defaults',None,'barcode'))==1:
@@ -312,15 +326,22 @@ def make_barcode_log(doctype_name, barcode_id, path, barcode_description):
 	blog.barcode_description = barcode_description
 	blog.save(ignore_permissions=True)
 
+
+def validate_bundle_abbreviation(doc,method):
+	if doc.purpose_type == 'Material Out':
+		branch  = get_user_branch()
+		if branch:
+			abbr = frappe.db.get_value('Branch',branch,'stock_entry_bundle_abbreviation')
+			if not abbr:
+				frappe.throw("Please Set Stock Entry Bundle Abbreviation for Branch {0}".format(branch))
+
+
 def my_random_string(doc,method):
 	if not doc.stock_in:
-		alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		pw_length=8
-		mypw=""
-		for i in range(pw_length):
-			next_index = random.randrange(len(alphabet))
-			mypw = mypw + alphabet[next_index]
-		doc.stock_in = mypw
+		branch  = get_user_branch()
+		if branch:
+			abbr = frappe.db.get_value('Branch',branch,'stock_entry_bundle_abbreviation')
+			doc.stock_in = make_autoname(abbr)
 	barcode(doc,doc.stock_in)
 
 def barcode(doc,m):

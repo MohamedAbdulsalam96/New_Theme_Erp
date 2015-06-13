@@ -14,7 +14,8 @@
    "label": "Service", 
    "options": "Price List", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "tailoring_item", 
@@ -23,7 +24,8 @@
    "label": "Tailoring Item Code", 
    "options": "Item", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "tailor_item_name", 
@@ -32,7 +34,8 @@
    "label": "Tailoring Item Name", 
    "options": "tailoring_item_code.item_name", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "serial_no_data", 
@@ -45,19 +48,22 @@
   {
    "fieldname": "release_status", 
    "fieldtype": "Select", 
+   "hidden": 1, 
    "label": "Release Status", 
    "options": "\nPending\nHold\nRelease", 
    "permlevel": 0, 
    "precision": "", 
-   "read_only": 0
+   "read_only": 1
   }, 
   {
    "fieldname": "release_stock_entry", 
    "fieldtype": "Link", 
+   "hidden": 0, 
    "label": "Release Stock Entry", 
    "options": "Stock Entry", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "column_break_3", 
@@ -71,7 +77,8 @@
    "in_list_view": 1, 
    "label": "Qty", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "tailor_work_order", 
@@ -90,7 +97,8 @@
    "label": "Trials", 
    "options": "Trials", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "production_cycle_details", 
@@ -99,7 +107,8 @@
    "label": "Production Cycle Details", 
    "options": "Production Cycle Details", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "tailor_fabric", 
@@ -108,7 +117,8 @@
    "label": "Tailor Fabric", 
    "options": "Item", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "tailor_fabric_qty", 
@@ -116,7 +126,8 @@
    "hidden": 0, 
    "label": "Tailor Fabric Qty per item", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "tailor_warehouse", 
@@ -124,7 +135,8 @@
    "label": "Tailor Warehouse", 
    "options": "Branches", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "refer_doc", 
@@ -132,15 +144,18 @@
    "hidden": 0, 
    "label": "Refer Doc", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "clubbed_product_name", 
    "fieldtype": "Link", 
+   "hidden": 0, 
    "label": "Clubbed Product Name", 
    "options": "Item", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }
  ], 
  "hide_heading": 0, 
@@ -150,7 +165,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-06-01 05:08:16.432649", 
+ "modified": "2015-06-12 08:01:30.481791", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Work Order Distribution", 

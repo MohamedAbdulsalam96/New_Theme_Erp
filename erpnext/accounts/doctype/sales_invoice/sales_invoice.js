@@ -136,40 +136,42 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 	},
 
 	sales_order_btn: function() {
-		this.$sales_order_btn = cur_frm.appframe.add_primary_action(__('From Sales Order'),
-			function() {
-				frappe.model.map_current_doc({
-					method: "erpnext.selling.doctype.sales_order.sales_order.make_sales_invoice",
-					source_doctype: "Sales Order",
-					get_query_filters: {
-						docstatus: 1,
-						status: ["!=", "Stopped"],
-						per_billed: ["<", 99.99],
-						customer: cur_frm.doc.customer || undefined,
-						company: cur_frm.doc.company
-					}
-				})
-			}, "icon-download", "btn-default");
+		var a;
+		// this.$sales_order_btn = cur_frm.appframe.add_primary_action(__('From Sales Order'),
+		// 	function() {
+		// 		frappe.model.map_current_doc({
+		// 			method: "erpnext.selling.doctype.sales_order.sales_order.make_sales_invoice",
+		// 			source_doctype: "Sales Order",
+		// 			get_query_filters: {
+		// 				docstatus: 1,
+		// 				status: ["!=", "Stopped"],
+		// 				per_billed: ["<", 99.99],
+		// 				customer: cur_frm.doc.customer || undefined,
+		// 				company: cur_frm.doc.company
+		// 			}
+		// 		})
+		// 	}, "icon-download", "btn-default");
 	},
 
 	delivery_note_btn: function() {
-		this.$delivery_note_btn = cur_frm.appframe.add_primary_action(__('From Delivery Note'),
-			function() {
-				frappe.model.map_current_doc({
-					method: "erpnext.stock.doctype.delivery_note.delivery_note.make_sales_invoice",
-					source_doctype: "Delivery Note",
-					get_query: function() {
-						var filters = {
-							company: cur_frm.doc.company
-						};
-						if(cur_frm.doc.customer) filters["customer"] = cur_frm.doc.customer;
-						return {
-							query: "erpnext.controllers.queries.get_delivery_notes_to_be_billed",
-							filters: filters
-						};
-					}
-				});
-			}, "icon-download", "btn-default");
+		var a;
+		// this.$delivery_note_btn = cur_frm.appframe.add_primary_action(__('From Delivery Note'),
+		// 	function() {
+		// 		frappe.model.map_current_doc({
+		// 			method: "erpnext.stock.doctype.delivery_note.delivery_note.make_sales_invoice",
+		// 			source_doctype: "Delivery Note",
+		// 			get_query: function() {
+		// 				var filters = {
+		// 					company: cur_frm.doc.company
+		// 				};
+		// 				if(cur_frm.doc.customer) filters["customer"] = cur_frm.doc.customer;
+		// 				return {
+		// 					query: "erpnext.controllers.queries.get_delivery_notes_to_be_billed",
+		// 					filters: filters
+		// 				};
+		// 			}
+		// 		});
+		// 	}, "icon-download", "btn-default");
 	},
 
 	tc_name: function() {
@@ -435,9 +437,9 @@ cur_frm.cscript.cost_center = function(doc, cdt, cdn) {
 }
 
 cur_frm.cscript.on_submit = function(doc, cdt, cdn) {
-	if(cint(frappe.boot.notification_settings.sales_invoice)) {
-		cur_frm.email_doc(frappe.boot.notification_settings.sales_invoice_message);
-	}
+	// if(cint(frappe.boot.notification_settings.sales_invoice)) {
+	// 	cur_frm.email_doc(frappe.boot.notification_settings.sales_invoice_message);
+	// }
 
 	$.each(doc["entries"], function(i, row) {
 		if(row.delivery_note) frappe.model.clear_doc("Delivery Note", row.delivery_note)
@@ -705,7 +707,7 @@ cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
 					dialog.show();
 					 $('div.modal.in').on("hide.bs.modal", function() {
 
-                  			$('div.modal.in').remove()
+                  			$('.modal-dialog').remove()
             			})
 
 
@@ -749,11 +751,11 @@ cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
 														
 												}
 										})
+										dialog.hide()
+										$('.modal-dialog').remove()
+										// cur_frm.save()
 										
 									
-										cur_frm.save()
-										dialog.hide()
-									$('div.modal.in').remove()
 										
 								}	
 						

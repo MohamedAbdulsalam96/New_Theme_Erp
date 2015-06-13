@@ -100,6 +100,7 @@ if (doc.emp_status == 'Assigned' ||  doc.emp_status == 'Reassigned')
 			doc.start_date =''
 			doc.completed_time =''
 			doc.task = ''
+			doc.work_qty = ''
 	}
 
 
@@ -162,9 +163,9 @@ cur_frm.cscript.toogle_field = function(doc){
 }
 
 cur_frm.cscript.assigned= function(doc, cdt, cdn){
-	console.log(doc)
 	if(doc.emp_status){
 		status = cur_frm.cscript.validate_mandatory_fields(doc)
+		cur_frm.cscript.validate_serial_no_qty(doc)
 		if(status=='true')
 		{
 			get_server_fields('assign_task_to_employee','','',doc, cdt, cdn,1, function(){
@@ -177,6 +178,24 @@ cur_frm.cscript.assigned= function(doc, cdt, cdn){
 	}
 	
 }
+
+
+cur_frm.cscript.validate_serial_no_qty = function  (doc) {
+	if (doc.serial_no_data){
+		my_array = doc.serial_no_data.split('\n')
+		my_array = $.map(my_array,function(key){
+			key = key.trim()
+			return (key!='' ? key : null)			
+		})
+		if(my_array.length != doc.work_qty){
+			doc.work_qty = my_array.length
+			refresh_field('work_qty')
+		} 
+
+
+	}
+}
+
 
 cur_frm.cscript.validate_mandatory_fields= function(doc){
 	data = {'Tailor': doc.process_tailor, 'Start Date': doc.start_date, 'End Date': doc.end_date,'Employee Name':doc.employee_name,'Serial No Data':doc.serial_no_data,'Qty':doc.work_qty}

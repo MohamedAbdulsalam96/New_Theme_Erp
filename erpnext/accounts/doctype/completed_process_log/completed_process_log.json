@@ -30,8 +30,9 @@
   }, 
   {
    "fieldname": "ste_no", 
-   "fieldtype": "Data", 
+   "fieldtype": "Link", 
    "label": "Ste No", 
+   "options": "Stock Entry", 
    "permlevel": 0, 
    "precision": "", 
    "read_only": 1
@@ -44,7 +45,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-12-12 19:53:04.739434", 
+ "modified": "2015-06-12 01:34:57.519851", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Completed Process Log", 

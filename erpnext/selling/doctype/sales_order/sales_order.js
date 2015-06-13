@@ -35,10 +35,10 @@ erpnext.selling.SalesOrderController = erpnext.selling.SellingController.extend(
 						this.make_material_request, "icon-ticket");
 
 				// sales invoice
-				if(flt(doc.per_billed, 2) < 100) {
-					cur_frm.add_custom_button(__('Make Invoice'), this.make_sales_invoice,
-						frappe.boot.doctype_icons["Sales Invoice"]);
-				}
+				// if(flt(doc.per_billed, 2) < 100) {
+				// 	cur_frm.add_custom_button(__('Make Invoice'), this.make_sales_invoice,
+				// 		frappe.boot.doctype_icons["Sales Invoice"]);
+				// }
 
 				// stop
 				if(flt(doc.per_delivered, 2) < 100 || doc.per_billed < 100)
