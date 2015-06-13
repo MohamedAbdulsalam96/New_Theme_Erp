@@ -132,7 +132,7 @@ def validate_validity(doc, method):
 		#res =''
 	 	res = frappe.db.sql("select name,user_name,validity from `tabUser Validity` where  user_name >0",as_list=1)
 	 	if  res:
-	 			frappe.db.sql("update `tabUser Validity` set user_name=%s-1  where name=%s" (res[0][1],res[0][0]),debug=1)
+	 			frappe.db.sql("update `tabUser Validity` set user_name=user_name-1  where name=%s" %(res[0][0]),debug=1)
 				from frappe.utils import nowdate,add_months,cint
 				doc.validity_start_date=nowdate()
 				doc.validity_end_date=add_months(nowdate(),res[0][2])
