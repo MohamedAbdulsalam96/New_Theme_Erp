@@ -345,10 +345,10 @@ def my_random_string(doc,method):
 				doc.stock_in = make_autoname(abbr+'.#####')
 			else:
 				frappe.throw(_("You have not define the stock entry bundle abbreviation {0}").format(branch))
-		barcode(doc,doc.stock_in)
+	barcode(doc,doc.stock_in)
 
 def barcode(doc,m):
-	if cint(frappe.db.get_value('Global Defaults',None,'barcode'))==1:
+	if cint(frappe.db.get_value('Global Defaults',None,'barcode'))==1 and if m:
 		if not doc.barcode:	
 			doc.bar= generate_barcode(m,doc.doctype)
 			doc.barcode ='<img src="/files/Barcode/%s/%s.svg">'%(doc.doctype,m)
