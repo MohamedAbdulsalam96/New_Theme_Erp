@@ -667,7 +667,7 @@ cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
 				if(r.message) {
 					
 					var result_set = r.message;
-					this.table = $("<table class='table table-bordered'>\
+					this.table = $("<table id='fabric_reserve' class='table table-bordered'>\
                        <thead><tr></tr></thead>\
                        <tbody></tbody>\
                        </table>").appendTo($(fd.styles_name.wrapper))
@@ -737,7 +737,8 @@ cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
 							
 
 							my_fabric_details[e.tailoring_item_code] = JSON.stringify(fabric_detail)
-							e.reserve_fabric_qty = JSON.stringify(my_fabric_details)			
+							// e.reserve_fabric_qty = JSON.stringify(my_fabric_details)			
+							frappe.model.set_value(cdt, cdn, 'reserve_fabric_qty', JSON.stringify(my_fabric_details));
 							refresh_field('reserve_fabric_qty',e.name,'sales_invoice_items_one')
 							e.reservation_status = 'Reserved';
 							refresh_field('reservation_status', e.name, 'sales_invoice_items_one')	
@@ -752,7 +753,11 @@ cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
 												}
 										})
 										dialog.hide()
-										$('.modal-dialog').remove()
+										// $.each($('#fabric_reserve'), function(i){
+										// 	$('.text_box').empty()
+										// })
+										// $('#fabric_reserve').empty()
+										// $('.modal-dialog').remove()
 										// cur_frm.save()
 										
 									

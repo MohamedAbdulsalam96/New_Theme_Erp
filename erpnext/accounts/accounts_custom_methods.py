@@ -15,6 +15,7 @@ from tools.custom_data_methods import get_user_branch, get_branch_cost_center, g
 from tools.tools_management.custom_methods import cut_order_generation
 import random
 import string
+import datetime
 
 def create_production_process(doc, method):
 	for d in doc.get('work_order_distribution'):
@@ -459,8 +460,8 @@ def make_schedule_for_trials(doc,method):
 		schedules_date(s, doc.item_code, doc.name,doc.trial_date,doc.customer_name)
 		s.save(ignore_permissions=True)	
 		update_work_order_distribution(doc.item_code,doc.sales_invoice_no,doc.name,s.name)
-		frappe.db.sql(""" update `tabWork Order` set trial_no=1 where name='%s' """%(doc.name))
-		
+		doc.trial_no = 1
+		update_trial_date(doc)
 		return s.name
 
 def get_first_serial_no(serial_no_data):
@@ -469,6 +470,27 @@ def get_first_serial_no(serial_no_data):
 	if sn:
 		serial_no = sn[0]
 	return serial_no
+
+def update_trial_date(doc):
+	if doc.parent_item_code:
+		result = frappe.db.get_value('Sales Invoice Item',{'parent':doc.sales_invoice_no,'item_code':doc.parent_item_code},['name','trial_date'],as_dict=1)
+	elif not doc.parent_item_code:
+		result = frappe.db.get_value('Sales Invoice Item',{'parent':doc.sales_invoice_no,'item_code':doc.item_code},['name','trial_date'],as_dict=1)		
+	update_for_recent_trial_date(doc,result)
+	
+def update_for_recent_trial_date(doc,result):
+	if not result.get('trial_date') or convert_string_to_datetime(result.get('trial_date')) > convert_string_to_datetime(doc.trial_date):
+		frappe.db.sql("""UPDATE
+							    `tabSales Invoice Item`
+							SET
+							    trial_date ='%s'
+							WHERE
+							    name='%s' """%(doc.trial_date,result.get('name')))
+
+def convert_string_to_datetime(date):
+	date = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+	return date							    		
+
 
 def update_work_order_distribution(item_code,sales_invoice,work_order,trial_name):
 	wod_name = frappe.db.get_value('Work Order Distribution',{'parent':sales_invoice,'tailor_work_order':work_order},'name')

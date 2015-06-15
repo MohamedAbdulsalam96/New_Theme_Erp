@@ -114,6 +114,11 @@ class WorkOrder(Document):
 	def apply_rules(self, args):
 		apply_measurement_rules(self.get('measurement_item'), args)
 
+	def before_submit(self):
+		from erpnext.accounts.accounts_custom_methods import make_schedule_for_trials
+		make_schedule_for_trials(self,'before_submit')
+
+
 	def on_submit(self):
 		self.update_status('Completed')
 		# self.set_work_order()

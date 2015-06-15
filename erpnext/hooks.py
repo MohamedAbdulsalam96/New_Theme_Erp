@@ -20,12 +20,13 @@ app_include_js = ["assets/js/erpnext.min.js","assets/js/charts.js","assets/js/bj
 				   "assets/plugins/main/wPaint.menu.main.min.js",
 				   "assets/plugins/text/wPaint.menu.text.min.js",
 				   "assets/plugins/shapes/wPaint.menu.main.shapes.min.js",
-     			   "assets/plugins/file/wPaint.menu.main.file.min.js"  
+     			   "assets/plugins/file/wPaint.menu.main.file.min.js"
 					]
 app_include_css = ["assets/css/erpnext.css","assets/css/bjqs.css","assets/css/demo.css","assets/css/cropper.css",
 					"assets/lib/wColorPicker.min.css",
 				   "assets/lib/wPaint.min.css",
-				   "assets/lib/wPaint.css"
+				   "assets/lib/wPaint.css",
+				   "assets/css/qrcode.css",
 					]
 web_include_js = "assets/js/erpnext-web.min.js"
 
@@ -77,8 +78,7 @@ doc_events = {
 		"validate":["erpnext.stock.stock_custom_methods.serial_barcode","erpnext.stock.stock_custom_methods.serial_qrcode"],
 	},
 	"Work Order":{
-		"validate":["erpnext.stock.stock_custom_methods.work_barcode","erpnext.stock.stock_custom_methods.work_qrcode"],
-		"on_submit" : ["erpnext.accounts.accounts_custom_methods.make_schedule_for_trials"]
+		"validate":["erpnext.stock.stock_custom_methods.work_barcode","erpnext.stock.stock_custom_methods.work_qrcode"]
 	},
 	"User": {
 		"validate": "erpnext.hr.doctype.employee.employee.validate_employee_role",
