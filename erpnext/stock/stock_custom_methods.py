@@ -341,7 +341,10 @@ def my_random_string(doc,method):
 		branch  = get_user_branch()
 		if branch:
 			abbr = frappe.db.get_value('Branch',branch,'stock_entry_bundle_abbreviation')
-			doc.stock_in = make_autoname(abbr)
+			if abbr:
+				doc.stock_in = make_autoname(abbr+'.#####')
+			else:
+				frappe.throw(_("You have not define the stock entry bundle abbreviation {0}").format(branch))
 	barcode(doc,doc.stock_in)
 
 def barcode(doc,m):
