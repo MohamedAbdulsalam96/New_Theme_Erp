@@ -348,7 +348,7 @@ def my_random_string(doc,method):
 	barcode(doc,doc.stock_in)
 
 def barcode(doc,m):
-	if cint(frappe.db.get_value('Global Defaults',None,'barcode'))==1 and if m:
+	if cint(frappe.db.get_value('Global Defaults',None,'barcode'))==1 and m:
 		if not doc.barcode:	
 			doc.bar= generate_barcode(m,doc.doctype)
 			doc.barcode ='<img src="/files/Barcode/%s/%s.svg">'%(doc.doctype,m)
