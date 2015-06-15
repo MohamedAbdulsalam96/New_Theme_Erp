@@ -130,22 +130,21 @@ def validate_validity(doc, method):
 	from frappe.utils import get_url, cstr
 	if doc.get("__islocal") and get_url()!='http://demo.tailorpad.com':
 		#res =''
-	 	res = frappe.db.sql("select name,user_name,validity from `tabUser Validity` where  user_name >0",as_list=1)
+	 	res = frappe.db.sql("select name,user_name,validity from `tabUser Validity` where  user_name > 0",as_list=1)
+	 	frappe.errprint(res)
 	 	if  res:
-	 			frappe.db.sql("update `tabUser Validity` set user_name=user_name-1  where name='%s'" %(res[0][0]),debug=1)
-				from frappe.utils import nowdate,add_months,cint
-				doc.validity_start_date=nowdate()
-				doc.validity_end_date=add_months(nowdate(),cint(res[0][2]))
-		else:
-			res1 = frappe.db.sql("select count(name) from `tabUser`")
+	 		res1 = frappe.db.sql("select count(name) from `tabUser`")
 	 		if res1 and res1[0][0]==2:
-				from frappe.utils import nowdate,add_months,cint
-				doc.validity_start_date=nowdate()
-				doc.validity_end_date=add_months(nowdate(),1)
-			else:	
-				#pass
-				#Comment by rohit
-	 			frappe.throw(_("Your User Creation limit is exceeded . Please contact administrator"))
+	 			frappe.db.sql("update `tabUser Validity` set user_name=user_name-2  where name='%s'" %(res[0][0]))
+			else:
+	 			frappe.db.sql("update `tabUser Validity` set user_name=user_name-1  where name='%s'" %(res[0][0]))
+	 		from frappe.utils import nowdate,add_months,cint, getdate 
+	 		doc.validity_start_date=nowdate()
+	 		doc.validity_end_date=add_months(getdate(nowdate()), cint(res[0][2]))
+		else:
+			# 	#pass
+			# 	#Comment by rohit
+	 		frappe.throw(_("Your User Creation limit is exceeded . Please contact administrator"))
 
 	# elif(get_url()!='http://admin.tailorpad.com'):
 	# 	frappe.errprint("updating existing user not admin.tailorpad.com")
