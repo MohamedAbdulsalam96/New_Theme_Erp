@@ -337,7 +337,7 @@ def validate_bundle_abbreviation(doc,method):
 
 
 def my_random_string(doc,method):
-	if not doc.stock_in:
+	if not doc.stock_in and doc.purpose_type=='Material Out':
 		branch  = get_user_branch()
 		if branch:
 			abbr = frappe.db.get_value('Branch',branch,'stock_entry_bundle_abbreviation')
@@ -345,7 +345,7 @@ def my_random_string(doc,method):
 				doc.stock_in = make_autoname(abbr+'.#####')
 			else:
 				frappe.throw(_("You have not define the stock entry bundle abbreviation {0}").format(branch))
-	barcode(doc,doc.stock_in)
+		barcode(doc,doc.stock_in)
 
 def barcode(doc,m):
 	if cint(frappe.db.get_value('Global Defaults',None,'barcode'))==1:
