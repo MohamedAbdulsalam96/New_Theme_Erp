@@ -219,16 +219,14 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
     },
 
     define_cost_to_tailor:function(doc, cdt, cdn){
-        var d = locals[cdt][cdn]
-        this.init_cost_to_tailor(d)
-        this.kill_dialog()
-        this.render_cost_to_tailor_form(d)
-        this.add_cost_to_tailor(d)
-        this.save_tailor_cost(d)
+        this.d = locals[cdt][cdn]
+        this.init_cost_to_tailor()
+        this.render_cost_to_tailor_form()
+        this.add_cost_to_tailor()
+        this.save_tailor_cost()
 
     },
-    init_cost_to_tailor:function(d){
-
+    init_cost_to_tailor:function(){
          this.dialog = new frappe.ui.Dialog({
             title:__('Cost To Tailor'),
             fields: [
@@ -247,27 +245,18 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
         this.div = $('<div id="myGrid" style="width:100%;height:200px;margin:10px;overflow-y:scroll;"><table class="table table-bordered" style="background-color: #f9f9f9;height:10px" id="mytable">\
                     <thead><tr ><td>Process</td><td>Tailor Cost</td><td>Remove</td></tr></thead><tbody></tbody></table></div>').appendTo($(this.control_tailor_cost.tailor_cost_name.wrapper))
 
+        
         this.dialog.show();
 
 
     },
-    kill_dialog : function (d){
-        
-         $('div.modal.in').on("hide.bs.modal", function() {
-
-                     $('.modal-dialog').remove()
-
-            })
-
-
-    },
-    render_cost_to_tailor_form:function(d){
+    render_cost_to_tailor_form:function(){
         var me = this
-        if(d.process_wise_tailor_cost){
-            tailor_dict = JSON.parse(d.process_wise_tailor_cost)
+        if(me.d.process_wise_tailor_cost){
+            tailor_dict = JSON.parse(me.d.process_wise_tailor_cost)
             $.each(tailor_dict,function(key,value){
                 $(me.div).find('#mytable tbody').append('<tr id="my_row"><td>'+key+'</td>\
-                <td><input class="text_box" data-fieldtype="Int" type="Textbox" value='+value+'>\
+                <td id="cost"><input class="text_box" data-fieldtype="Int" type="Textbox" value='+value+'>\
                 </td><td>&nbsp;<button  class="remove">X</button></td></tr>')
                  me.remove_row()
             })
@@ -276,7 +265,7 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
 
 
     },
-    add_cost_to_tailor:function(d){
+    add_cost_to_tailor:function(){
 
         var me = this;
         this.table;
@@ -288,33 +277,34 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
         })
 
     },
-     save_tailor_cost:function(d){
+     save_tailor_cost:function(){
 
        var me = this
-       
         $(this.control_tailor_cost.create_new.input).click(function(){
-             var tailor_cost_dict = {}
-             $('#mytable tr#my_row').each(function(i,value){
+             this.tailor_cost_dict = {}
+             var inner_me = this
+             $(me.div).find('#mytable tr#my_row').each(function(i,value){
                 var $td = $(this).find('td')
                   var process_name = ''
                 $($td).each(function(inner_index){
                   
                     if(inner_index == 0){
                         process_name = $(this).text()
-                        tailor_cost_dict[$(this).text()]=''
+                        inner_me.tailor_cost_dict[$(this).text()]=[]
                     }
                     if(inner_index == 1){
-                        tailor_cost_dict[process_name]=$(this).find('input').val()
+                        inner_me.tailor_cost_dict[process_name]=$(this).find('input').val()
                     }
                    
                 })
 
+
              })
-        d.process_wise_tailor_cost = JSON.stringify(tailor_cost_dict)
+    
+        me.d.process_wise_tailor_cost = JSON.stringify(this.tailor_cost_dict)
         refresh_field('style_item')
-        refresh_field(['wo_style',d.name,'process_wise_tailor_cost'])
-        $('#mytable').remove()
-        $('.modal-dialog').remove()
+        refresh_field(['wo_style',me.d.name,'process_wise_tailor_cost'])
+        me.dialog.hide()
 
         })
         
@@ -522,4 +512,177 @@ erpnext.stock.SplitQty = frappe.ui.form.Controller.extend({
             $(this).parent().parent().remove()
         })
     }
+})
+
+
+
+
+
+
+
+
+
+
+erpnext.stock.ReserveFabric = frappe.ui.form.Controller.extend({
+
+    reserve_fabric:function(doc,cdt,cdn){
+        this.data = locals[cdt][cdn]
+        this.init_reserve_fabric()
+        this.doc = doc
+        this.cdt = cdt
+        this.cdn = cdn
+    },
+    init_reserve_fabric:function(){
+        this.check_for_fabric_qty()
+
+    },
+    check_for_fabric_qty:function(){
+      
+      if (this.data.fabric_qty){
+        this.render_reserve_fabric_dialog()
+        this.render_existing_reserved_fabric()
+      }else{
+        alert("Fabric qty must be given to reserve fabric {0}".replace('{0}',this.data.fabric_code))
+      } 
+
+
+    },
+    render_reserve_fabric_dialog:function(){
+        this.dialog = new frappe.ui.Dialog({
+                 title:__('Reserve Fabric'),
+                 fields: [
+                     {fieldtype:'HTML', fieldname:'reserve', reqd:false,
+                         description: __("")},
+                         {fieldtype:'Button', fieldname:'create_new', label:__('Ok') }
+                 ]
+             })
+            
+        this.fd = this.dialog.fields_dict;
+        this.table = $("<table id='fabric_reserve' class='table table-bordered'>\
+                       <thead><tr></tr></thead>\
+                       <tbody></tbody>\
+                       </table>").appendTo($(this.fd.reserve.wrapper))
+
+        columns =[['Branch','40'],['Qty','40'], ['Reserve Qty', 50]]
+        
+        this.dialog.show()
+
+
+    },
+    render_existing_reserved_fabric:function(){
+        var me =this
+        if (this.data.reserve_fabric_qty){
+            me.head = $("<th style='width:100px'>Branch</th><th style='width:100px'>Reserve Qty</th>").appendTo($(me.table).find('thead tr')) 
+            $.each(JSON.parse(this.data.reserve_fabric_qty),function(key,value){
+                $.each(JSON.parse(value),function(index,inner_value){
+                   var row = $("<tr>").appendTo($(me.table).find("tbody"));
+                    
+                     $("<td>").html(index).appendTo(row);
+
+                     $("<td>").html(inner_value[1]).appendTo(row); 
+
+
+                })
+            })
+        
+            $(me.fd.create_new.input).click(function() {
+                me.dialog.hide()
+            })
+
+
+        }
+        else{
+
+             this.add_reserve_fabric()
+        }
+
+
+    },
+    add_reserve_fabric:function(){
+      var me = this
+
+       return frappe.call({
+            type: "GET",
+            method: "tools.tools_management.custom_methods.get_warehouse_wise_stock_balance",
+            args: {
+                "item": this.data.fabric_code,
+                "qty": this.data.fabric_qty
+            },
+            callback: function(r) {
+                if(r.message) {
+                    
+                    var result_set = r.message;
+                
+                    
+                    me.head = $("<th style='width:100px'>Branch</th><th style='width:100px'>Qty</th><th style='width:100px'>Reserve Qty</th>").appendTo($(me.table).find('thead tr')) 
+                    $.each(result_set, function(i, d) {
+                        var row = $("<tr>").appendTo($(me.table).find("tbody"));
+                        $("<td>").html(d[2]).appendTo(row);
+                        $("<td>").html(d[1]).appendTo(row); 
+                        if(me.doc.branch == d[2]){
+                            if (parseInt(d[1]) < parseInt(me.data.fabric_qty)){
+                            $("<td>").html('<input type="Textbox" class="text_box" value='+d[1]+'>').appendTo(row); 
+                            }
+                            else{
+                                $("<td>").html('<input type="Textbox" class="text_box" value='+me.data.fabric_qty+'>').appendTo(row);
+                            }   
+                            
+
+                        }else{
+                              $("<td>").html('<input type="Textbox" class="text_box">').appendTo(row);
+                        }
+                      
+                     
+                      
+               });
+
+                                
+                    $(me.fd.create_new.input).click(function() {
+                        this.total_qty = 0.0
+                        this.fabric_detail ={}
+                        var inner_me = this   
+                        $.each($(me.table).find('input.text_box'),function(){
+                            if ($(this).val()){
+                                inner_me.fabric_detail[$(this).closest("tr").find('td:first').text()] = [me.data.fabric_code, $(this).closest("tr").find('.text_box').val(), me.data.tailoring_item_code]                            
+                                inner_me.total_qty = parseFloat($(this).val()) + parseFloat(inner_me.total_qty)
+                            }
+                            
+                        })
+
+                         if (inner_me.total_qty > parseFloat(me.data.fabric_qty)){
+                                alert("Sum of Total Quantity entered i.e {0} is exceeding Fabric Quantity {1}".replace('{1}',me.data.fabric_qty).replace('{0}',inner_me.total_qty))       
+                        
+                            }
+
+                        else{
+
+                            var check = confirm(__("This is Permanent Action. Are you sure you want to reserve fabric ?"))
+                            if (check){
+                                     
+                                    this.my_fabric_details = {}
+                                    this.my_fabric_details[me.data.tailoring_item_code] = JSON.stringify(this.fabric_detail) 
+                                    frappe.model.set_value(me.cdt, me.cdn, 'reserve_fabric_qty', JSON.stringify(this.my_fabric_details));
+                                    refresh_field('reserve_fabric_qty',me.data.name,'sales_invoice_items_one')
+                                    me.data.reservation_status = 'Reserved';
+                                    refresh_field('reservation_status', me.data.name, 'sales_invoice_items_one')  
+                                    me.dialog.hide()
+
+                                            
+                                 }       
+                                        
+                            }   
+                        
+                        
+                    })
+                }
+            }
+        })  
+
+
+
+
+    }
+
+
+
 })

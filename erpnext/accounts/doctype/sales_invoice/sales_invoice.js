@@ -92,7 +92,6 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 		this._super();
 		cur_frm.cscript.is_opening(doc, dt, dn);
 		cur_frm.dashboard.reset();
-
 		if(doc.docstatus==1) {
 			cur_frm.appframe.add_button('View Ledger', function() {
 				frappe.route_options = {
@@ -632,150 +631,150 @@ cur_frm.fields_dict['work_order_distribution'].grid.get_field('tailor_work_order
 
 {% include 'stock/custom_items.js' %}
 $.extend(cur_frm.cscript, new erpnext.stock.SplitQty({frm: cur_frm}));
+$.extend(cur_frm.cscript, new erpnext.stock.ReserveFabric({frm:cur_frm}));
 
 
 
 // cur_frm.script_manager.make(erpnext.account.CustomJs);
 
 
-cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
-	var e =locals[cdt][cdn]
+// cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
+// 	var e =locals[cdt][cdn]
 
-	if(e.fabric_qty){
-			var fabric_detail = {}
+// 	if(e.fabric_qty){
+// 			var fabric_detail = {}
 
-	var total_qty = 0.0;
-	var dialog = new frappe.ui.Dialog({
-			title:__('Reserve Fabric'),
-			fields: [
-				{fieldtype:'HTML', fieldname:'styles_name', label:__('Styles'), reqd:false,
-					description: __("")},
-					{fieldtype:'Button', fieldname:'create_new', label:__('Ok') }
-			]
-		})
-	var fd = dialog.fields_dict;
+// 	var total_qty = 0.0;
+// 	var dialog = new frappe.ui.Dialog({
+// 			title:__('Reserve Fabric'),
+// 			fields: [
+// 				{fieldtype:'HTML', fieldname:'styles_name', label:__('Styles'), reqd:false,
+// 					description: __("")},
+// 					{fieldtype:'Button', fieldname:'create_new', label:__('Ok') }
+// 			]
+// 		})
+// 	var fd = dialog.fields_dict;
 
-        // $(fd.styles_name.wrapper).append('<div id="style">Welcome</div>')
-        return frappe.call({
-			type: "GET",
-			method: "tools.tools_management.custom_methods.get_warehouse_wise_stock_balance",
-			args: {
-				"item": e.fabric_code,
-				"qty": e.fabric_qty
-			},
-			callback: function(r) {
-				if(r.message) {
+//         // $(fd.styles_name.wrapper).append('<div id="style">Welcome</div>')
+//         return frappe.call({
+// 			type: "GET",
+// 			method: "tools.tools_management.custom_methods.get_warehouse_wise_stock_balance",
+// 			args: {
+// 				"item": e.fabric_code,
+// 				"qty": e.fabric_qty
+// 			},
+// 			callback: function(r) {
+// 				if(r.message) {
 					
-					var result_set = r.message;
-					this.table = $("<table id='fabric_reserve' class='table table-bordered'>\
-                       <thead><tr></tr></thead>\
-                       <tbody></tbody>\
-                       </table>").appendTo($(fd.styles_name.wrapper))
+// 					var result_set = r.message;
+// 					this.table = $("<table id='fabric_reserve' class='table table-bordered'>\
+//                        <thead><tr></tr></thead>\
+//                        <tbody></tbody>\
+//                        </table>").appendTo($(fd.styles_name.wrapper))
 
-					columns =[['Branch','40'],['Qty','40'], ['Reserve Qty', 50]]
-					var me = this;
-					$.each(columns, 
-                       function(i, col) {                  
-                       $("<th>").html(col[0]).css("width", col[1]+"%")
-                               .appendTo(me.table.find("thead tr"));
-                  }	);
+// 					columns =[['Branch','40'],['Qty','40'], ['Reserve Qty', 50]]
+// 					var me = this;
+// 					$.each(columns, 
+//                        function(i, col) {                  
+//                        $("<th>").html(col[0]).css("width", col[1]+"%")
+//                                .appendTo(me.table.find("thead tr"));
+//                   }	);
 					
 					
-					$.each(result_set, function(i, d) {
-						var row = $("<tr>").appendTo(me.table.find("tbody"));
-						$("<td>").html(d[2]).appendTo(row);
-	                    $("<td>").html(d[1]).appendTo(row); 
-	                    if(doc.branch == d[2]){
-	                    	if (parseInt(d[1]) < parseInt(e.fabric_qty)){
-	                    	$("<td>").html('<input type="Textbox" class="text_box" value='+d[1]+'>').appendTo(row);	
-	                    	}
-	                    	else{
-	                    		$("<td>").html('<input type="Textbox" class="text_box" value='+e.fabric_qty+'>').appendTo(row);
-	                    	}	
+// 					$.each(result_set, function(i, d) {
+// 						var row = $("<tr>").appendTo(me.table.find("tbody"));
+// 						$("<td>").html(d[2]).appendTo(row);
+// 	                    $("<td>").html(d[1]).appendTo(row); 
+// 	                    if(doc.branch == d[2]){
+// 	                    	if (parseInt(d[1]) < parseInt(e.fabric_qty)){
+// 	                    	$("<td>").html('<input type="Textbox" class="text_box" value='+d[1]+'>').appendTo(row);	
+// 	                    	}
+// 	                    	else{
+// 	                    		$("<td>").html('<input type="Textbox" class="text_box" value='+e.fabric_qty+'>').appendTo(row);
+// 	                    	}	
 	                    	
 
-	                    }else{
-	                    	  $("<td>").html('<input type="Textbox" class="text_box">').appendTo(row);
-	                    }
+// 	                    }else{
+// 	                    	  $("<td>").html('<input type="Textbox" class="text_box">').appendTo(row);
+// 	                    }
 	                  
                      
                       
-               });
+//                });
 
 								
 
-					dialog.show();
-					 $('div.modal.in').on("hide.bs.modal", function() {
-
-                  			$('.modal-dialog').remove()
-            			})
-
+// 					dialog.show();
+// 					 $('div.modal.in').on("hide.bs.modal", function() {
+//                   			$('.modal-dialog').remove()
+//             			})
 
 
-					$(fd.create_new.input).click(function() {
-						total_qty = 0.0
-						fabric_detail ={}	
-						$.each($('input.text_box'),function(){
-							if ($(this).val()){
-								fabric_detail[$(this).closest("tr").find('td:first').text()] = [e.fabric_code, $(this).closest("tr").find('.text_box').val(), e.tailoring_item_code]							
-								total_qty = parseFloat($(this).val()) + parseFloat(total_qty)
-							}
+
+// 					$(fd.create_new.input).click(function() {
+// 						total_qty = 0.0
+// 						fabric_detail ={}	
+// 						$.each($('input.text_box'),function(){
+// 							if ($(this).val()){
+// 								fabric_detail[$(this).closest("tr").find('td:first').text()] = [e.fabric_code, $(this).closest("tr").find('.text_box').val(), e.tailoring_item_code]							
+// 								total_qty = parseFloat($(this).val()) + parseFloat(total_qty)
+// 							}
 							
-						})
+// 						})
 
-						 if (total_qty > parseFloat(e.fabric_qty)){
-								alert("Sum of Total Quantity entered i.e {0} is exceeding Fabric Quantity {1}".replace('{1}',e.fabric_qty).replace('{0}',total_qty))
-								dialog.show()		
-							}
+// 						 if (total_qty > parseFloat(e.fabric_qty)){
+// 								alert("Sum of Total Quantity entered i.e {0} is exceeding Fabric Quantity {1}".replace('{1}',e.fabric_qty).replace('{0}',total_qty))
+// 								dialog.show()		
+// 							}
 
-						else{
-							var my_fabric_details = {}
+// 						else{
+// 							var my_fabric_details = {}
 							
-							if (doc.reserve_fabric_qty){
-								my_fabric_details = JSON.parse(doc.reserve_fabric_qty)
-							}
+// 							if (doc.reserve_fabric_qty){
+// 								my_fabric_details = JSON.parse(doc.reserve_fabric_qty)
+// 							}
 							
 
-							my_fabric_details[e.tailoring_item_code] = JSON.stringify(fabric_detail)
-							// e.reserve_fabric_qty = JSON.stringify(my_fabric_details)			
-							frappe.model.set_value(cdt, cdn, 'reserve_fabric_qty', JSON.stringify(my_fabric_details));
-							refresh_field('reserve_fabric_qty',e.name,'sales_invoice_items_one')
-							e.reservation_status = 'Reserved';
-							refresh_field('reservation_status', e.name, 'sales_invoice_items_one')	
-							me.fabric_detail = {}	
+// 							my_fabric_details[e.tailoring_item_code] = JSON.stringify(fabric_detail)
+// 							// e.reserve_fabric_qty = JSON.stringify(my_fabric_details)			
+// 							frappe.model.set_value(cdt, cdn, 'reserve_fabric_qty', JSON.stringify(my_fabric_details));
+// 							refresh_field('reserve_fabric_qty',e.name,'sales_invoice_items_one')
+// 							e.reservation_status = 'Reserved';
+// 							refresh_field('reservation_status', e.name, 'sales_invoice_items_one')	
+// 							me.fabric_detail = {}	
 							
-							 var $input_check = $('input[type="checkbox"]')
-										$.each($input_check,function(key,value){
-												if($(this).is(':checked') == true){
+// 							 var $input_check = $('input[type="checkbox"]')
+// 										$.each($input_check,function(key,value){
+// 												if($(this).is(':checked') == true){
 														
-														$(this).prop('checked',false) 
+// 														$(this).prop('checked',false) 
 														
-												}
-										})
-										dialog.hide()
-										// $.each($('#fabric_reserve'), function(i){
-										// 	$('.text_box').empty()
-										// })
-										// $('#fabric_reserve').empty()
-										// $('.modal-dialog').remove()
-										// cur_frm.save()
+// 												}
+// 										})
+// 										dialog.hide()
+// 										// $.each($('#fabric_reserve'), function(i){
+// 										// 	$('.text_box').empty()
+// 										// })
+// 										// $('#fabric_reserve').empty()
+// 										// $('.modal-dialog').remove()
+// 										// cur_frm.save()
 										
 									
 										
-								}	
+// 								}	
 						
 						
-					})
-				}
-			}
-		})	
+// 					})
+// 				}
+// 			}
+// 		})	
 
-	}
-	else{
-		alert("Fabric qty must be given to reserve fabric {0}".replace('{0}',e.fabric_code))
-	}
+// 	}
+// 	else{
+// 		alert("Fabric qty must be given to reserve fabric {0}".replace('{0}',e.fabric_code))
+// 	}
 
 
-}
+// }
 
 

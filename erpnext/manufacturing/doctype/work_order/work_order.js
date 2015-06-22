@@ -328,6 +328,5 @@ cur_frm.script_manager.make(erpnext.stock.CustomItem);
 
 
 cur_frm.cscript.on_submit = function(doc, cdt, cdn) {
-cur_frm.cscript.reload_doc()
 
 }

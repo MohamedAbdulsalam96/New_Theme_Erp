@@ -216,6 +216,7 @@
   {
    "fieldname": "reserve_fabric_qty", 
    "fieldtype": "Data", 
+   "hidden": 1, 
    "label": "Reserve Fabric Qty", 
    "permlevel": 0, 
    "precision": ""
@@ -1002,7 +1003,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-06-12 07:57:05.665190", 
+ "modified": "2015-06-17 04:09:44.127214", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Sales Invoice Items", 
