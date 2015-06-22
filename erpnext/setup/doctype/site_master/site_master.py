@@ -128,7 +128,7 @@ def multitenanct(from_test=False):
 
 def validate_validity(doc, method):
 	from frappe.utils import get_url, cstr
-	if doc.get("__islocal") and get_url()!='http://demo.tailorpad.com':
+	if doc.get("__islocal") and get_url()!='http://demo.tailorpad.com' and frappe.db.get_value('Global Defaults', None, 'company'):
 		#res =''
 	 	res = frappe.db.sql("select name,user_name,validity from `tabUser Validity` where  user_name > 0",as_list=1)
 	 	frappe.errprint(res)

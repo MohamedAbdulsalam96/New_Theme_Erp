@@ -1,6 +1,6 @@
 {
  "allow_copy": 0, 
- "allow_import": 0, 
+ "allow_import": 1, 
  "allow_rename": 0, 
  "autoname": "field:new_series", 
  "creation": "2015-01-15 12:17:20.802598", 
@@ -36,7 +36,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-01-15 12:17:20.802598", 
+ "modified": "2015-06-22 11:40:12.011429", 
  "modified_by": "Administrator", 
  "module": "Setup", 
  "name": "Item Series", 
