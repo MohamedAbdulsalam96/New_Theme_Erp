@@ -457,12 +457,13 @@ def make_schedule_for_trials(doc,method):
 		s.branch = get_user_branch()
 		s.item_name = frappe.db.get_value('Item', doc.item_code, 'item_name')
 		s.work_order = doc.name
-		schedules_date(s, doc.item_code, doc.name,doc.trial_date,doc.customer_name)
-		s.save(ignore_permissions=True)	
-		update_work_order_distribution(doc.item_code,doc.sales_invoice_no,doc.name,s.name)
-		doc.trial_no = 1
-		update_trial_date(doc)
-		return s.name
+		data = schedules_date(s, doc.item_code, doc.name,doc.trial_date,doc.customer_name)
+		if data == 'True':
+			s.save(ignore_permissions=True)	
+			update_work_order_distribution(doc.item_code,doc.sales_invoice_no,doc.name,s.name)
+			doc.trial_no = 1
+			update_trial_date(doc)
+			return s.name
 
 def get_first_serial_no(serial_no_data):
 	serial_no = ''
@@ -523,7 +524,9 @@ def schedules_date(parent, item, work_order, trial_date, customer_name):
 					# d.parenttype = 'Trials'
 					# d.parentfield = 'trial_dates'
 					# d.save(ignore_permissions=True)		
-	return "Done"
+		return 'True'
+	else:
+		return 'False'
 
 def validate_work_order_assignment(doc):
 # 	if doc.get('work_order_distribution') and doc.get('sales_invoice_items_one'):
