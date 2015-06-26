@@ -411,7 +411,7 @@ class ProcessAllotment(Document):
 						WHERE
 						    parent = '%s'
 						    and process_name = '%s'   """%(self.item,self.process),as_list=1)
-		if branch_dict and self.process_trials:
+		if branch_dict[0][0] and self.process_trials:
 			self.process_trials = cint(self.process_trials)
 			branch_dict[0][0] = eval(branch_dict[0][0])
 			trial_cost = flt(branch_dict[0][0].get("{0}".format(  cint(self.process_trials) - 1  )   ).get('cost'))
