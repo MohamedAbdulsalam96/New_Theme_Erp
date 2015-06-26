@@ -79,6 +79,7 @@ class Trials(Document):
 				self.validate_QI_completed(trial_data, args_obj)
 				self.OpenNextTrial(trial_data)
 				if trial_data.work_status == 'Open' and cint(trial_data.skip_trial)!=1 and trial_data.production_status!='Closed':
+					self.update_trial_date_on_wo_si(trial_data)
 					if reverse_entry == 'Pending' and trial_data.trial_branch != data.branch:
 						self.open_trial(trial_data.quality_check, trial_data.process, trial_data)
 						branch = data.branch
@@ -110,7 +111,6 @@ class Trials(Document):
 		if cint(args.actual_fabric) == 1:
 			fabric = frappe.db.get_value('Production Dashboard Details', self.pdd, 'fabric_code')
 		if args.work_order:
-			self.update_trial_date_on_wo_si(args)
 			frappe.db.sql(""" update `tabWork Order` set trial_no='%s', fabric__code='%s'
 				where name = '%s'"""%(args.trial_no, fabric, args.work_order))
 

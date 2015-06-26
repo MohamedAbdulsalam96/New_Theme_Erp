@@ -215,7 +215,7 @@
   }, 
   {
    "fieldname": "reserve_fabric_qty", 
-   "fieldtype": "Data", 
+   "fieldtype": "Small Text", 
    "hidden": 1, 
    "label": "Reserve Fabric Qty", 
    "permlevel": 0, 
@@ -477,7 +477,7 @@
   {
    "depends_on": "", 
    "fieldname": "split_qty_dict", 
-   "fieldtype": "Data", 
+   "fieldtype": "Small Text", 
    "label": "Split Qty Dict", 
    "permlevel": 0, 
    "precision": ""
@@ -1003,7 +1003,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-06-17 04:09:44.127214", 
+ "modified": "2015-06-26 09:17:41.410353", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Sales Invoice Items", 

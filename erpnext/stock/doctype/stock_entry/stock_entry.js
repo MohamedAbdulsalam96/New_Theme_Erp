@@ -236,7 +236,6 @@ erpnext.stock.StockEntry = erpnext.stock.StockController.extend({
 		var row = frappe.get_doc(cdt, cdn);
 		this.frm.script_manager.copy_from_first_row("mtn_details", row,
 			["expense_account", "cost_center"]);
-		console.log([this.frm.doc.from_warehouse,this.frm.doc.to_warehouse])
 		if(!row.s_warehouse) row.s_warehouse = this.frm.doc.from_warehouse;
 		if(!row.t_warehouse) row.t_warehouse = this.frm.doc.to_warehouse;
 		if(!row.target_branch) row.target_branch = this.frm.doc.t_branch;
