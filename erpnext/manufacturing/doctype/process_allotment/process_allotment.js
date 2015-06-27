@@ -92,11 +92,9 @@ if (doc.emp_status == 'Assigned' ||  doc.emp_status == 'Reassigned')
 
 			doc.wages = ''
 			doc.wages_for_single_piece = ''
-			doc.process_tailor = ''
+			// doc.process_tailor = ''
 			doc.serial_no = ''
 			doc.serial_no_data = ''
-			doc.employee_name = ''
-			doc.process_tailor = ''
 			doc.start_date =''
 			doc.completed_time =''
 			doc.task = ''
@@ -108,7 +106,7 @@ if (doc.emp_status == 'Assigned' ||  doc.emp_status == 'Reassigned')
 }
 
 cur_frm.cscript.process_tailor=function(doc,cdt,cdn){
-
+	cur_frm.cscript.emp_status(doc, cdt, cdn)
 	if(doc.emp_status == 'Assigned' ||  doc.emp_status == 'Reassigned'){
 		get_server_fields('find_start_time','','', doc, cdt, cdn, 1, function(){
 			refresh_field('start_date')

@@ -19,7 +19,7 @@ class ProcessAllotment(Document):
 		# self.assign_task()
 		# self.update_process_status()
 		self.make_IssueSTE()
-		self.update_task()
+		# self.update_task()
 		self.prepare_for_time_log()
 		# self.make_auto_ste()
 		# self.auto_ste_for_trials()
@@ -75,17 +75,14 @@ class ProcessAllotment(Document):
 				if cint(data.idx) == cint(len(self.get('employee_details'))):
 					status = 'Closed' if data.employee_status == 'Completed' else 'Open'
 					frappe.db.sql("update `tabTask` set status ='%s' where name='%s'"%( status, data.tailor_task))
-				if data.employee_status =='Completed' and not data.time_log_name:
-					name = self.make_time_log(data)
-					data.time_log_name = name
 
-	def make_time_log(self, data):
+	def make_time_log(self, data, task):
 		tl = frappe.new_doc('Time Log')
 		tl.from_time = data.tailor_from_time
 		tl.hours = flt(data.work_completed_time)/60
 		tl.to_time = datetime.datetime.strptime(tl.from_time, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours = flt(tl.hours))
 		tl.activity_type = self.process
-		tl.task = data.tailor_task
+		tl.task = task
 		tl.project = self.sales_invoice_no
 		tl.save(ignore_permissions=True)
 		t = frappe.get_doc('Time Log', tl.name)
@@ -640,6 +637,12 @@ class ProcessAllotment(Document):
 		emp.wages_per_single_piece = flt(self.wages_for_single_piece)
 		emp.tailor_wages = flt(self.wages)
 		emp.qc_required = cint(self.qc)
+		if self.emp_status == 'Assigned':
+			self.task = self.create_task()
+		elif self.emp_status == 'Completed':
+			self.task = self.get_task()
+			if self.task:
+				emp.time_log_name = self.make_time_log(emp, self.task)
 		if self.emp_status == 'Completed':
 			self.add_to_completed_list()
 
@@ -647,6 +650,13 @@ class ProcessAllotment(Document):
 		
 		return "Done"
 
+	def get_task(self):
+		data = frappe.db.sql(''' select tailor_task from `tabEmployee Details` where parent = "%s"
+			and employee = "%s" and tailor_serial_no = "%s" and employee_status = "Assigned"'''%(self.name, self.process_tailor, self.serial_no_data), as_list=1)
+		if data:
+			return data[0][0]
+		else:
+			return None
 	
 	def add_to_completed_list(self):
 		self.serial_no_list = cstr(self.serial_no_list)
