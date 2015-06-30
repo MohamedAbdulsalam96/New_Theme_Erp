@@ -18,6 +18,7 @@ frappe.MakeCalendar = Class.extend({
 
 	make_calendar: function(){
 		var me = this
+		$(this.wrapper).find('.layout-main').empty()
 		$(this.wrapper).find('.layout-main').html('<div id="calendar"></div>')
 		this.item_code = this.wrapper.appframe.add_field({fieldtype:"Link", label:"Item Code",
 			fieldname:"item_code", options:'Item'});
