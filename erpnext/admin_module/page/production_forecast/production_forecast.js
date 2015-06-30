@@ -18,13 +18,13 @@ frappe.MakeCalendar = Class.extend({
 
 	make_calendar: function(){
 		var me = this
-		$(this.wrapper).find('.layout-main').empty()
 		$(this.wrapper).find('.layout-main').html('<div id="calendar"></div>')
 		this.item_code = this.wrapper.appframe.add_field({fieldtype:"Link", label:"Item Code",
 			fieldname:"item_code", options:'Item'});
 		this.search = this.wrapper.appframe.add_field({fieldtype:"Button", label:"Search",
 			fieldname:"search", input_css: {"z-index": 3}});
 		$(this.search.wrapper).click(function(){ 
+			$(me.wrapper).find('#calendar').empty()
 			if(me.item_code.$input.val()){
 				me.render_data();	
 			}else{
