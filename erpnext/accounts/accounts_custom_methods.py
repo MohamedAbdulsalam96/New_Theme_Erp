@@ -85,7 +85,7 @@ def get_styles_DefaultValues(style, item_code):            #Newly Added Method
 def create_work_order_measurement(data, wo_name, item_code):
 	style_parm=[]
 	if wo_name and item_code:
-		measurements = frappe.db.sql(""" select * from `tabMeasurement Item` where parent = '%s'
+		measurements = frappe.db.sql(""" select * from `tabMeasurement Item` where parent = '%s' order by idx
 			"""%(item_code),as_dict=1)
 		if measurements:
 			for s in measurements:
@@ -94,6 +94,7 @@ def create_work_order_measurement(data, wo_name, item_code):
 					mi.parameter = s.parameter
 					mi.abbreviation = s.abbreviation
 					mi.image_view = s.image_view
+					mi.idx = s.idx
 					# mi.parent = wo_name
 					# mi.parentfield = 'measurement_item'
 					# mi.parenttype = 'Work Order'
