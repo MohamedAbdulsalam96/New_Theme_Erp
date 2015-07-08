@@ -110,7 +110,7 @@ def check_freezing_date(posting_date, adv_adj=False):
 
 def update_outstanding_amt(account, against_voucher_type, against_voucher, on_cancel=False):
 	# get final outstanding amt
-	bal = flt(frappe.db.sql("""select sum(ifnull(debit, 0)) - sum(ifnull(credit, 0))
+	bal = flt(frappe.db.sql("""select round(sum(ifnull(debit, 0)) - sum(ifnull(credit, 0)), 2)
 		from `tabGL Entry`
 		where against_voucher_type=%s and against_voucher=%s and account = %s""",
 		(against_voucher_type, against_voucher, account))[0][0] or 0.0)
@@ -119,7 +119,7 @@ def update_outstanding_amt(account, against_voucher_type, against_voucher, on_ca
 		bal = -bal
 	elif against_voucher_type == "Journal Voucher":
 		against_voucher_amount = flt(frappe.db.sql("""
-			select sum(ifnull(debit, 0)) - sum(ifnull(credit, 0))
+			select round(sum(ifnull(debit, 0)) - sum(ifnull(credit, 0)), 2)
 			from `tabGL Entry` where voucher_type = 'Journal Voucher' and voucher_no = %s
 			and account = %s and ifnull(against_voucher, '') = ''""",
 			(against_voucher, account))[0][0])
