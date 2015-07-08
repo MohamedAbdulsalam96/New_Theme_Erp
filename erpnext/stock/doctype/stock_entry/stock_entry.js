@@ -495,3 +495,13 @@ cur_frm.fields_dict.supplier.get_query = function(doc, cdt, cdn) {
 
 cur_frm.add_fetch("branch", "warehouse", "from_warehouse");
 
+cur_frm.fields_dict['mtn_details'].grid.get_field('work_order').get_query = function(doc, cdt, cdn) {
+		return { filters: {'docstatus':1} }
+}
+
+cur_frm.cscript.work_order = function(doc, cdt, cdn){
+	var d = locals[cdt][cdn]
+	get_server_fields('get_work_orderDetails', d.work_order, '', doc, cdt, cdn, 1, function(r, rt){
+		refresh_field('mtn_details');
+	})
+}

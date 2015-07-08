@@ -294,7 +294,7 @@ cur_frm.cscript.process_trials = function(doc, cdt, cdn){
 cur_frm.fields_dict['serial_no'].get_query = function(doc) {
 	return{
 		query: "erpnext.accounts.accounts_custom_methods.get_serial_no",
-		filters: {'branch': doc.branch, 'process': doc.process, 'work_order': doc.process_work_order, 'trial_no':doc.process_trials}
+		filters: {'branch': doc.branch, 'process': doc.process, 'work_order': doc.process_work_order, 'trial_no':doc.process_trials, 'item_code': doc.item}
 	}
 }
 

@@ -122,7 +122,7 @@ class WorkOrder(Document):
 	def on_submit(self):
 		self.update_status('Completed')
 		# self.set_work_order()
-		release_work_order(self)
+		# release_work_order(self)
 		self.add_total_cost_to_customer()
 
 	

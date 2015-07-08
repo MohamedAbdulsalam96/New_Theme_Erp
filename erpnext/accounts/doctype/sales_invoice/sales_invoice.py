@@ -20,6 +20,7 @@ from erpnext.controllers.selling_controller import SellingController
 from tools.tools_management.custom_methods import get_merchandise_item_details, get_item_details
 from erpnext.accounts.accounts_custom_methods import update_serial_noInto
 from erpnext.stock.stock_custom_methods import split_serial_no
+from erpnext.accounts.accounts_custom_methods import generate_serial_no, release_work_order
 
 form_grid_templates = {
 	"entries": "templates/form_grid/item_grid.html"
@@ -108,6 +109,14 @@ class SalesInvoice(SellingController):
 		self.update_time_log_batch(self.name)
 		update_serial_noInto(self)
 		convert_to_recurring(self, "RECINV.#####", self.posting_date)
+		self.release_workOrder()
+
+	def release_workOrder(self):
+		if self.get('work_order_distribution'):
+			for data in self.get('work_order_distribution'):
+				if data.tailor_work_order:
+					obj = frappe.get_doc('Work Order', data.tailor_work_order)
+					release_work_order(obj)
 
 	def before_cancel(self):
 		self.update_time_log_batch(None)

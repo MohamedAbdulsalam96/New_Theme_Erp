@@ -761,9 +761,9 @@ def new_common_get_serial_no(filters):
 	if filters.get('trial_no'):
 		return frappe.db.sql(""" select name from `tabSerial No` where name in (select
 			trials_serial_no_status from `tabTrials` where work_order='%s') and warehouse='%s'
-			and (select status from `tabWork Order` where name='%s') = 'Release'"""%(filters.get('work_order'), get_branch_warehouse(get_user_branch()), filters.get('work_order')))
+			and (select status from `tabWork Order` where name='%s') = 'Release' and item_code='%s'"""%(filters.get('work_order'), get_branch_warehouse(get_user_branch()), filters.get('work_order'), filters.get('item_code')))
 	else:
-		filters_dict = {'wo':filters.get('work_order'),'process':filters.get('process'),'warehouse': get_branch_warehouse(get_user_branch()),'cond':''}
+		filters_dict = {'wo':filters.get('work_order'),'process':filters.get('process'),'warehouse': get_branch_warehouse(get_user_branch()),'cond':'', 'item_code': filters.get('item_code')}
 		idx_no = frappe.db.sql(""" select idx from  `tabProcess Wise Warehouse Detail` where parent='%(wo)s' and process='%(process)s'   """%(filters_dict),as_list=1)
 		cond = ''
 		if cint(idx_no[0][0]) !=1:
@@ -808,7 +808,7 @@ def new_common_get_serial_no(filters):
 							            `tabSerial No`
 							        WHERE
 							            warehouse = '%(warehouse)s'
-							        AND work_order='%(wo)s'
+							        AND work_order='%(wo)s' AND item_code = '%(item_code)s'
 							        AND (
 							                SELECT
 							                    status
@@ -1357,7 +1357,7 @@ def new_validations(doc,method,sales_dict,wo_dict):
 
 def validate_for_reserve_qty(doc,method):
 	for row in doc.get('sales_invoice_items_one'):
-		if row.fabric_code:
+		if row.fabric_code and frappe.db.get_value('Item', row.fabric_code, 'item_group')=='Fabric':
 			if not row.reserve_fabric_qty:
 				frappe.throw("Fabric is not Reserved for Item {0} for row {1}".format(row.tailoring_item_code,row.idx))	
 

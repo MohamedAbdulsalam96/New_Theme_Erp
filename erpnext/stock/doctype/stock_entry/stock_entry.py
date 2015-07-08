@@ -623,6 +623,19 @@ class StockEntry(StockController):
 					frappe.throw(_("Item or Warehouse for row {0} does not match Material Request").format(item.idx),
 						frappe.MappingMismatchError)
 
+	def get_work_orderDetails(self, work_order):
+		WO_details = frappe.db.get_value('Work Order', work_order, '*', as_dict=1, debug=1)
+		if WO_details:
+			return 	{
+						'sales_invoice_no' : WO_details.sales_invoice_no,
+						'customer_name' : WO_details.customer_name,
+						'trial_date' : WO_details.trial_date,
+						'delivery_date' : WO_details.delivery_date,
+						'trials' : WO_details.trial_no
+					}
+		else:
+			return None
+
 @frappe.whitelist()
 def get_party_details(ref_dt, ref_dn):
 	if ref_dt in ["Delivery Note", "Sales Invoice"]:
