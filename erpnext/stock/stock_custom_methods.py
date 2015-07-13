@@ -298,9 +298,15 @@ def custom_validateItem_methods(doc, method):
 	validate_for_gift_voucher(doc,method)
 	check_for_gv_redeem_amount(doc,method)
 	validate_style(doc)
+	validate_trials(doc)
 
 def set_default_values(doc):
 	doc.default_warehouse = frappe.db.get_value('Branch', doc.default_branch, 'warehouse')
+
+def validate_trials(doc):
+	for d in doc.get('process_item'):
+		if d.trials and not d.branch_dict:
+			frappe.throw(_('Against Process {0}, trials has not defined').format(d.process_name))
 
 def validate_style(doc):
 	obj = [d.style for d in doc.get('style_item') if cint(d.default_values ==1)]
