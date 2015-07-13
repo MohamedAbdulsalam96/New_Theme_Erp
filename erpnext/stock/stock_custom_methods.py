@@ -304,9 +304,14 @@ def set_default_values(doc):
 	doc.default_warehouse = frappe.db.get_value('Branch', doc.default_branch, 'warehouse')
 
 def validate_trials(doc):
+	import json
 	for d in doc.get('process_item'):
 		if d.trials and not d.branch_dict:
 			frappe.throw(_('Against Process {0}, trials has not defined').format(d.process_name))
+		elif d.branch_dict:
+			branch_dict = json.loads(d.branch_dict)
+			if len(branch_dict) < 1:
+				frappe.throw(_('Against Process {0}, trials has not defined').format(d.process_name))
 
 def validate_style(doc):
 	obj = [d.style for d in doc.get('style_item') if cint(d.default_values ==1)]
