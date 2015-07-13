@@ -308,7 +308,7 @@ def validate_trials(doc):
 	for d in doc.get('process_item'):
 		if d.trials and not d.branch_dict:
 			frappe.throw(_('Against Process {0}, trials has not defined').format(d.process_name))
-		elif d.branch_dict:
+		elif d.trials and d.branch_dict:
 			branch_dict = json.loads(d.branch_dict)
 			if len(branch_dict) < 1:
 				frappe.throw(_('Against Process {0}, trials has not defined').format(d.process_name))
