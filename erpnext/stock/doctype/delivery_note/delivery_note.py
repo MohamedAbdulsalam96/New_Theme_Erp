@@ -89,6 +89,7 @@ class DeliveryNote(SellingController):
 		self.validate_warehouse()
 		self.validate_uom_is_integer("stock_uom", "qty")
 		self.validate_with_previous_doc()
+		self.validate_zero_qty()
 
 		from erpnext.stock.doctype.packed_item.packed_item import make_packing_list
 		make_packing_list(self, 'delivery_note_details')
@@ -98,6 +99,11 @@ class DeliveryNote(SellingController):
 		if not self.status: self.status = 'Draft'
 		if not self.installation_status: self.installation_status = 'Not Installed'
 		self.append_serial_no_To_ClubbedProduct()
+
+	def validate_zero_qty(self):
+		for d in self.get('delivery_note_details'):
+			if cint(d.qty) == 0:
+				frappe.throw(_('Qty must be greater than zero for item {0}').format(d.item_code))
 
 	def append_serial_no_To_ClubbedProduct(self):
 		for d in self.get('packing_details'):
