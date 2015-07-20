@@ -345,7 +345,7 @@ cur_frm.cscript.calculate_qty = function(doc){
 cur_frm.cscript.add_all_serial_no= function(doc, cdt, cdn){
 	frappe.call({
 		method:"erpnext.accounts.accounts_custom_methods.get_all_serial_no",
-		args:{'filters': {'branch': doc.branch, 'process': doc.process, 'work_order': doc.process_work_order, 'trial_no':doc.process_trials}},
+		args:{'filters': {'branch': doc.branch, 'process': doc.process, 'work_order': doc.process_work_order, 'trial_no':doc.process_trials, 'item_code': doc.item}},
 		callback:function(r){
 			if (r.message){
 				doc.serial_no_data = ''
