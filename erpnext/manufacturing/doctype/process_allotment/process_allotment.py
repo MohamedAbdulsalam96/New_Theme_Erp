@@ -618,7 +618,6 @@ class ProcessAllotment(Document):
 		emp = self.append('employee_details',{})
 		emp.employee = self.process_tailor
 		emp.employee_name = frappe.db.get_value('Employee', self.process_tailor, 'employee_name')
-		emp.tailor_task = self.task
 		emp.employee_status = self.emp_status
 		emp.tailor_payment = self.payment
 		emp.tailor_wages = self.wages
@@ -643,6 +642,7 @@ class ProcessAllotment(Document):
 			self.task = self.get_task()
 			if self.task:
 				emp.time_log_name = self.make_time_log(emp, self.task)
+		emp.tailor_task = self.task
 		if self.emp_status == 'Completed':
 			self.add_to_completed_list()
 
@@ -652,11 +652,12 @@ class ProcessAllotment(Document):
 
 	def get_task(self):
 		data = frappe.db.sql(''' select tailor_task from `tabEmployee Details` where parent = "%s"
-			and employee = "%s" and tailor_serial_no = "%s" and employee_status = "Assigned"'''%(self.name, self.process_tailor, self.serial_no_data), as_list=1)
+			and employee = "%s" and tailor_serial_no = "%s" and (employee_status = "Assigned" or employee_status = "Completed")'''%(self.name, self.process_tailor, self.serial_no_data), as_list=1)
 		if data:
 			return data[0][0]
 		else:
-			return None
+			val = self.create_task()
+			return val
 	
 	def add_to_completed_list(self):
 		self.serial_no_list = cstr(self.serial_no_list)
