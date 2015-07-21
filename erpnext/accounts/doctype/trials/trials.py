@@ -25,6 +25,7 @@ class Trials(Document):
 				frappe.db.sql("""update `tabProcess Allotment` set process_trials = (select name from `tabCustomer` where 1=2),
 					emp_status='', start_date=(select name from `tabSupplier` where 1=2), qc=0 where pdd = '%s' 
 					and process='%s'"""%(self.pdd, self.finish_trial_for_process))
+				frappe.db.sql(""" update `tabWork Order` set trial_no = (select true from dual where 1=2) where work_order_name ='%s'"""%(self.work_order))
 				self.prepare_ste_for_finished_process()
 
 	def make_process_completed_log(self):
