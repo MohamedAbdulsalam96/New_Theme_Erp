@@ -43,7 +43,7 @@ class SalarySlip(TransactionBase):
 
 		drawings_overtime_details ,loan_details = self.get_mapper_details()
 		# Earnings
-		mapper = {'overtime': ['Overtime', drawings_overtime_details[0].get('overtime') if len(drawings_overtime_details) > 0 else 0.0], 'wages' : ['Wages', self.pull_wages_for_employee()]}
+		mapper = {'overtime': ['Overtime', drawings_overtime_details[0].get('overtime') if len(drawings_overtime_details) > 0 else 0.0], 'wages' : ['Wages', self.pull_wages_for_employee()], 'extra_amt' : ['Extra Charges', self.pull_extra_amt_for_employee()]}
 
 		for types in mapper:
 			if cint(mapper.get(types)[1]) > 0:
@@ -96,6 +96,22 @@ class SalarySlip(TransactionBase):
 			m = frappe.get_doc('Salary Manager').get_month_details(self.fiscal_year, self.month)
 			wages_amt = frappe.db.sql("""  SELECT
 				    ifnull(sum(tailor_wages),0)
+				FROM
+				    `tabEmployee Details`
+				WHERE
+				    employee='{0}'
+				AND ste_no = 'Completed'
+				AND modified BETWEEN '{1}' AND '{2}' """.format(self.employee,m['month_start_date'], m['month_end_date']),as_list=1)	
+			if wages_amt:
+				wages = wages_amt[0][0]
+		return wages
+
+	def pull_extra_amt_for_employee(self):
+		wages = 0.0
+		if self.employee and self.month and self.fiscal_year:
+			m = frappe.get_doc('Salary Manager').get_month_details(self.fiscal_year, self.month)
+			wages_amt = frappe.db.sql("""  SELECT
+				    ifnull(sum(tailor_extra_amt),0)
 				FROM
 				    `tabEmployee Details`
 				WHERE
