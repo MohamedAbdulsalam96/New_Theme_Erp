@@ -371,6 +371,13 @@ def delete_production_process(doc, method):
 	for d in doc.get('entries'):
 		production_dict = get_dict(doc.name)
 		delte_doctype_data(production_dict)
+	delete_work_distribution(doc)
+
+def delete_work_distribution(self):
+	wo_disct_list = []
+	for d in self.get('work_order_distribution'):
+		wo_disct_list.append(d)
+	[self.remove(d) for d in wo_disct_list]
 
 def get_dict(invoice_no):
 	return {'Production Dashboard Details':{'sales_invoice_no':invoice_no}}
