@@ -70,6 +70,15 @@
    "read_only": 1
   }, 
   {
+   "fieldname": "branch", 
+   "fieldtype": "Link", 
+   "hidden": 1, 
+   "label": "Branch", 
+   "options": "Branch", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "address_display", 
    "fieldtype": "Small Text", 
    "hidden": 1, 
@@ -1013,7 +1022,7 @@
  "idx": 1, 
  "in_create": 0, 
  "is_submittable": 1, 
- "modified": "2015-03-26 09:52:44.364302", 
+ "modified": "2015-07-24 10:50:02.019422", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Delivery Note", 
