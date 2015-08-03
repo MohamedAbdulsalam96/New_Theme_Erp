@@ -187,7 +187,7 @@ def get_data():
 				{
 					"type": "report",
 					"is_query_report": True,
-					"name": "Customer History",
+					"name": "Customer Order History",
 					"doctype": "Customer",
 					"icon":"icon-file-text"
 				},
