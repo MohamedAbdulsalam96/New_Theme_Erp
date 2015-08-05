@@ -22,7 +22,7 @@ def get_data(filters):
 	cond = get_conditions(filters)
 	return frappe.db.sql(''' select a.name, a.posting_date, a.customer, a.customer_name, a.branch , a.grand_total_export, 
 		sum(b.qty), ifnull(a.outstanding_amount,0), ifnull(a.grand_total_export,0) - ifnull(a.outstanding_amount,0) from `tabSales Invoice` a, `tabSales Invoice Item` b
-		where b.parent = a.name and a.status = 'Submitted' and a.posting_date between '{0}' and '{1}' {2} group by b.parent'''.format(filters.get('from_date'), filters.get('to_date'), cond), as_list=1)
+		where b.parent = a.name and a.docstatus = 1 and a.posting_date between '{0}' and '{1}' {2} group by b.parent'''.format(filters.get('from_date'), filters.get('to_date'), cond), as_list=1)
 
 def get_conditions(filters):
 	conditions = []
