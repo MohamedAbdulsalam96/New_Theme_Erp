@@ -142,8 +142,9 @@ def create_process_allotment(doc, data):
 		 	pa.process_work_order = data.tailor_work_order
 		 	pa.qc = cint(s.quality_check)
 		 	pa.work_order = data.tailor_work_order
-		 	pa.total_expense = flt(data.expense) / flt(data.tailor_qty)
-		 	pa.total_invoice_amount = frappe.db.get_value('Sales Invoice Items', {'parent': doc.name, 'tailoring_item_code': data.clubbed_product_name}, 'tailoring_rate') or 0.0
+		 	if data.expense:
+			 	pa.total_expense = flt(data.expense) / flt(data.tailor_qty)
+			pa.total_invoice_amount = frappe.db.get_value('Sales Invoice Items', {'parent': doc.name, 'tailoring_item_code': data.clubbed_product_name}, 'tailoring_rate') or 0.0
 		 	# Suyash 'Customer name field added in process allotment'
 		 	pa.customer_name = doc.customer
 		 	pa.status = 'Pending'
