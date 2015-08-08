@@ -100,7 +100,7 @@ doc_events = {
 
 	},
 	"Sales Invoice": {
-		"on_update" : ["erpnext.accounts.accounts_custom_methods.create_serial_no"],#"tools.tools_management.custom_methods.update_work_order","tools.tools_management.custom_methods.create_se_or_mr"],
+		"on_update" : ["erpnext.accounts.accounts_custom_methods.create_serial_no", "erpnext.accounts.accounts_custom_methods.update_event_date"],#"tools.tools_management.custom_methods.update_work_order","tools.tools_management.custom_methods.create_se_or_mr"],
 		"validate"  : ["erpnext.accounts.accounts_custom_methods.validate_for_duplicate_item","erpnext.accounts.accounts_custom_methods.validate_for_split_qty","erpnext.accounts.accounts_custom_methods.validate_for_item_qty","erpnext.accounts.accounts_custom_methods.add_data_in_work_order_assignment","erpnext.accounts.accounts_custom_methods.validation_for_deleted_rows", "tools.tools_management.custom_methods.merge_tailoring_items", "erpnext.accounts.accounts_custom_methods.invoice_validation_method"],
 		# "on_submit" : ["erpnext.accounts.accounts_custom_methods.create_production_process","tools.tools_management.custom_methods.sales_invoice_on_submit_methods","erpnext.accounts.accounts_custom_methods.validate_sales_invoice","tools.tools_management.custom_methods.create_se_or_mr", "mreq.mreq.page.sales_dashboard.sales_dashboard.create_swatch_item_po", "erpnext.accounts.accounts_custom_methods.update_WoCount","erpnext.accounts.accounts_custom_methods.update_serial_no_for_gift_voucher"],
 		"on_submit" : ["erpnext.accounts.accounts_custom_methods.validate_for_reserve_qty","erpnext.accounts.accounts_custom_methods.validate_all_wo_submitted","tools.tools_management.custom_methods.create_se_or_mr","erpnext.accounts.accounts_custom_methods.create_production_process","tools.tools_management.custom_methods.sales_invoice_on_submit_methods","erpnext.accounts.accounts_custom_methods.validate_sales_invoice","mreq.mreq.page.sales_dashboard.sales_dashboard.create_swatch_item_po", "erpnext.accounts.accounts_custom_methods.update_WoCount","erpnext.accounts.accounts_custom_methods.validation_for_jv_creation","erpnext.accounts.accounts_custom_methods.create_event_on_sales_invoice_submission"],
@@ -127,7 +127,8 @@ doc_events = {
 		]
 	},
 	"Journal Voucher":{
-		"on_update": "loyalty_point_engine.loyalty_point_engine.hooks_call_handler.grab_jv_and_invoice_details"
+		"on_submit": "loyalty_point_engine.loyalty_point_engine.hooks_call_handler.grab_jv_and_invoice_details",
+		"on_cancel": "loyalty_point_engine.loyalty_point_engine.hooks_call_handler.cancle_points_and_jv"
 	}
 }
 
