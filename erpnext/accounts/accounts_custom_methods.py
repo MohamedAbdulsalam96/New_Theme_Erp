@@ -485,8 +485,12 @@ def update_trial_date(doc):
 	if doc.parent_item_code:
 		result = frappe.db.get_value('Sales Invoice Item',{'parent':doc.sales_invoice_no,'item_code':doc.parent_item_code},['name','trial_date'],as_dict=1)
 	elif not doc.parent_item_code:
-		result = frappe.db.get_value('Sales Invoice Item',{'parent':doc.sales_invoice_no,'item_code':doc.item_code},['name','trial_date'],as_dict=1)		
-	update_for_recent_trial_date(doc,result)
+		result = frappe.db.get_value('Sales Invoice Item',{'parent':doc.sales_invoice_no,'item_code':doc.item_code},['name','trial_date'],as_dict=1)
+	if result:
+		update_for_recent_trial_date(doc,result)
+	else:
+		item_code = doc.parent_item_code if doc.parent_item_code else doc.item_code
+		frappe.throw(_("Item {0} is not present in sales invoice # {1}").format(item_code, doc.sales_invoice_no))
 	
 def update_for_recent_trial_date(doc,result):
 	if not result.get('trial_date') or convert_string_to_datetime(result.get('trial_date')) > convert_string_to_datetime(doc.trial_date):
