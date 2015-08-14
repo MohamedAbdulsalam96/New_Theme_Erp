@@ -14,6 +14,7 @@ from default_website import website_maker
 import install_fixtures
 import frappe.installer
 import os
+import subprocess
 
 @frappe.whitelist()
 def setup_account(args=None):
@@ -23,8 +24,9 @@ def setup_account(args=None):
 		frappe.installer.install_app('mreq')
 		frappe.installer.install_app('loyalty_point_engine')
 		path = os.path.abspath(os.path.join('.'))
-		site_name = frappe.local.site_path.split('/')[1]
-		os.system('cd %s && source ./env/bin/activate && cd %s && frappe --use %s && frappe --latest'%(path.replace('sites', ''), path, site_name))
+		site = frappe.local.site_path.split('/')[1]
+		bench='.'
+		# os.system('cd %s && source ./env/bin/activate && cd %s && frappe --use %s && frappe --latest && frappe --latest'%(path.replace('sites', ''), path, site_name))
 		frappe.db.sql("""update  tabSingles set value = 1 where field = 'disable_signup' and doctype = 'Website Settings'""")
 
 		if frappe.db.sql("select name from tabCompany"):
@@ -133,6 +135,19 @@ def setup_account(args=None):
 		for hook in frappe.get_hooks("setup_wizard_success"):
 			frappe.get_attr(hook)(args)
 
+def exec_cmd(cmd, cwd='.'):
+	try:
+		subprocess.check_call(cmd, cwd=cwd, shell=True)
+	except subprocess.CalledProcessError, e:
+		print "Error:", getattr(e, "output", None) or getattr(e, "error", None)
+		raise
+
+def get_frappe(bench='.'):
+	frappe = os.path.abspath(os.path.join(bench, 'env', 'bin', 'frappe'))
+	if not os.path.exists(frappe):
+		print 'frappe app is not installed. Run the following command to install frappe'
+		print 'bench get-app frappe https://github.com/frappe/frappe.git'
+	return frappe
 
 def update_user_name(args):
 	if args.get("email"):

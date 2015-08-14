@@ -71,7 +71,7 @@ doc_events = {
 	},
 	"Delivery Note":{
 		# "on_submit": ["erpnext.stock.stock_custom_methods.validate_serial_no_status","erpnext.accounts.accounts_custom_methods.update_serial_no","erpnext.stock.stock_custom_methods.check_hooks"]
-		"on_submit": ["erpnext.stock.stock_custom_methods.validate_serial_no_status"]
+		"on_submit": ["erpnext.stock.stock_custom_methods.validate_serial_no_status", "erpnext.accounts.custom_notification_events.delivery_note"]
 
 	},
 	"Serial No":{

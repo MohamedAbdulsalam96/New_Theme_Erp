@@ -578,7 +578,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "max_attachments": 0, 
- "modified": "2015-03-07 04:25:18.972097", 
+ "modified": "2015-08-11 21:00:27.531331", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Stock Entry", 
@@ -682,6 +682,21 @@
    "read": 1, 
    "report": 1, 
    "role": "Cashier", 
+   "submit": 1, 
+   "write": 1
+  }, 
+  {
+   "amend": 1, 
+   "apply_user_permissions": 1, 
+   "cancel": 1, 
+   "create": 1, 
+   "delete": 1, 
+   "permlevel": 0, 
+   "print": 1, 
+   "read": 1, 
+   "report": 1, 
+   "role": "Sales User", 
+   "set_user_permissions": 1, 
    "submit": 1, 
    "write": 1
   }

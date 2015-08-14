@@ -171,6 +171,7 @@ class MaterialRequest(BuyingController):
 		return "Done"
 
 def update_completed_qty(doc, method):
+	clear_bundle_details(doc)
 	if doc.doctype == "Stock Entry":
 		material_request_map = {}
 
@@ -363,3 +364,6 @@ def make_stock_entry(source_name, target_doc=None):
 	}, target_doc, set_missing_values)
 
 	return doclist
+
+def clear_bundle_details(self):
+	stock_in = frappe.db.get_value('Stock Entry', {'stock_in': self.stock_in, 'purpose_type': 'Material Out'}, 'name')

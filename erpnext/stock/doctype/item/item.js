@@ -122,6 +122,17 @@ cur_frm.fields_dict['item_tax'].grid.get_field("tax_type").get_query = function(
 	}
 }
 
+cur_frm.fields_dict['sales_bom_item'].grid.get_field("item_code").get_query = function(doc, cdt, cdn) {
+	return {
+		filters: [
+			['Item', 'item_group', 'in',
+				'Tailoring, Merchandise'],
+			['Item', 'name', '!=', doc.name]
+		]
+	}
+}
+
+
 cur_frm.cscript.tax_type = function(doc, cdt, cdn){
 	var d = locals[cdt][cdn];
 	return get_server_fields('get_tax_rate', d.tax_type, 'item_tax', doc, cdt, cdn, 1);

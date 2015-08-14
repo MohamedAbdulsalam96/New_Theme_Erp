@@ -191,6 +191,13 @@ def get_data():
 					"doctype": "Customer",
 					"icon":"icon-file-text"
 				},
+				{
+					"type": "report",
+					"is_query_report": False,
+					"name": "Work Status",
+					"doctype": "Serial No",
+					"icon":"icon-file-text"
+				},
 			]
 		},
 		{

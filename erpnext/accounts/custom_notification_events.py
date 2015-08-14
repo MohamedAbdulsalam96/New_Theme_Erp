@@ -19,7 +19,9 @@ def welcome_notification():
 		args = make_WelcomeMSG()
 		for d in args:
 			customer_data = get_customer_details(d.customer)
-			data = re.sub('customer_name', d.customer, notification.template)
+			branch = get_customer_details(d.branch)
+			data = cstr(notification.template).replace('branch_phone', branch.phone_no_1)
+			data = re.sub('customer_name', d.customer, data)
 			if notification.email_template and customer_data:
 				send_mail(customer_data.email_id, data, notification.subject)
 			if notification.sms_template and customer_data:
@@ -27,9 +29,13 @@ def welcome_notification():
 			if customer_data and notification:
 				update_status(d.name, 'Welcome')
 
+def get_branch_details(branch):
+	branch_data = frappe.db.get_value('Branch', branch, '*') if branch else ""
+	return branch_data
+
 def make_WelcomeMSG():
-	args = frappe.db.sql(""" select customer , customer_name, name from `tabSales Invoice` a
-		where name not in (select document_name from `tabNotification Log` where type='Welcome') and docstatus=1""", as_dict=1)
+	args = frappe.db.sql(""" select customer , customer_name, name, branch from `tabSales Invoice` a
+		where name not in (select document_name from `tabNotification Log` where type='Welcome') and docstatus=1 and posting_date between DATE_FORMAT(NOW() ,'%Y-%m-01') AND NOW()""", as_dict=1)
 
 # call completion of item, STE, process
 def self_service(customer, serial_no):
@@ -45,7 +51,8 @@ def self_service(customer, serial_no):
 
 
 # call on submission of dn
-def delivery_note(customer):
+def delivery_note(doc, method):
+	customer = doc.customer
 	notification = has_template('Home Delivery')
 	if notification:
 		customer_data = get_customer_details(customer)
@@ -75,7 +82,7 @@ def outstanding_amount():
 			for d in args:
 				customer_data = get_customer_details(d.customer)
 				symbol = frappe.db.get_value('Currency', d.currency, 'symbol')
-				data = cstr(notification.template).replace('customer_name', d.customer).replace('symbol', symbol).replace('outstanding_amount', d.outstanding_amount).replace('order_no', d.name)
+				data = cstr(notification.template).replace('customer_name', d.customer).replace('currency_symbol', symbol).replace('outstanding_amount', d.outstanding_amount).replace('order_no', d.name)
 				if notification.email_template and customer_data:
 					send_mail(customer_data.email_id, data, notification.subject)
 				if notification.sms_template and customer_data:
@@ -101,9 +108,10 @@ def late_delivery():
 def thank_you():
 	notification = has_template('Thank You')
 	if notification:
-		args = frappe.db.sql("""select customer, name, modified from(select customer,name, modified from `tabSales Invoice` 
-		 where ifnull(outstanding_amount, 0) = 0 and docstatus=1 and thank_you is null) as foo, 
-		`tabSales Invoice Item` b where b.parent = foo.name and b.delivered_qty = b.qty""", as_dict=1)
+		args = frappe.db.sql("""select a.customer,a.name, a.modified from `tabSales Invoice` a, 
+			`tabSerial No` b where ifnull(a.outstanding_amount, 0) = 0 and a.docstatus=1 
+			and a.thank_you is null and b.sales_invoice = a.name and b.completed = 'Yes' 
+			and a.posting_date between DATE_FORMAT(NOW() ,'%Y-%m-01') AND NOW()""", as_dict=1)
 		if args:
 			for d in args:
 				if datetime.datetime.strptime(d.modified, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(minutes = 30) > datetime.datetime.now():
