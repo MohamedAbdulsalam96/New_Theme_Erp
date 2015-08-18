@@ -13,6 +13,7 @@ from frappe.model.naming import make_autoname
 from erpnext.stock.utils import get_incoming_rate
 from tools.custom_data_methods import get_user_branch, get_branch_cost_center, get_branch_warehouse, find_next_process
 from tools.tools_management.custom_methods import cut_order_generation
+from erpnext.accounts.custom_notification_events import send_sms_trial_delivery
 import random
 import string
 import datetime
@@ -668,23 +669,26 @@ def add_to_serial_no(args, work_order, sn_list=None, qc=0, emp=None):
 		for serial_no in serial_no_list:
 			make_serial_no_log(serial_no, args, work_order, qc, emp)
 
-def stock_entry_for_out(args, target_branch, sn_list, qty):
+def stock_entry_for_out(args, target_branch, sn_list, qty, type_of_log='No'):
 	if target_branch != get_user_branch():
 		parent = frappe.db.get_value('Stock Entry Detail', {'target_branch':target_branch, 'docstatus':0, 's_warehouse': get_branch_warehouse(get_user_branch())}, 'parent')
 		if parent:
 			obj = frappe.get_doc('Stock Entry', parent)
-			stock_entry_of_child(obj, args, target_branch, sn_list, qty)
+			stock_entry_of_child(obj, args, target_branch, sn_list, qty, type_of_log)
 			obj.posting_date = nowdate()
 			obj.posting_time = nowtime()
 			obj.fiscal_year = frappe.db.get_value('Global Defaults',None,'current_fiscal_year')
 			obj.save(ignore_permissions=True)
 		else:
-			parent = make_StockEntry(args, target_branch, sn_list, qty)
+			parent = make_StockEntry(args, target_branch, sn_list, qty, type_of_log)
 		return parent
 	else:
+		if type_of_log in ['Trial','Delivery']:
+			args['type_of_log'] = type_of_log
+			send_sms_trial_delivery(args)
 		return "Completed"
 
-def make_StockEntry(args, target_branch, sn_list, qty):
+def make_StockEntry(args, target_branch, sn_list, qty, type_of_log='No'):
 	ste = frappe.new_doc('Stock Entry')
  	ste.purpose_type = 'Material Out'
  	ste.purpose ='Material Issue'
@@ -694,11 +698,11 @@ def make_StockEntry(args, target_branch, sn_list, qty):
  	ste.fiscal_year = frappe.db.get_value('Global Defaults',None,'current_fiscal_year')
  	ste.from_warehouse = get_branch_warehouse(get_user_branch())
  	ste.t_branch = target_branch
- 	stock_entry_of_child(ste, args, target_branch, sn_list, qty)
+ 	stock_entry_of_child(ste, args, target_branch, sn_list, qty, type_of_log)
  	ste.save(ignore_permissions=True)
  	return ste.name
 
-def stock_entry_of_child(obj, args, target_branch, sn_list, qty):
+def stock_entry_of_child(obj, args, target_branch, sn_list, qty, type_of_log='No'):
 	ste = obj.append('mtn_details', {})
 	incoming_rate_args = get_args_list(args, get_branch_warehouse(get_user_branch()), qty, sn_list)
 	ste.s_warehouse = get_branch_warehouse(get_user_branch())
@@ -706,6 +710,7 @@ def stock_entry_of_child(obj, args, target_branch, sn_list, qty):
 	ste.t_warehouse = get_branch_warehouse(target_branch)
 	ste.qty = qty
 	ste.serial_no = sn_list
+	ste.type_of_log = type_of_log
 	ste.incoming_rate = get_incoming_rate(incoming_rate_args) or 1.0
 	ste.conversion_factor = 1.0
 	ste.work_order = args.get('work_order')
@@ -957,23 +962,26 @@ def update_QI_for_SerialNo(doc, data):
 
 def make_ste_for_QI(self, data):
 	details = find_next_process(self.pdd, self.process, self.trial_no)
-	target_branch = get_branch(self, details)
-	args = {'work_order': self.work_order, 'status': 'Release', 'item': self.item_code}
-	parent = stock_entry_for_out(args, target_branch, self.serial_no_data, self.sample_size)
+	target_branch, type_of_log = get_branch(self, details)
+	args = {'work_order': self.work_order, 'status': 'Release', 'item': self.item_code, 'type_of_log':type_of_log}
+	parent = stock_entry_for_out(args, target_branch, self.serial_no_data, self.sample_size, type_of_log)
 
 	if parent and self.tdd and self.trial_no:
 		frappe.db.sql("""update `tabTrial Dates` set quality_check_status='Completed' where 
 			parent='%s' and trial_no = '%s'"""%(self.tdd, self.trial_no))
 
 def get_branch(self, pdlog):
+	type_of_log = 'No' 
 	if pdlog:
 		branch = pdlog.branch	
 	elif not self.trial_no:
 		branch = frappe.db.get_value('Production Dashboard Details', self.pdd, 'end_branch')
 		update_serial_no_status_completed(self.serial_no_data)
+		type_of_log = 'Delivery'
 	if self.trial_no and self.tdd:
 		branch = frappe.db.get_value('Trial Dates', {'parent': self.tdd, 'trial_no': self.trial_no}, 'trial_branch')	
-	return branch
+		type_of_log = 'Trial'
+	return branch, type_of_log
 
 def update_serial_no_status_completed(serial_no):
 	sn = cstr(serial_no).split('\n')

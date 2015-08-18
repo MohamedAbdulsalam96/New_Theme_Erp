@@ -71,7 +71,7 @@ class Trials(Document):
 	def make_auto_ste(self, trial_data):
 		args_obj = {}
 		args_obj.setdefault(trial_data.idx, trial_data)
-		data = frappe.db.get_value('Process Log', {'parent': self.pdd, 'process_name': trial_data.process, 'trials': trial_data.trial_no}, '*')
+		data = frappe.db.get_value('Process Log', {'parent': self.pdd, 'process_name': trial_data.process, 'trials': trial_data.trial_no}, '*', as_dict=1)
 		if data:
 			reverse_entry = data.reverse_entry if data.reverse_entry else ''
 			if trial_data.production_status == 'Closed' and cint(trial_data.skip_trial) != 1 and cint(self.finished_all_trials)!=1:
@@ -81,13 +81,12 @@ class Trials(Document):
 				self.OpenNextTrial(trial_data)
 				if trial_data.work_status == 'Open' and cint(trial_data.skip_trial)!=1 and trial_data.production_status!='Closed':
 					self.update_trial_date_on_wo_si(trial_data)
-					if reverse_entry == 'Pending' and trial_data.trial_branch != data.branch:
+					if reverse_entry == 'Pending':
 						self.open_trial(trial_data.quality_check, trial_data.process, trial_data)
-						branch = data.branch
-						msg = cstr(trial_data.trial_no) + ' ' +cstr(trial_data.production_status)
-						self.prepare_for_ste(trial_data, branch, data, msg)
-					if reverse_entry == 'Pending' and trial_data.trial_branch == data.branch:
-						self.open_trial(trial_data.quality_check, trial_data.process, trial_data)	
+						if trial_data.trial_branch != data.branch:
+							branch = data.branch
+							msg = cstr(trial_data.trial_no) + ' ' +cstr(trial_data.production_status)
+							self.prepare_for_ste(trial_data, branch, data, msg)
 
 	def validate_QI_completed(self, args, args_obj):
 		for obj in args_obj:

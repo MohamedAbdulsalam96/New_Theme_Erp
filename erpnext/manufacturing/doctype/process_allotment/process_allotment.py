@@ -141,22 +141,25 @@ class ProcessAllotment(Document):
 		s= {'work_order': self.process_work_order, 'status': 'Release', 'item': self.item}
 		sn_list = self.get_not_added_sn(data.tailor_serial_no, 'serial_no', 'Stock Entry Detail')
 		if sn_list:
-			branch = self.get_branch(details, data)
-			dte_no = stock_entry_for_out(s, branch, sn_list, data.assigned_work_qty)
+			branch, type_of_log = self.get_branch(details, data)
+			dte_no = stock_entry_for_out(s, branch, sn_list, data.assigned_work_qty, type_of_log)
 			return dte_no
 
 	def get_branch(self, pdlog, args):
+		type_of_log = 'No'
 		if pdlog:
 			branch = pdlog.branch
 		elif not args.tailor_process_trials:
 			branch = frappe.db.get_value('Production Dashboard Details', self.pdd, 'end_branch')
 			if branch:
 				self.Change_Completed_Status(args, branch)  #newly added
+				type_of_log = 'Delivery'
 
 		if args.tailor_process_trials and self.trial_dates: 
 			branch = frappe.db.get_value('Trial Dates', {'parent': self.trial_dates, 'trial_no': args.tailor_process_trials}, 'trial_branch')
+			type_of_log = 'Trial'
 
-		return branch
+		return branch, type_of_log
 
 	def Change_Completed_Status(self, args, branch):
 		if args.tailor_serial_no:

@@ -298,11 +298,25 @@
    "permlevel": 0, 
    "print_hide": 1, 
    "read_only": 1
+  }, 
+  {
+   "default": "No", 
+   "fieldname": "type_of_log", 
+   "fieldtype": "Select", 
+   "hidden": 1, 
+   "label": "Type of Log", 
+   "no_copy": 1, 
+   "options": "No\nTrial\nDelivery", 
+   "permlevel": 0, 
+   "precision": "", 
+   "print_hide": 1, 
+   "read_only": 0, 
+   "report_hide": 1
   }
  ], 
  "idx": 1, 
  "istable": 1, 
- "modified": "2014-08-11 03:54:49.688635", 
+ "modified": "2015-08-18 13:04:06.035751", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Stock Entry Detail", 

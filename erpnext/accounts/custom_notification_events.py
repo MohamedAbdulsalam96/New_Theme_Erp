@@ -25,7 +25,7 @@ def welcome_notification():
 			if notification.email_template and customer_data:
 				send_mail(customer_data.email_id, data, notification.subject)
 			if notification.sms_template and customer_data:
-				send_sms([customer_data.phone],data)
+				send_sms([customer_data.mobile_no],data)
 			if customer_data and notification:
 				update_status(d.name, 'Welcome')
 
@@ -47,7 +47,7 @@ def self_service(customer, serial_no):
 		if notification.email_template and customer_data:
 			send_mail(customer_data.email_id, data, notification.subject)
 		if notification.sms_template and customer_data:
-			send_sms([customer_data.phone],data)
+			send_sms([customer_data.mobile_no],data)
 
 
 # call on submission of dn
@@ -60,7 +60,7 @@ def delivery_note(doc, method):
 		if notification.email_template and customer_data:
 			send_mail(customer_data.email_id, data, notification.subject)
 		if notification.sms_template and customer_data:
-			send_sms([customer_data.phone],data)
+			send_sms([customer_data.mobile_no],data)
 
 # call completion of item, STE, process
 def trial(customer, item_name, invoice_no):
@@ -71,7 +71,7 @@ def trial(customer, item_name, invoice_no):
 		if notification.email_template and customer_data:
 			send_mail(customer_data.email_id, data, notification.subject)
 		if notification.sms_template and customer_data:
-			send_sms([customer_data.phone],data)
+			send_sms([customer_data.mobile_no],data)
 
 # every day
 def outstanding_amount():
@@ -86,7 +86,7 @@ def outstanding_amount():
 				if notification.email_template and customer_data:
 					send_mail(customer_data.email_id, data, notification.subject)
 				if notification.sms_template and customer_data:
-					send_sms([customer_data.phone],data)
+					send_sms([customer_data.mobile_no],data)
 
 # every day
 def late_delivery():
@@ -102,7 +102,7 @@ def late_delivery():
 				if notification.email_template and customer_data:
 					send_mail(customer_data.email_id, data, notification.subject)
 				if notification.sms_template and customer_data:
-					send_sms([customer_data.phone],data)
+					send_sms([customer_data.mobile_no],data)
 
 # All schedular
 def thank_you():
@@ -120,15 +120,23 @@ def thank_you():
 					if notification.email_template and customer_data:
 						send_mail(customer_data.email_id, data, notification.subject)
 					if notification.sms_template and customer_data:
-						send_sms([customer_data.phone],data)
+						send_sms([customer_data.mobile_no],data)
 					frappe.db.sql(""" update `tabSales Invoice` set thank_you='Completed' where name='%s'"""%(d.name))
 
 def get_customer_details(customer):
-	return frappe.db.sql(""" select * from `tabAddress` where 
+	data = frappe.db.sql(""" select * from `tabContact` where 
 		customer ='%s' limit 1"""%(customer), as_dict=1)
+	if data:
+		return data[0]
+	else:
+		return ""
 
 def has_template(type_of_event):
-	return frappe.db.get_value('Notification Details',{'select_event':'Welcome'}, '*')
+	msg = ''
+	data = frappe.db.sql(""" select * from `tabNotification` where select_event ='%s'"""%(type_of_event), as_dict=1)
+	if data:
+		msg = data[0]
+	return msg
 
 def update_status(name, type_of_event):
 	name = frappe.db.get_value('Notification Log', {'document_name': name, 'type': type_of_event}, 'name')
@@ -142,5 +150,20 @@ def send_mail(recipient, message, sub):
 	import itertools
 	from frappe.utils.email_lib import sendmail
 	emails = [value for key, value in recipient.items()]
-	sendmail(list(itertools.chain(*emails)), subject=sub, msg=cstr(message))
+	sendmail(list(emails), subject=sub, msg=cstr(message))
 	return "done"
+
+
+def send_sms_trial_delivery(args):
+	if args.get('work_order'):
+		wo_details = frappe.db.get_value('Work Order', args.get('work_order'),'*', as_dict=1)
+		template = 'Ready For Trial' if args.get('type_of_log') == 'Trial' else 'Ready For Delivery'
+		notification = has_template(template)
+		customer_data = get_customer_details(wo_details.customer)
+		if customer_data and notification:
+			data = cstr(notification.template).replace('customer_name', wo_details.customer_name).replace('item_name', frappe.db.get_value('Item', wo_details.item_code, 'item_name')).replace('order_no', wo_details.sales_invoice_no)
+			if cint(notification.send_email)==1 and customer_data:
+				customer_id = {frappe.db.get_value('Customer', customer_data.customer, 'customer_name') : customer_data.email_id}
+				send_mail(customer_id, data, notification.subject)
+			if cint(notification.send_sms)==1 and customer_data:
+				send_sms([customer_data.mobile_no],data)

@@ -17,6 +17,7 @@ from PIL import Image
 import qrcode.image.pil
 from frappe.utils import cint
 from frappe.model.naming import make_autoname
+from erpnext.accounts.custom_notification_events import send_sms_trial_delivery
 import qrcode.image.svg
 
 def update_status(doc, method):
@@ -80,6 +81,7 @@ def make_stock_entry_for_child(s, name):
 	sed.t_warehouse = frappe.db.get_value('Branches', s.target_branch, 'warehouse')
 	sed.source_warehouse = s.s_warehouse
 	sed.item_name = s.item_name
+	sed.type_of_log = s.type_of_log
 	sed.description = s.description
 	sed.qty = s.qty
 	sed.conversion_factor = s.conversion_factor
@@ -132,7 +134,11 @@ def update_serial_no_status(process, parent, serial_no):
 				
 
 def in_stock_entry(doc, method):
-	pass
+	if doc.purpose_type == 'Material In':
+		for data in doc.get('mtn_details'):
+			if data.type_of_log in ['Trial', 'Delivery']:
+				args = {'work_order': data.work_order, 'status': 'Release', 'item': data.item_code, 'type_of_log': data.type_of_log}
+				send_sms_trial_delivery(args)
 
 @frappe.whitelist()
 def get_details(item_name):
