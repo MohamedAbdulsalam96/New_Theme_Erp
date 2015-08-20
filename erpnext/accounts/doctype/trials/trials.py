@@ -40,7 +40,7 @@ class Trials(Document):
 			if d.completed_process and not d.ste_no:
 				self.update_process_staus(d)
 				branch = self.get_target_branch(d.completed_process)
-				if branch != get_user_branch() and not frappe.db.get_value('Stock Entry Detail', {'work_order': self.work_order, 'target_branch':branch, 'docstatus':0, 's_warehouse': get_branch_warehouse(get_user_branch())}, 'name'):
+				if branch != get_user_branch() and not frappe.db.get_value('Stock Entry Detail', {'work_order': self.work_order, 'target_branch':branch, 'item_code': self.item_code, 'docstatus':1, 's_warehouse': get_branch_warehouse(get_user_branch())}, 'name'):
 					s= {'work_order': self.work_order, 'status': 'Release', 'item': self.item_code}
 					d.ste_no = stock_entry_for_out(s, branch, self.trials_serial_no_status, 1)
 				
