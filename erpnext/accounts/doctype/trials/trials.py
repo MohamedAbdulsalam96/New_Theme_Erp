@@ -46,7 +46,7 @@ class Trials(Document):
 					d.ste_no = stock_entry_for_out(s, branch, self.trials_serial_no_status, 1)
 
 	def allow_to_make_ste(self, branch):
-		data = frappe.db.sql(""" select name from `tabStock Entry Detail` where serial_no like '%%%s%%' and item_code = '%s'
+		data = frappe.db.sql(""" select name from `tabStock Entry Detail` where serial_no like '%%%s%%' and item_code = '%s' and docstatus = 0
 			and work_order = '%s' and target_branch = '%s' and s_warehouse = '%s'"""%(self.trials_serial_no_status, self.item_code, self.work_order, branch, get_branch_warehouse(get_user_branch())), as_dict=1)
 		msg = 'True' if data else 'False'
 		return msg
