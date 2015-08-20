@@ -23,7 +23,8 @@ def welcome_notification():
 			data = cstr(notification.template).replace('branch_phone', branch.phone_no_1)
 			data = re.sub('customer_name', d.customer, data)
 			if notification.email_template and customer_data:
-				send_mail(customer_data.email_id, data, notification.subject)
+				customer_id = {frappe.db.get_value('Customer', customer_data.customer, 'customer_name') : customer_data.email_id}
+				send_mail(customer_id, data, notification.subject)
 			if notification.sms_template and customer_data:
 				send_sms([customer_data.mobile_no],data)
 			if customer_data and notification:
@@ -84,7 +85,8 @@ def outstanding_amount():
 				symbol = frappe.db.get_value('Currency', d.currency, 'symbol')
 				data = cstr(notification.template).replace('customer_name', d.customer).replace('currency_symbol', symbol).replace('outstanding_amount', d.outstanding_amount).replace('order_no', d.name)
 				if notification.email_template and customer_data:
-					send_mail(customer_data.email_id, data, notification.subject)
+					customer_id = {frappe.db.get_value('Customer', customer_data.customer, 'customer_name') : customer_data.email_id}
+					send_mail(customer_id, data, notification.subject)
 				if notification.sms_template and customer_data:
 					send_sms([customer_data.mobile_no],data)
 
@@ -118,7 +120,8 @@ def thank_you():
 					customer_data = get_customer_details(d.customer)
 					data = cstr(notification.template).replace('customer_name', d.customer)
 					if notification.email_template and customer_data:
-						send_mail(customer_data.email_id, data, notification.subject)
+						customer_id = {frappe.db.get_value('Customer', customer_data.customer, 'customer_name') : customer_data.email_id}
+						send_mail(customer_id, data, notification.subject)
 					if notification.sms_template and customer_data:
 						send_sms([customer_data.mobile_no],data)
 					frappe.db.sql(""" update `tabSales Invoice` set thank_you='Completed' where name='%s'"""%(d.name))

@@ -3,7 +3,10 @@
 
 from __future__ import unicode_literals
 import frappe
+from frappe import msgprint, _, throw
 from frappe.model.document import Document
 
 class NotificationSettings(Document):
-	pass
+	def validate(self):
+		if len([d.name for d in self.get('notification_details') if not d.subject]) > 0:
+			frappe.throw(_('Subject is mandatory field'))
