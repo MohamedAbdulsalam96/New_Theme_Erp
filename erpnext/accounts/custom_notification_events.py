@@ -28,8 +28,8 @@ def welcome_notification():
 					send_mail(customer_id, data, notification.subject)
 				if cint(notification.send_sms)==1 and customer_data:
 					send_sms([customer_data.mobile_no],data)
-				# if customer_data and notification:
-				# 	update_status(d.name, 'Welcome')
+				if customer_data and notification:
+					update_status(d.name, 'Welcome')
 
 def get_branch_details(branch):
 	branch_data = frappe.db.get_value('Branch', branch, '*') if branch else ""
@@ -37,7 +37,7 @@ def get_branch_details(branch):
 
 def make_WelcomeMSG():
 	args = frappe.db.sql(""" select customer , customer_name, name, branch from `tabSales Invoice` a
-		where name not in (select document_name from `tabNotification Log` where type='Welcome') and docstatus=1 and posting_date between DATE_FORMAT(NOW() ,'%Y-%m-01') AND NOW()""", as_dict=1)
+		where name not in (select ifnull(document_name,'') from `tabNotification Log` where type='Welcome') and docstatus=1 and posting_date between DATE_FORMAT(NOW() ,'%Y-%m-01') AND NOW()""", as_dict=1)
 	if args:
 		return args
 	else:
@@ -147,8 +147,8 @@ def has_template(type_of_event):
 	return msg
 
 def update_status(name, type_of_event):
-	name = frappe.db.get_value('Notification Log', {'document_name': name, 'type': type_of_event}, 'name')
-	if not name:
+	not_name = frappe.db.get_value('Notification Log', {'document_name': name, 'type': type_of_event}, 'name')
+	if not not_name:
 		s = frappe.new_doc('Notification Log')
 		s.document_name = name
 		s.type = type_of_event
