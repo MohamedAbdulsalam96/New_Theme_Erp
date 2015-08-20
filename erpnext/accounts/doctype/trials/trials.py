@@ -40,10 +40,16 @@ class Trials(Document):
 			if d.completed_process and not d.ste_no:
 				self.update_process_staus(d)
 				branch = self.get_target_branch(d.completed_process)
-				if branch != get_user_branch() and not frappe.db.get_value('Stock Entry Detail', {'work_order': self.work_order, 'target_branch':branch, 'item_code': self.item_code, 'docstatus':1, 's_warehouse': get_branch_warehouse(get_user_branch())}, 'name'):
+				ste_status = self.allow_to_make_ste(branch)
+				if branch != get_user_branch() and ste_status != 'True':
 					s= {'work_order': self.work_order, 'status': 'Release', 'item': self.item_code}
 					d.ste_no = stock_entry_for_out(s, branch, self.trials_serial_no_status, 1)
-				
+
+	def allow_to_make_ste(self, branch):
+		data = frappe.db.sql(""" select name from `tabStock Entry Detail` where serial_no like '%%%s%%' and item_code = '%s'
+			and work_order = '%s' and target_branch = '%s' and s_warehouse = '%s'"""%(self.trials_serial_no_status, self.item_code, self.work_order, branch, get_branch_warehouse(get_user_branch())), as_dict=1)
+		msg = 'True' if data else 'False'
+		return msg
 
 	def update_process_staus(self, args):
 		qc_status = 0
