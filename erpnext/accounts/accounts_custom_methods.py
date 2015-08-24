@@ -1408,7 +1408,10 @@ def make_appointment_list(obj,customer):
 
 def update_event_date(doc,method):
 	for row in doc.get('sales_invoice_items_one'):
-		frappe.db.sql("update `tabEvent` set starts_on = '%s' where sales_invoice_no='%s' and item_name ='%s' "%(row.tailoring_delivery_date,doc.name,row.tailoring_item_code))
+		if frappe.db.get_value('Event', {'sales_invoice_no': doc.name, 'item_name': row.tailoring_item_code}, 'name'):
+			frappe.db.sql("update `tabEvent` set starts_on = '%s' where sales_invoice_no='%s' and item_name ='%s' "%(row.tailoring_delivery_date,doc.name,row.tailoring_item_code))
+		else:
+			create_event_for_item(row, doc)	
 		frappe.db.sql(" update `tabSales Invoice Item` set delivery_date ='%s' where parent='%s' and item_code='%s' "%(row.tailoring_delivery_date,doc.name,row.tailoring_item_code))	
 		update_delivery_date_on_work_order(doc,row)
 
