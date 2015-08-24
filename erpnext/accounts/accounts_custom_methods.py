@@ -1397,6 +1397,7 @@ def create_event_for_item(row,my_doc):
 	evt.sales_invoice_no = my_doc.name
 	evt.item_name = row.tailoring_item_code 
 	make_appointment_list(evt,my_doc.customer)
+	make_event_user(evt)
 	evt.save(ignore_permissions = True)
 
 
@@ -1405,6 +1406,10 @@ def make_appointment_list(obj,customer):
 		apl = obj.append('appointment_list',{})
 		apl.customer = customer
 		return "Done"
+
+def make_event_user(obj):
+	evt_usr = obj.append('event_individuals',{})
+	evt_usr.person = frappe.session.user
 
 def update_event_date(doc,method):
 	for row in doc.get('sales_invoice_items_one'):
