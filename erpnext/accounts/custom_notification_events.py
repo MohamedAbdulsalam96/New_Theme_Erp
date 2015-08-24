@@ -175,3 +175,48 @@ def send_sms_trial_delivery(args):
 				send_mail(customer_id, data, notification.subject)
 			if cint(notification.send_sms)==1 and customer_data:
 				send_sms([customer_data.mobile_no],data)
+
+def late_deliveryN_trial():
+	late_trial_notification()
+	late_delivery_notification()
+
+def late_trial_notification():
+	customer_info = get_late_trialCustomer_Data()
+	notification = has_template('Late Trial Notification')
+	if customer_info and notification:
+		notify_to_customer(customer_info, notification)
+
+def get_late_trialCustomer_Data():
+	trial_data = frappe.db.sql(""" select b.sales_invoice, b.customer, b.customer_name from `tabTrial Dates` a inner join
+			`tabTrials` b on a.parent = b.name  where date_format(a.trial_date, '%Y-%m-%d') = date_format(NOW(), '%Y-%m-%d') 
+			and ifnull(a.production_status, '') != 'Closed' and ifnull(a.work_status , '') = 'Open' 
+			group by b.sales_invoice """, as_dict=1)
+	trial_data = trial_data	if trial_data else ""
+	return trial_data
+
+def late_delivery_notification():
+	customer_info = get_late_deliveryCustomer_Data()
+	notification = has_template('Late Delivery Notification')
+	if customer_info and notification:
+		notify_to_customer(customer_info, notification)
+
+def get_late_deliveryCustomer_Data():
+	delivery_data = frappe.db.sql(""" select a.parent as sales_invoice, b.customer ,b.customer_name from 
+		`tabSales Invoice Items` a inner join `tabSales Invoice` b on a.parent = b.name 
+		where date_format(a.tailoring_delivery_date, '%Y-%m-%d') = date_format(NOW(), '%Y-%m-%d') 
+		and b.docstatus =1 group by a.parent """, as_dict=1)
+	delivery_data = delivery_data if delivery_data else ""
+	return delivery_data
+
+def notify_to_customer(args, msg):
+	for data in args:
+		print data.sales_invoice
+		msg_data = cstr(msg.template).replace('customer_name', data.customer_name).replace('order_no', data.sales_invoice)
+		customer_data = get_customer_details(data.customer)
+		if customer_data:
+			if cint(msg.send_email)==1 and customer_data:
+				customer_id = {frappe.db.get_value('Customer', customer_data.customer, 'customer_name') : customer_data.email_id}
+				send_mail(customer_id, msg_data, msg.subject)
+			if cint(msg.send_sms)==1 and customer_data:
+				send_sms([customer_data.mobile_no],msg_data)
+

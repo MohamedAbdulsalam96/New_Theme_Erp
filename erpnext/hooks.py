@@ -146,6 +146,7 @@ scheduler_events = {
 		"erpnext.support.doctype.support_ticket.support_ticket.auto_close_tickets",
 		"erpnext.accounts.custom_notification_events.outstanding_amount",
 		"erpnext.accounts.custom_notification_events.late_delivery",
+		"erpnext.accounts.custom_notification_events.late_deliveryN_trial",
 		"erpnext.support.page.report_scheduler.delete_report_folder",
 	],
 	"daily_long": [
