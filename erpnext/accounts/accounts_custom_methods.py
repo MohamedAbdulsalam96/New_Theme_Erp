@@ -714,6 +714,7 @@ def stock_entry_of_child(obj, args, target_branch, sn_list, qty, type_of_log='No
 	ste.incoming_rate = get_incoming_rate(incoming_rate_args) or 1.0
 	ste.conversion_factor = 1.0
 	ste.work_order = args.get('work_order')
+	ste.trials = args.get('trial_no')
 	# Suyash 'sales_invoice_no and customer_name are added in custom field in stock_entry child table'
 	ste.sales_invoice_no = frappe.db.get_value('Work Order',args.get('work_order'),'sales_invoice_no') if args.get('work_order') else ''
 	ste.customer_name = frappe.db.get_value('Work Order',args.get('work_order'),'customer_name') if args.get('work_order') else ''
@@ -963,7 +964,7 @@ def update_QI_for_SerialNo(doc, data):
 def make_ste_for_QI(self, data):
 	details = find_next_process(self.pdd, self.process, self.trial_no)
 	target_branch, type_of_log = get_branch(self, details)
-	args = {'work_order': self.work_order, 'status': 'Release', 'item': self.item_code, 'type_of_log':type_of_log}
+	args = {'work_order': self.work_order, 'status': 'Release', 'item': self.item_code, 'type_of_log':type_of_log, 'trial_no': self.trial_no}
 	parent = stock_entry_for_out(args, target_branch, self.serial_no_data, self.sample_size, type_of_log)
 
 	if parent and self.tdd and self.trial_no:
@@ -1391,15 +1392,15 @@ def create_event_on_sales_invoice_submission(doc,method):
 def create_event_for_item(row,my_doc):
 	evt = frappe.new_doc('Event')
 	evt.branch = my_doc.branch 
-	evt.subject = "Customer {0}:Delivery For Item {1}".format(my_doc.customer_name,row.tailoring_item_code)
+	evt.subject = "Customer {0}:Delivery For Item {1} of Invoice # {2}".format(my_doc.customer_name,row.tailoring_item_code, row.parent)
 	evt.description = 'Dear %s, your delivery date for item "%s" with us today. Kindly Collect your item "%s". Thank you.'%(my_doc.customer_name, row.tailoring_item_code,row.tailoring_item_code)
 	evt.starts_on = row.tailoring_delivery_date or ''
 	evt.sales_invoice_no = my_doc.name
 	evt.item_name = row.tailoring_item_code 
 	make_appointment_list(evt,my_doc.customer)
 	make_event_user(evt)
+	make_event_roles(evt)
 	evt.save(ignore_permissions = True)
-
 
 def make_appointment_list(obj,customer):
 	if customer:
@@ -1410,6 +1411,12 @@ def make_appointment_list(obj,customer):
 def make_event_user(obj):
 	evt_usr = obj.append('event_individuals',{})
 	evt_usr.person = frappe.session.user
+
+def make_event_roles(obj):
+	evt_roles_list = ['Sales User', 'Manufacturing User', 'System Manager']
+	for role in evt_roles_list:
+		evt_roles = obj.append('event_roles', {})
+		evt_roles.role = role  
 
 def update_event_date(doc,method):
 	for row in doc.get('sales_invoice_items_one'):

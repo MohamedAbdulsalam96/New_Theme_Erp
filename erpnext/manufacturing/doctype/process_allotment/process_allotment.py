@@ -138,7 +138,7 @@ class ProcessAllotment(Document):
 		return "Done"
 
 	def make_ste(self, details, data):
-		s= {'work_order': self.process_work_order, 'status': 'Release', 'item': self.item}
+		s= {'work_order': self.process_work_order, 'status': 'Release', 'item': self.item, 'trial_no': self.process_trials}
 		sn_list = self.get_not_added_sn(data.tailor_serial_no, 'serial_no', 'Stock Entry Detail')
 		if sn_list:
 			branch, type_of_log = self.get_branch(details, data)

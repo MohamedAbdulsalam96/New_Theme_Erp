@@ -137,7 +137,7 @@ def in_stock_entry(doc, method):
 	if doc.purpose_type == 'Material In':
 		for data in doc.get('mtn_details'):
 			if data.type_of_log in ['Trial', 'Delivery']:
-				args = {'work_order': data.work_order, 'status': 'Release', 'item': data.item_code, 'type_of_log': data.type_of_log}
+				args = {'work_order': data.work_order, 'status': 'Release', 'item': data.item_code, 'type_of_log': data.type_of_log, 'trial_no': data.trials}
 				send_sms_trial_delivery(args)
 
 @frappe.whitelist()

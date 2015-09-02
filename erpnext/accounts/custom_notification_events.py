@@ -163,8 +163,10 @@ def send_mail(recipient, message, sub):
 
 
 def send_sms_trial_delivery(args):
-	if args.get('work_order'):
-		wo_details = frappe.db.get_value('Work Order', args.get('work_order'),'*', as_dict=1)
+	args['status'] = 'true'
+	check_others_are_ready(args)
+	if args.get('work_order') and args.get('status') == 'true':
+		wo_details = get_workorder_Details(args.get('work_order'))
 		template = 'Ready For Trial' if args.get('type_of_log') == 'Trial' else 'Ready For Delivery'
 		notification = has_template(template)
 		customer_data = get_customer_details(wo_details.customer)
@@ -175,6 +177,54 @@ def send_sms_trial_delivery(args):
 				send_mail(customer_id, data, notification.subject)
 			if cint(notification.send_sms)==1 and customer_data:
 				send_sms([customer_data.mobile_no],data)
+
+def get_workorder_Details(work_order):
+	return frappe.db.get_value('Work Order', work_order,'*', as_dict=1)
+
+def check_others_are_ready(args):
+	if args.get('work_order'):
+		status = get_trial_status(args) if args.get('type_of_log') == 'Trial' else get_Deliveryorder_status(args)
+
+def get_trial_status(args):
+	wo_data = get_workorder_Details(args.get('work_order'))
+	products = get_other_clubbed_product(wo_data, args)
+	if products:
+		get_trial_statusGarment(products, args)
+
+def get_other_clubbed_product(wo_data, args):
+	data = frappe.db.sql("""select a.tailoring_item, a.parent, a.trials from 
+		(select  clubbed_product_name, parent from `tabWork Order Distribution` where clubbed_product_name != tailoring_item
+		and tailoring_item = '%s' and tailor_work_order = '%s') as foo, `tabWork Order Distribution` a 
+	where a.clubbed_product_name = foo.clubbed_product_name and  a.parent = foo.parent and a.tailoring_item != '%s' and a.trials is not null"""%(wo_data.item_code, wo_data.name, wo_data.item_code), as_dict=1)
+	data = data if data else ''
+	return data
+
+def get_trial_statusGarment(products_info, args):
+	for data in products_info:
+		data = get_product_trialStatus(data, args)
+		if args.get('status') == 'false':
+			return None
+
+def get_product_trialStatus(products_info, args):
+	data = frappe.db.sql(""" select snd.status
+		from `tabTrials` trs inner join `tabSerial No Detail` snd on snd.parent = trs.trials_serial_no_status 
+		where snd.trial_no = '%s' and trs.name = '%s' 
+		and ifnull(snd.status,'') = 'Completed'"""%(args.get('trial_no'), products_info.trials), as_list=1)
+	if data:
+		if data[0][0] != 'Completed':
+			args['status'] = 'false'
+			return None
+
+def get_Deliveryorder_status(args):
+	wo_data = get_workorder_Details(args.get('work_order'))
+	get_products_delivery_status(wo_data, args)
+
+def get_products_delivery_status(wo_data, args):
+	data = frappe.db.sql(""" select ifnull(count(*),0) from `tabSerial No`
+				where ifnull(completed, 'No') != 'Yes' and sales_invoice = '%s'"""%(wo_data.sales_invoice_no), as_list=1)
+	if data:
+		if cint(data[0][0]) > 0:
+			args['status'] = 'false'
 
 def late_deliveryN_trial():
 	late_trial_notification()

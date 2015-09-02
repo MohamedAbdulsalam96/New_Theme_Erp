@@ -6,7 +6,7 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import cint, cstr, flt, nowdate, nowtime
 from frappe import _
-from erpnext.accounts.accounts_custom_methods import stock_entry_for_out
+from erpnext.accounts.accounts_custom_methods import stock_entry_for_out, make_event_roles
 import datetime
 from tools.custom_data_methods import get_user_branch, get_branch_cost_center, get_branch_warehouse, update_serial_no
 
@@ -275,11 +275,12 @@ class Trials(Document):
 			self.validate_mandatory_field(args)
 			evt = frappe.new_doc('Event')
 			evt.branch = args.trial_branch 
-			evt.subject = args.subject
+			evt.subject = "Customer {0}:Trial For Item {1} of Invoice # {2}".format(self.customer_name,self.item_name, self.sales_invoice)
 			evt.description = 'Dear %s, you have an appointment for trial with us at %s today. Kindly revert in case you need to re-schedule. Thank you.'%(self.customer_name, time)
 			evt.starts_on = args.trial_date
 			evt.ends_on = args.to_time
 			self.make_appointment_list(evt)
+			make_event_roles(evt)
 			evt.save(ignore_permissions = True)
 			args.event = evt.name
 		else:
