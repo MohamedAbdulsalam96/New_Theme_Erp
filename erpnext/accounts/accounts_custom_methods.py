@@ -373,7 +373,17 @@ def delete_production_process(doc, method):
 	for d in doc.get('entries'):
 		production_dict = get_dict(doc.name)
 		delte_doctype_data(production_dict)
+	cancel_stock_entry(doc)
 	delete_work_distribution(doc)
+
+def cancel_stock_entry(doc):
+	data = frappe.db.sql(""" select distinct se.name as name from `tabStock Entry` se, `tabStock Entry Detail` sed 
+		where se.purpose_type = 'Material Receipt' and se.docstatus = 1 and sed.sales_invoice_no = '%s' 
+		and sed.parent = se.name"""%(doc.name), as_dict=1)
+	for d in data:
+		if d:
+			obj = frappe.get_doc('Stock Entry', d.name)
+			obj.cancel()
 
 def delete_work_distribution(self):
 	wo_disct_list = []
