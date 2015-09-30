@@ -493,6 +493,7 @@ def get_first_serial_no(serial_no_data):
 	return serial_no
 
 def update_trial_date(doc):
+	
 	if doc.parent_item_code:
 		result = frappe.db.get_value('Sales Invoice Item',{'parent':doc.sales_invoice_no,'item_code':doc.parent_item_code},['name','trial_date'],as_dict=1)
 	elif not doc.parent_item_code:
@@ -504,6 +505,7 @@ def update_trial_date(doc):
 		frappe.throw(_("Item {0} is not present in sales invoice # {1}").format(item_code, doc.sales_invoice_no))
 	
 def update_for_recent_trial_date(doc,result):
+	item_code = doc.parent_item_code if doc.parent_item_code else doc.item_code
 	if not result.get('trial_date') or convert_string_to_datetime(result.get('trial_date')) > convert_string_to_datetime(doc.trial_date):
 		frappe.db.sql("""UPDATE
 							    `tabSales Invoice Item`
@@ -511,6 +513,8 @@ def update_for_recent_trial_date(doc,result):
 							    trial_date ='%s'
 							WHERE
 							    name='%s' """%(doc.trial_date,result.get('name')))
+		frappe.db.sql(""" update `tabSales Invoice Items` set tailoring_trial_date = '%s'
+			where tailoring_item_code = '%s' and parent = '%s'"""%(doc.trial_date, item_code, doc.sales_invoice_no))
 
 def convert_string_to_datetime(date):
 	date = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')

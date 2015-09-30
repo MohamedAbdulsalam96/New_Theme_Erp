@@ -994,6 +994,14 @@
    "reqd": 0, 
    "search_index": 0, 
    "set_only_once": 0
+  }, 
+  {
+   "fieldname": "tailoring_trial_date", 
+   "fieldtype": "Datetime", 
+   "hidden": 1, 
+   "label": "Tailoring Trial Date", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -1003,7 +1011,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-06-26 09:17:41.410353", 
+ "modified": "2015-09-30 09:06:12.924480", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Sales Invoice Items", 
