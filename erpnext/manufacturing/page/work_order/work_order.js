@@ -36,15 +36,16 @@ frappe.WOForm = Class.extend({
 					['Item code', 'Link', 'Item', 'item_code'],
 					['Customer Name', 'Data', '', 'customer'],
 					['Serial NO', 'Small Text', '', 'serial_no_data'],
-					['Note', 'Small Text', '', 'note']
+					['Note', 'Small Text', '', 'note'],
+					['Measured By', 'Data', '', 'measured_by']
 				],
 			"Measurement Item":[
-					['Parameter', 'Link', 'Measurement', 'parameter'],
-					['Abbreviation', 'Data', '', 'abbreviation'],
-					['Value', 'Float', '', 'value']
+					// ['Parameter', 'Link', 'Measurement', 'parameter'],
+					// ['Abbreviation', 'Data', '', 'abbreviation'],
+					// ['Value', 'Float', '', 'value']
 				],
 				"Style Transactions":[
-					['Field Name', 'Link', 'Style', 'field_name']
+					// ['Field Name', 'Link', 'Style', 'field_name']
 				]
 		}
 
@@ -140,11 +141,11 @@ frappe.WOForm = Class.extend({
 
 		if(key!='Work Order'){
 
-			$("<button class='btn btn-small btn-primary' style='margin-bottom:2%' id='"+key+"'><i class='icon-plus'></i></button>")
-			.appendTo($("<td colspan='2' align='center'>").appendTo(row))
-			.click(function() {
-				me.add_row($(this).attr('id'))
-			});
+			// $("<button class='btn btn-small btn-primary' style='margin-bottom:2%' id='"+key+"'><i class='icon-plus'></i></button>")
+			// .appendTo($("<td colspan='2' align='center'>").appendTo(row))
+			// .click(function() {
+			// 	me.add_row($(this).attr('id'))
+			// });
 
 			if(key == 'Style Transactions')
 				columns = [["Field Name",50], ["Name", 100], ["Abbreviation", 100], ['Image', 100],["View", 100]];
@@ -190,8 +191,9 @@ frappe.WOForm = Class.extend({
 
 		if(key == 'Work Order') {
 			$.each(dic, function(key, val){
-				if(key!='note'){
-					$('[data-fieldname="'+key+'"]').attr("disabled","disabled")
+				$('[data-fieldname="'+key+'"]').attr("disabled","disabled")
+				if(key == 'note' || key == 'measured_by'){
+					$('[data-fieldname="'+key+'"]').removeAttr('disabled');
 				}
 				$('[data-fieldname="'+key+'"]').val(val)
 			})
@@ -353,7 +355,7 @@ frappe.WOForm = Class.extend({
 		
 		frappe.call({
 			method:"mreq.mreq.page.sales_dashboard.sales_dashboard.create_work_order",
-			args:{'wo_details': me.wo_details, 'style_details':me.style_details, 'fields':me.field_list, 'woname': me.woname, 'note':$("[data-fieldname='note']").val(),'args': me.args, 'type_of_wo':'amend'},
+			args:{'wo_details': me.wo_details, 'style_details':me.style_details, 'fields':me.field_list, 'woname': me.woname, 'note':$("[data-fieldname='note']").val(),'args': me.args, 'measured_by' : $("[data-fieldname='measured_by']").val(), 'type_of_wo':'amend'},
 			callback: function(r){
 				if(r.message){
 					frappe.route_options.woname = r.message[0]

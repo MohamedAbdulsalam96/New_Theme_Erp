@@ -121,10 +121,22 @@ class WorkOrder(Document):
 
 	def on_submit(self):
 		self.update_status('Completed')
+		self.validate_mandatory_fields()
+		self.validate_nonzero_measurement()
 		# self.set_work_order()
 		# release_work_order(self)
 		self.add_total_cost_to_customer()
 
+	def validate_mandatory_fields(self):
+		mandatory_field = {'Measured By': self.measured_by, 'Note': self.note}
+		for key in mandatory_field:
+			if not mandatory_field[key]:
+				frappe.throw(_('{0} field is mandatory field').format(key))
+
+	def validate_nonzero_measurement(self):
+		for d in self.measurement_item:
+			if flt(d.value) <= 0.0:
+				frappe.throw(_('For measurement "{0}" value must be grater than zero').format(d.parameter)) 
 	
 	def add_total_cost_to_customer(self):
 		if self.sales_invoice_no and self.item_qty:
