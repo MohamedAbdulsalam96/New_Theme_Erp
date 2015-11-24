@@ -10,7 +10,7 @@ from frappe import msgprint, _
 import frappe.defaults
 from frappe.model.mapper import get_mapped_doc
 from erpnext.stock.utils import update_bin
-from erpnext.stock.stock_custom_methods import split_serial_no
+from erpnext.stock.stock_custom_methods import split_serial_no, count_serial_no
 from erpnext.controllers.selling_controller import SellingController
 
 form_grid_templates = {
@@ -111,8 +111,8 @@ class DeliveryNote(SellingController):
 				if d.parent_item == data.item_code and data.against_sales_invoice:
 					serial_no = frappe.db.get_value('Work Order Distribution', {'tailoring_item': d.item_code, 'parent': data.against_sales_invoice}, 'serial_no_data')
 					if serial_no:
-						d.serial_no = serial_no
 						d.serial_no = split_serial_no(d)
+						d.qty = count_serial_no(d.serial_no)
 
 	def validate_with_previous_doc(self):
 		items = self.get("delivery_note_details")

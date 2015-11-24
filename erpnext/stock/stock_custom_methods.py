@@ -490,3 +490,13 @@ def split_serial_no(doc):
 				if sn_details.status == 'Available' and sn_details.completed == 'Yes' and sn_details.warehouse == doc.warehouse:
 					serial_no_data += '\n' + sn if serial_no_data else sn
 	return serial_no_data
+
+def count_serial_no(serial_no_list):
+	count = 0
+	if serial_no_list:
+		serial_no = cstr(serial_no_list).split('\n')
+		for sn in serial_no:
+			if sn:
+				count =count + 1
+
+	return count
