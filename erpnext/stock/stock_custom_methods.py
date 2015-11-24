@@ -485,6 +485,8 @@ def split_serial_no(doc):
 	if doc.serial_no:
 		serial_no = cstr(doc.serial_no).split('\n')
 		for sn in serial_no:
-			if frappe.db.get_value('Serial No', sn ,'status') == 'Available':
-				serial_no_data += '\n' + sn if serial_no_data else sn
+			if sn:
+				sn_details = frappe.db.get_value('Serial No', sn ,'*', as_dict=1)
+				if sn_details.status == 'Available' and sn_details.completed == 'Yes' and sn_details.warehouse == doc.warehouse:
+					serial_no_data += '\n' + sn if serial_no_data else sn
 	return serial_no_data
