@@ -895,7 +895,7 @@ def make_serial_no_log(serial_no, args, work_order, qc, emp):
 	if args:
 		# if cint(args.idx)>1:
 		# 	check_previous_is_closed(serial_no, args, work_order)
-		if args.trials:
+		if args.trials and cint(args.skip_trial) != 1:
 			if not frappe.db.get_value('Serial No Detail', {'parent':serial_no, 'process': args.process_name,'trial_no': args.trials,  'work_order': work_order}, 'name'):
 				make_sn_detail(serial_no, args, work_order, qc, emp)
 		elif not frappe.db.get_value('Serial No Detail', {'parent':serial_no, 'process': args.process_name, 'work_order': work_order}, 'name'):
@@ -916,14 +916,25 @@ def make_sn_detail(serial_no, args, work_order, qc, emp):
 	snd.parent = serial_no
 	snd.save(ignore_permissions=True)
 
-def update_status_to_completed(serial_no, process_data, trial_no, emp_status):
+def update_status_to_completed(serial_no, process_data, emp_status, args):
 	cond = "1=1"
-	if trial_no:
-		cond = "trial_no = '%s'"%(trial_no)
-	name = frappe.db.sql("""select name from `tabSerial No Detail` where parent='%s'
+	if args.tailor_process_trials:
+		cond = "trial_no = '%s'"%(args.tailor_process_trials)
+	name = frappe.db.sql("""select name, ifnull(extra_style_cost_given, 'No') from `tabSerial No Detail` where parent='%s'
 		and process_data='%s' and  %s"""%(serial_no, process_data, cond), as_list=1)
 	if name:
-		update_serial_no_log_status(name[0][0], emp_status)
+		extra_style_cost_given = get_details_extra_style_cost_given(name, args)
+		update_serial_no_log_status(name[0][0], emp_status, extra_style_cost_given)
+
+def get_details_extra_style_cost_given(sn_details, args):
+	status = sn_details[0][1]
+	if args.employee_status == 'Completed' and sn_details[0][1] == 'No' and args.extra_style_cost_given == 'Yes':
+		status = args.extra_style_cost_given
+	return status 
+
+def update_extra_style_cost_given(name, args):
+	if args.employee_status == 'Completed' and frappe.db.get_value('Serial No Detail', name, 'extra_style_cost_given') == 'No':
+		frappe.db.sql("Update `tabSerial No Detail` set status='%s' where name='%s'"%(status, name))	
 
 def get_idx_for_serialNo(args, pdd, process):
 	if args.tailor_process_trials:
@@ -932,20 +943,20 @@ def get_idx_for_serialNo(args, pdd, process):
 		return  frappe.db.get_value('Process Log' ,{'parent': pdd, 'process_name': process}, 'idx')
 
 def check_for_reassigned(serial_no, args, process):
-	cond = "1=1"
-	if args.tailor_process_trials:
-		cond = "trial_no='%s'"%(args.tailor_process_trials)
+	pass
+	# cond = "1=1"
+	# if args.tailor_process_trials:
+	# 	cond = "trial_no='%s'"%(args.tailor_process_trials)
 
-	name = frappe.db.sql("""select name from `tabSerial No Detail`
-		where parent='%s' and process='%s' and status='Completed' and %s"""%(serial_no, process, cond), as_list=1)
-	if name:
-		update_serial_no_log_status(name[0][0], 'Assigned')
-	else:
-		frappe.throw(_("already completed"))
+	# name = frappe.db.sql("""select name from `tabSerial No Detail`
+	# 	where parent='%s' and process='%s' and status='Completed' and %s"""%(serial_no, process, cond), as_list=1)
+	# if name:
+	# 	update_serial_no_log_status(name[0][0], 'Assigned')
+	# else:
+	# 	frappe.throw(_("already completed"))
 
-def update_serial_no_log_status(name, status):
-	frappe.db.sql("Update `tabSerial No Detail` set status='%s' where name='%s'"%(status, name))
-
+def update_serial_no_log_status(name, status, extra_style):
+	frappe.db.sql("Update `tabSerial No Detail` set status='%s', extra_style_cost_given = '%s' where name='%s'"%(status, extra_style, name))
 
 def make_stock_entry_against_qc(doc, method):
 	if doc.get('qa_specification_details'):

@@ -217,6 +217,17 @@
    "permlevel": 0, 
    "precision": "", 
    "read_only": 1
+  }, 
+  {
+   "default": "No", 
+   "fieldname": "extra_style_cost_given", 
+   "fieldtype": "Select", 
+   "hidden": 1, 
+   "label": "Extra Style Cost Given", 
+   "options": "Yes\nNo", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
   }
  ], 
  "hide_heading": 0, 
@@ -226,7 +237,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-04-28 02:29:36.299551", 
+ "modified": "2015-11-25 05:57:07.522049", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Employee Details", 

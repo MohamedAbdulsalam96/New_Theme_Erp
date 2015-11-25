@@ -392,6 +392,16 @@
   }, 
   {
    "default": "No", 
+   "fieldname": "extra_style_cost_given", 
+   "fieldtype": "Select", 
+   "hidden": 1, 
+   "label": "Extra Style Cost Given", 
+   "options": "Yes\nNo", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "default": "No", 
    "depends_on": "", 
    "fieldname": "deduct_late_work", 
    "fieldtype": "Select", 
@@ -430,7 +440,7 @@
    "options": "Employee Details", 
    "permlevel": 0, 
    "precision": "", 
-   "read_only": 0
+   "read_only": 1
   }, 
   {
    "fieldname": "section_break_19", 
@@ -592,7 +602,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2015-07-25 07:29:58.250051", 
+ "modified": "2015-11-25 05:55:59.660641", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

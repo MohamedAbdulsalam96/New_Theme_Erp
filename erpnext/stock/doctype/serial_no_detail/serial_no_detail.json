@@ -15,14 +15,16 @@
    "in_list_view": 1, 
    "label": "Process Data", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "assigned_person", 
    "fieldtype": "Data", 
    "label": "Assigned Person", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "allow_on_submit": 0, 
@@ -37,7 +39,7 @@
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
-   "read_only": 0, 
+   "read_only": 1, 
    "report_hide": 0, 
    "reqd": 0, 
    "search_index": 0, 
@@ -56,7 +58,7 @@
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
-   "read_only": 0, 
+   "read_only": 1, 
    "report_hide": 0, 
    "reqd": 0, 
    "search_index": 0, 
@@ -75,7 +77,7 @@
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
-   "read_only": 0, 
+   "read_only": 1, 
    "report_hide": 0, 
    "reqd": 0, 
    "search_index": 0, 
@@ -95,7 +97,7 @@
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
-   "read_only": 0, 
+   "read_only": 1, 
    "report_hide": 0, 
    "reqd": 0, 
    "search_index": 0, 
@@ -106,21 +108,34 @@
    "fieldtype": "Data", 
    "label": "idx_no", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "has_qc", 
    "fieldtype": "Check", 
    "label": "Has QC", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "qc_completed", 
    "fieldtype": "Data", 
    "label": "QC Completed", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "default": "No", 
+   "fieldname": "extra_style_cost_given", 
+   "fieldtype": "Select", 
+   "label": "Extra Style Cost Given", 
+   "options": "Yes\nNo", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
   }
  ], 
  "hide_heading": 0, 
@@ -130,7 +145,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2015-08-12 10:59:22.959343", 
+ "modified": "2015-11-25 05:57:52.309859", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Serial No Detail", 

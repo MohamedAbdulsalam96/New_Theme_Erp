@@ -206,7 +206,7 @@ class ProcessAllotment(Document):
 			serial_no_list = cstr(args.tailor_serial_no).split('\n')
 			for serial_no in serial_no_list:
 				if args.employee_status == 'Completed' or  args.employee_status == 'Reassigned' and not args.ste_no:
-					update_status_to_completed(serial_no, self.name, args.tailor_process_trials, self.emp_status)
+					update_status_to_completed(serial_no, self.name, self.emp_status, args)
 
 	def validate_trials(self, args):
 		if self.process_trials and cint(args.assigned_work_qty) > 1:
@@ -350,11 +350,11 @@ class ProcessAllotment(Document):
 			
 			for serial_no in serial_list:
 				check_dict = self.get_dic_List(serial_no)
-				if frappe.db.get_value('Serial No Detail', check_dict, 'status') == 'Reassigned':
+				if frappe.db.get_value('Serial No Detail', check_dict, 'extra_style_cost_given') == 'Yes':
 					break
 			else:		
 				if self.process_trials == 1 or not self.process_trials:
-					tailor_cost = self.calculate_process_wise_tailor_cost()	
+					tailor_cost = self.calculate_process_wise_tailor_cost()
 
 			if amount:
 				if amount[0].get('type_of_payment') == 'Percent' and self.payment=='Yes':
@@ -420,6 +420,7 @@ class ProcessAllotment(Document):
 	
 	def calculate_process_wise_tailor_cost(self):
 		tailor_cost = 0.0
+		self.extra_style_cost_given = 'No'	
 		process_wise_tailor_cost = frappe.db.sql(""" SELECT
 							    process_wise_tailor_cost
 							FROM
@@ -428,8 +429,9 @@ class ProcessAllotment(Document):
 							    parent = '{0}'
 							AND process_wise_tailor_cost LIKE "%{1}%"    """.format(self.work_order,self.process),as_list=1)
 		if process_wise_tailor_cost:
+			self.extra_style_cost_given = 'Yes'
 			for row in process_wise_tailor_cost:
-				tailor_cost += flt(eval(row[0]).get(self.process))	
+				tailor_cost += flt(eval(row[0]).get(self.process))
 		return tailor_cost		
 
 	def update_task(self):
@@ -639,6 +641,7 @@ class ProcessAllotment(Document):
 		emp.wages_per_single_piece = flt(self.wages_for_single_piece)
 		emp.tailor_wages = flt(self.wages)
 		emp.qc_required = cint(self.qc)
+		emp.extra_style_cost_given = self.extra_style_cost_given
 		if self.emp_status == 'Assigned':
 			self.task = self.create_task()
 		elif self.emp_status == 'Completed':
@@ -743,7 +746,7 @@ class ProcessAllotment(Document):
 			val.append('Reassigned')
 		if self.emp_status == 'Reassigned':
 			val.append('Completed')
-			val.remove('Assigned')
+			val.append('Assigned')
 			val.append('Reassigned')	 
 		check_dict = self.get_dic_List(serial_no)
 		if frappe.db.get_value('Serial No Detail', check_dict, 'status') not in val:
