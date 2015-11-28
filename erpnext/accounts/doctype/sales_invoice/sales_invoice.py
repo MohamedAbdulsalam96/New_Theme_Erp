@@ -663,9 +663,9 @@ def make_delivery_note(source_name, target_doc=None):
 			flt(source_doc.base_rate)
 		target_doc.amount = (flt(source_doc.qty) - flt(source_doc.delivered_qty)) * \
 			flt(source_doc.rate)
-		target_doc.qty = flt(source_doc.qty) - flt(source_doc.delivered_qty)
-		target_doc.serial_no = split_serial_no(source_doc)
-		target_doc.qty = count_serial_no(target_doc.serial_no)
+		# target_doc.qty = flt(source_doc.qty) - flt(source_doc.delivered_qty)
+		target_doc.serial_no = split_serial_no(source_doc) if frappe.db.get_value('Item', source_doc.item_code, 'is_stock_item') == 'Yes' and frappe.db.get_value('Item', doc.item_code, 'has_serial_no') == 'Yes' else ''	
+		target_doc.qty = count_serial_no(target_doc.serial_no) if frappe.db.get_value('Item', source_doc.item_code, 'is_stock_item') == 'Yes' and frappe.db.get_value('Item', doc.item_code, 'has_serial_no') == 'Yes' else flt(source_doc.qty) - flt(source_doc.delivered_qty)
 
 	doclist = get_mapped_doc("Sales Invoice", source_name, 	{
 		"Sales Invoice": {
@@ -682,7 +682,7 @@ def make_delivery_note(source_name, target_doc=None):
 				"serial_no": "serial_no"
 			},
 			"postprocess": update_item,
-			"condition" : lambda doc: len(split_serial_no(doc)) > 0 if frappe.db.get_value('Item', doc.item_code, 'has_serial_no') == 'Yes' else None
+			"condition" : lambda doc: len(split_serial_no(doc)) > 0 if frappe.db.get_value('Item', doc.item_code, 'is_stock_item') == 'Yes' and frappe.db.get_value('Item', doc.item_code, 'has_serial_no') == 'Yes' else None
 		},
 		"Sales Taxes and Charges": {
 			"doctype": "Sales Taxes and Charges",
