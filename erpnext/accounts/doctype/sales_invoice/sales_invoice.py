@@ -682,7 +682,7 @@ def make_delivery_note(source_name, target_doc=None):
 				"serial_no": "serial_no"
 			},
 			"postprocess": update_item,
-			"condition" : lambda doc: len(split_serial_no(doc)) > 0 if frappe.db.get_value('Item', doc.item_code, 'is_stock_item') == 'Yes' and frappe.db.get_value('Item', doc.item_code, 'has_serial_no') == 'Yes' else None
+			"condition" : lambda doc: len(split_serial_no(doc)) > 0 if frappe.db.get_value('Item', doc.item_code, 'is_stock_item') == 'Yes' and frappe.db.get_value('Item', doc.item_code, 'has_serial_no') == 'Yes' else doc.item_code
 		},
 		"Sales Taxes and Charges": {
 			"doctype": "Sales Taxes and Charges",
