@@ -321,6 +321,14 @@ class Trials(Document):
 				and process='%s'"""%(self.pdd, process))
 			self.save()
 
+	def on_trash(self):
+		self.remove_link_from_invoice()
+
+	def remove_link_from_invoice(self):
+		if self.sales_invoice:
+			frappe.db.sql(""" update `tabWork Order Distribution` set trials = (select true from dual where 1=2) 
+				where parent = "%(invoice_no)s" and trials = "%(trial_no)s" """%{'invoice_no': self.sales_invoice, 'trial_no': self.name})
+
 @frappe.whitelist()
 def get_serial_no_data(work_order):
 	return frappe.db.get_value('Work Order', work_order, 'serial_no_data') if work_order else ''

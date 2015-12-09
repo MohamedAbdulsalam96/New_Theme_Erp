@@ -126,6 +126,12 @@ class WorkOrder(Document):
 		# self.set_work_order()
 		# release_work_order(self)
 		self.add_total_cost_to_customer()
+		self.amend_work_order()
+
+	def amend_work_order(self):
+		if self.amended_from:
+			frappe.db.sql(""" update `tabWork Order Distribution` set tailor_work_order = "%s"
+				where tailor_work_order = "%s" """%(self.name, self.amended_from))
 
 	def validate_mandatory_fields(self):
 		mandatory_field = {'Measured By': self.measured_by}
@@ -175,6 +181,13 @@ class WorkOrder(Document):
 	def on_cancel(self):
 		self.update_status('Pending')
 		self.set_to_null()
+		self.check_trials()
+
+	def check_trials(self):
+		if self.trial_date:
+			trial = frappe.db.get_value('Trials', {'work_order': self.name}, 'name')
+			if trial:
+				frappe.throw(_("Delete the linked trials no {0}").format(trial))
 
 	def validate_trial_serial_no(self):
 		if self.serial_no_data and not self.trial_serial_no:

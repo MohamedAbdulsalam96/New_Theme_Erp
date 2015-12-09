@@ -1195,7 +1195,7 @@ def get_all_serial_no(filters):
 
 
 def validate_all_wo_submitted(doc,method):
-	wo_details = frappe.db.sql("select name from `tabWork Order` where sales_invoice_no = '{0}'  ".format(doc.name),as_list=1)
+	wo_details = frappe.db.sql("select name from `tabWork Order` where sales_invoice_no = '{0}' and docstatus <> 2 ".format(doc.name),as_list=1)
 	for work_order in wo_details:
 		if frappe.db.get_value("Work Order",work_order[0],'docstatus') != 1:
 			frappe.throw("Sales Invoice {0} can not be Submiited beacause Work order {1} is not Submitted".format(doc.name,work_order[0]))
