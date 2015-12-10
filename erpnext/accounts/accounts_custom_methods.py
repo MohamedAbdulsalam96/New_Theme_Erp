@@ -1468,7 +1468,7 @@ def after_install():
 	site = frappe.local.site_path.split('/')[1]
 	exec_cmd("../env/bin/frappe --use %s"%(site), cwd = path)
 	exec_cmd("../env/bin/frappe --latest", cwd = path)
-	print "executeddddddddddddddddd"
+	frappe.db.sql("update `tabSingles` set value=null where field = 'footer' and doctype = 'Outgoing Email Settings' ")
 
 def exec_cmd(cmd, cwd='.'):
 	try:
