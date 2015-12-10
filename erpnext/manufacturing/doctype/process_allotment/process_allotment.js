@@ -376,3 +376,10 @@ cur_frm.cscript.clear_all= function(doc, cdt, cdn){
   })
 
 }
+
+cur_frm.fields_dict['process_tailor'].get_query = function(doc) {
+	return{
+		query: "erpnext.manufacturing.doctype.process_allotment.process_allotment.get_employee_details",
+		filters: {'process': doc.process, 'item_code': doc.item}
+	}
+}

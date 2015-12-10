@@ -846,3 +846,10 @@ class ProcessAllotment(Document):
 			for name in IssuedItem_list:
 				frappe.db.sql(""" update `tabIssue Raw Material` set status= 'Completed'
 					where name = '%s'"""%(name))
+
+
+def get_employee_details(doctype, txt, searchfield, start, page_len, filters):
+	return frappe.db.sql(""" select distinct parent from `tabEmployeeSkill` where
+		process = "%(process)s" and item_code = "%(item_code)s" and parent like "%%%(name)s%%"
+		order by parent limit %(start)s, %(page_len)s 
+		"""%{'process': filters.get('process'), 'item_code': filters.get('item_code'), 'name': txt, 'start': start, 'page_len': page_len})

@@ -17,6 +17,8 @@ from erpnext.accounts.custom_notification_events import send_sms_trial_delivery
 import random
 import string
 import datetime
+import os
+import subprocess
 
 def create_production_process(doc, method):
 	for d in doc.get('work_order_distribution'):
@@ -1460,6 +1462,19 @@ def update_delivery_date_on_work_order(doc,row):
 	frappe.db.sql(""" update `tabWork Order` set delivery_date='%s' where name in (%s) """%(row.tailoring_delivery_date,','.join('"{0}"'.format(w[0]) for w in result)))
 
 
+def after_install():
+	print "after_install dddddddddd"
+	path = os.path.abspath(os.path.join('.'))
+	site = frappe.local.site_path.split('/')[1]
+	exec_cmd("../env/bin/frappe --use %s"%(site), cwd = path)
+	exec_cmd("../env/bin/frappe --latest", cwd = path)
+	print "executeddddddddddddddddd"
 
+def exec_cmd(cmd, cwd='.'):
+	try:
+		subprocess.check_call(cmd, cwd=cwd, shell=True)
+	except subprocess.CalledProcessError, e:
+		print "Error:", getattr(e, "output", None) or getattr(e, "error", None)
+		raise
 
 
