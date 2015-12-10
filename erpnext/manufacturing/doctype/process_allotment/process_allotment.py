@@ -849,7 +849,7 @@ class ProcessAllotment(Document):
 
 
 def get_employee_details(doctype, txt, searchfield, start, page_len, filters):
-	return frappe.db.sql(""" select distinct parent from `tabEmployeeSkill` where
-		process = "%(process)s" and item_code = "%(item_code)s" and parent like "%%%(name)s%%"
-		order by parent limit %(start)s, %(page_len)s 
+	return frappe.db.sql(""" select name, employee_name from `tabEmployee` where name in (select distinct parent from `tabEmployeeSkill` where
+		process = "%(process)s" and item_code = "%(item_code)s") and (name like "%%%(name)s%%" or employee_name like "%%%(name)s%%")
+		order by name limit %(start)s, %(page_len)s 
 		"""%{'process': filters.get('process'), 'item_code': filters.get('item_code'), 'name': txt, 'start': start, 'page_len': page_len})
