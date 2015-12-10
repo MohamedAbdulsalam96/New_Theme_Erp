@@ -687,7 +687,7 @@ def add_to_serial_no(args, work_order, sn_list=None, qc=0, emp=None):
 
 def stock_entry_for_out(args, target_branch, sn_list, qty, type_of_log='No'):
 	if target_branch != get_user_branch():
-		parent = frappe.db.get_value('Stock Entry Detail', {'target_branch':target_branch, 'docstatus':0, 's_warehouse': get_branch_warehouse(get_user_branch())}, 'parent')
+		parent = frappe.db.get_value('Stock Entry', {'t_branch':target_branch, 'docstatus':0, 'from_warehouse': get_branch_warehouse(get_user_branch())}, 'name')
 		if parent:
 			obj = frappe.get_doc('Stock Entry', parent)
 			stock_entry_of_child(obj, args, target_branch, sn_list, qty, type_of_log)

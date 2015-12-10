@@ -173,7 +173,7 @@ class Trials(Document):
 							    name IN (%s) """%(args.trial_date,','.join('"{0}"'.format(w[0]) for w in wo_result)))
 
 	def prepare_for_ste(self, trial_data, branch, data, msg):
-		parent = frappe.db.get_value('Stock Entry Detail', {'target_branch':data.branch, 'docstatus':0, 's_warehouse': get_branch_warehouse(trial_data.trial_branch)}, 'parent')
+		parent = frappe.db.get_value('Stock Entry', {'t_branch':data.branch, 'docstatus':0, 'from_warehouse': get_branch_warehouse(trial_data.trial_branch)}, 'name')
 		args = {'qty': 1, 'serial_data': self.trials_serial_no_status, 'work_order': self.work_order, 'item': self.item_code, 'trials': trial_data.next_trial_no}	
 		if parent:
 			st = frappe.get_doc('Stock Entry', parent)
