@@ -383,3 +383,12 @@ cur_frm.fields_dict['process_tailor'].get_query = function(doc) {
 		filters: {'process': doc.process, 'item_code': doc.item}
 	}
 }
+
+
+cur_frm.fields_dict['issue_raw_material'].grid.get_field('article_serial_no').get_query = function(doc, cdt, cdn) {
+	var d = locals[cdt][cdn];
+	return{
+		query: "erpnext.manufacturing.doctype.process_allotment.process_allotment.get_raw_serial_no",
+		filters: {'item_code': d.raw_material_item_code}
+	}
+}

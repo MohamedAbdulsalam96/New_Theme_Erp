@@ -853,3 +853,11 @@ def get_employee_details(doctype, txt, searchfield, start, page_len, filters):
 		process = "%(process)s" and item_code = "%(item_code)s") and (name like "%%%(name)s%%" or employee_name like "%%%(name)s%%")
 		order by name limit %(start)s, %(page_len)s 
 		"""%{'process': filters.get('process'), 'item_code': filters.get('item_code'), 'name': txt, 'start': start, 'page_len': page_len})
+
+def get_raw_serial_no(doctype, txt, searchfield, start, page_len, filters):
+	if filters.get('item_code'):
+		return frappe.db.sql(""" select name, item_name from `tabSerial No` where item_code = "%(item_code)s" and (name like "%%%(name)s%%" or item_name like "%%%(name)s%%")
+			order by name limit %(start)s, %(page_len)s 
+			"""%{'item_code': filters.get('item_code'), 'name': txt, 'start': start, 'page_len': page_len})
+	else:
+		return [['']]
