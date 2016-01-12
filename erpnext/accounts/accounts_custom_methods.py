@@ -250,6 +250,8 @@ def create_stock_entry(doc, data):
  	ste.purpose_type = 'Material Receipt'
  	ste.purpose ='Material Receipt'
  	ste.branch = get_user_branch()
+ 	ste.posting_date = doc.posting_date
+ 	ste.fiscal_year = doc.fiscal_year
  	make_stock_entry_of_child(ste,data,doc)
  	ste.save(ignore_permissions=True)
  	st = frappe.get_doc('Stock Entry', ste.name)
